@@ -13,3 +13,8 @@ target/
 .project
 .classpath
 参考/
+*.pem
+*.pub
+screenshots/
+tests/__pycache__/
+fix-curl-alias.ps1
