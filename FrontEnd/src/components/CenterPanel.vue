@@ -36,6 +36,9 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 import * as echarts from 'echarts'
+import { getWarehouseList } from '@/api/warehouse'
+import { getTransportList } from '@/api/transport'
+import { getOrderList } from '@/api/order'
 
 const ceshi8Ref = ref(null)
 const ceshi6Ref = ref(null)
@@ -56,6 +59,71 @@ const initChart8 = async () => {
   } catch (error) {
     console.error('加载中国地图数据失败:', error)
   }
+  
+  let mapData = [
+    { name: '北京', value: 1500 },
+    { name: '天津', value: 800 },
+    { name: '上海', value: 1800 },
+    { name: '重庆', value: 900 },
+    { name: '河北', value: 600 },
+    { name: '河南', value: 700 },
+    { name: '云南', value: 400 },
+    { name: '辽宁', value: 650 },
+    { name: '黑龙江', value: 500 },
+    { name: '湖南', value: 550 },
+    { name: '安徽', value: 480 },
+    { name: '山东', value: 1200 },
+    { name: '新疆', value: 300 },
+    { name: '江苏', value: 1600 },
+    { name: '浙江', value: 1400 },
+    { name: '江西', value: 450 },
+    { name: '湖北', value: 580 },
+    { name: '广西', value: 420 },
+    { name: '甘肃', value: 320 },
+    { name: '山西', value: 380 },
+    { name: '内蒙古', value: 350 },
+    { name: '陕西', value: 460 },
+    { name: '吉林', value: 520 },
+    { name: '福建', value: 850 },
+    { name: '贵州', value: 390 },
+    { name: '广东', value: 1900 },
+    { name: '青海', value: 280 },
+    { name: '西藏', value: 250 },
+    { name: '四川', value: 750 },
+    { name: '宁夏', value: 270 },
+    { name: '海南', value: 310 },
+    { name: '台湾', value: 600 },
+    { name: '香港', value: 1100 },
+    { name: '澳门', value: 500 }
+  ]
+  
+  try {
+    const response = await getWarehouseList()
+    if (response.code === 200 && response.data) {
+      const cityMap = {
+        '北京': '北京', '天津': '天津', '上海': '上海', '重庆': '重庆',
+        '河北': '河北', '河南': '河南', '云南': '云南', '辽宁': '辽宁',
+        '黑龙江': '黑龙江', '湖南': '湖南', '安徽': '安徽', '山东': '山东',
+        '新疆': '新疆', '江苏': '江苏', '浙江': '浙江', '江西': '江西',
+        '湖北': '湖北', '广西': '广西', '甘肃': '甘肃', '山西': '山西',
+        '内蒙古': '内蒙古', '陕西': '陕西', '吉林': '吉林', '福建': '福建',
+        '贵州': '贵州', '广东': '广东', '青海': '青海', '西藏': '西藏',
+        '四川': '四川', '宁夏': '宁夏', '海南': '海南', '台湾': '台湾',
+        '香港': '香港', '澳门': '澳门'
+      }
+      
+      mapData = mapData.map(item => {
+        const warehouse = response.data.find(w => w.location && cityMap[w.location] === item.name)
+        return {
+          name: item.name,
+          value: warehouse ? warehouse.capacity || item.value : item.value
+        }
+      })
+    }
+  } catch (error) {
+    console.error('获取仓库数据失败:', error)
+  }
+  
   const option = {
     tooltip: {
       trigger: 'item'
@@ -90,42 +158,7 @@ const initChart8 = async () => {
             areaColor: '#2a333d'
           }
         },
-        data: [
-          { name: '北京', value: 1500 },
-          { name: '天津', value: 800 },
-          { name: '上海', value: 1800 },
-          { name: '重庆', value: 900 },
-          { name: '河北', value: 600 },
-          { name: '河南', value: 700 },
-          { name: '云南', value: 400 },
-          { name: '辽宁', value: 650 },
-          { name: '黑龙江', value: 500 },
-          { name: '湖南', value: 550 },
-          { name: '安徽', value: 480 },
-          { name: '山东', value: 1200 },
-          { name: '新疆', value: 300 },
-          { name: '江苏', value: 1600 },
-          { name: '浙江', value: 1400 },
-          { name: '江西', value: 450 },
-          { name: '湖北', value: 580 },
-          { name: '广西', value: 420 },
-          { name: '甘肃', value: 320 },
-          { name: '山西', value: 380 },
-          { name: '内蒙古', value: 350 },
-          { name: '陕西', value: 460 },
-          { name: '吉林', value: 520 },
-          { name: '福建', value: 850 },
-          { name: '贵州', value: 390 },
-          { name: '广东', value: 1900 },
-          { name: '青海', value: 280 },
-          { name: '西藏', value: 250 },
-          { name: '四川', value: 750 },
-          { name: '宁夏', value: 270 },
-          { name: '海南', value: 310 },
-          { name: '台湾', value: 600 },
-          { name: '香港', value: 1100 },
-          { name: '澳门', value: 500 }
-        ]
+        data: mapData
       }
     ]
   }
@@ -137,8 +170,22 @@ const initChart8 = async () => {
   resizeObserver8.observe(ceshi8Ref.value)
 }
 
-const initChart6 = () => {
+const initChart6 = async () => {
   chart6 = echarts.init(ceshi6Ref.value)
+  
+  let inboundData = [120, 132, 101, 134, 90, 230, 210]
+  let outboundData = [220, 182, 191, 234, 290, 330, 310]
+  
+  try {
+    const response = await getTransportList()
+    if (response.code === 200 && response.data) {
+      inboundData = response.data.slice(0, 7).map(item => item.vehicleCount || 0)
+      outboundData = response.data.slice(0, 7).map(item => item.totalDistance || 0)
+    }
+  } catch (error) {
+    console.error('获取运输数据失败:', error)
+  }
+  
   const option = {
     tooltip: {
       trigger: 'axis'
@@ -166,7 +213,7 @@ const initChart6 = () => {
       {
         name: '入库量',
         type: 'line',
-        data: [120, 132, 101, 134, 90, 230, 210],
+        data: inboundData,
         itemStyle: {
           color: '#5bc0de'
         }
@@ -174,7 +221,7 @@ const initChart6 = () => {
       {
         name: '出库量',
         type: 'line',
-        data: [220, 182, 191, 234, 290, 330, 310],
+        data: outboundData,
         itemStyle: {
           color: '#f59a8f'
         }
@@ -189,8 +236,62 @@ const initChart6 = () => {
   resizeObserver6.observe(ceshi6Ref.value)
 }
 
-const initChart7 = () => {
+const initChart7 = async () => {
   chart7 = echarts.init(ceshi7Ref.value)
+  
+  let warehouseData = [320, 302, 301, 334]
+  let transportData = [120, 132, 101, 134]
+  let deliveryData = [220, 182, 191, 234]
+  
+  try {
+    const response = await getOrderList()
+    if (response.code === 200 && response.data) {
+      const q1Data = response.data.filter(item => {
+        if (!item.orderDate) return false
+        const date = new Date(item.orderDate)
+        return date.getMonth() >= 0 && date.getMonth() <= 2
+      })
+      const q2Data = response.data.filter(item => {
+        if (!item.orderDate) return false
+        const date = new Date(item.orderDate)
+        return date.getMonth() >= 3 && date.getMonth() <= 5
+      })
+      const q3Data = response.data.filter(item => {
+        if (!item.orderDate) return false
+        const date = new Date(item.orderDate)
+        return date.getMonth() >= 6 && date.getMonth() <= 8
+      })
+      const q4Data = response.data.filter(item => {
+        if (!item.orderDate) return false
+        const date = new Date(item.orderDate)
+        return date.getMonth() >= 9 && date.getMonth() <= 11
+      })
+      
+      warehouseData = [
+        q1Data.reduce((sum, item) => sum + (item.orderAmount || 0), 0),
+        q2Data.reduce((sum, item) => sum + (item.orderAmount || 0), 0),
+        q3Data.reduce((sum, item) => sum + (item.orderAmount || 0), 0),
+        q4Data.reduce((sum, item) => sum + (item.orderAmount || 0), 0)
+      ]
+      
+      transportData = [
+        q1Data.reduce((sum, item) => sum + (item.orderAmount || 0) * 0.3, 0),
+        q2Data.reduce((sum, item) => sum + (item.orderAmount || 0) * 0.3, 0),
+        q3Data.reduce((sum, item) => sum + (item.orderAmount || 0) * 0.3, 0),
+        q4Data.reduce((sum, item) => sum + (item.orderAmount || 0) * 0.3, 0)
+      ]
+      
+      deliveryData = [
+        q1Data.reduce((sum, item) => sum + (item.orderAmount || 0) * 0.2, 0),
+        q2Data.reduce((sum, item) => sum + (item.orderAmount || 0) * 0.2, 0),
+        q3Data.reduce((sum, item) => sum + (item.orderAmount || 0) * 0.2, 0),
+        q4Data.reduce((sum, item) => sum + (item.orderAmount || 0) * 0.2, 0)
+      ]
+    }
+  } catch (error) {
+    console.error('获取订单数据失败:', error)
+  }
+  
   const option = {
     tooltip: {
       trigger: 'axis',
@@ -222,7 +323,7 @@ const initChart7 = () => {
         name: '仓储',
         type: 'bar',
         stack: 'total',
-        data: [320, 302, 301, 334],
+        data: warehouseData,
         itemStyle: {
           color: '#8d7fec'
         }
@@ -231,7 +332,7 @@ const initChart7 = () => {
         name: '运输',
         type: 'bar',
         stack: 'total',
-        data: [120, 132, 101, 134],
+        data: transportData,
         itemStyle: {
           color: '#5085f2'
         }
@@ -240,7 +341,7 @@ const initChart7 = () => {
         name: '配送',
         type: 'bar',
         stack: 'total',
-        data: [220, 182, 191, 234],
+        data: deliveryData,
         itemStyle: {
           color: '#e75fc3'
         }

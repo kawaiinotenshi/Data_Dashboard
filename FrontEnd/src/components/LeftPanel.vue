@@ -34,6 +34,8 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 import * as echarts from 'echarts'
+import { getInventoryList } from '@/api/inventory'
+import { getOrderList } from '@/api/order'
 
 const ceshiRef = ref(null)
 const ceshi2Ref = ref(null)
@@ -42,9 +44,9 @@ let chart2 = null
 let resizeObserver1 = null
 let resizeObserver2 = null
 
-const initChart1 = () => {
+const initChart1 = async () => {
   chart1 = echarts.init(ceshiRef.value)
-  const ydata = [
+  let ydata = [
     { name: '京东', value: 18 },
     { name: '拼多多', value: 16 },
     { name: '淘宝', value: 15 },
@@ -56,6 +58,17 @@ const initChart1 = () => {
     { name: '航空专用仓', value: 4.5 },
     { name: '大型设备专用仓', value: 3 }
   ]
+  try {
+    const response = await getInventoryList()
+    if (response.code === 200 && response.data) {
+      ydata = response.data.map((item, index) => ({
+        name: item.enterpriseName || `仓库${index + 1}`,
+        value: item.ratio || 0
+      }))
+    }
+  } catch (error) {
+    console.error('获取库存数据失败:', error)
+  }
   const color = [
     '#8d7fec',
     '#5085f2',
@@ -68,18 +81,7 @@ const initChart1 = () => {
     '#57e7ec',
     '#cf9ef1'
   ]
-  const xdata = [
-    '京东',
-    '拼多多',
-    '淘宝',
-    '唯品会',
-    '跨境仓1',
-    '东南亚仓1',
-    '西欧仓1',
-    '北欧仓1',
-    '航空专用仓',
-    '大型设备专用仓'
-  ]
+  const xdata = ydata.map(item => item.name)
 
   const option = {
     color: color,
@@ -143,8 +145,17 @@ const initChart1 = () => {
   resizeObserver1.observe(ceshiRef.value)
 }
 
-const initChart2 = () => {
+const initChart2 = async () => {
   chart2 = echarts.init(ceshi2Ref.value)
+  let barData = [120, 132, 101, 134, 90, 230, 210, 180, 200, 190, 220, 250]
+  try {
+    const response = await getOrderList()
+    if (response.code === 200 && response.data) {
+      barData = response.data.slice(0, 12).map(item => item.orderAmount || 0)
+    }
+  } catch (error) {
+    console.error('获取订单数据失败:', error)
+  }
   const option = {
     tooltip: {
       trigger: 'axis',
@@ -175,7 +186,7 @@ const initChart2 = () => {
       {
         name: '清关量',
         type: 'bar',
-        data: [120, 132, 101, 134, 90, 230, 210, 180, 200, 190, 220, 250],
+        data: barData,
         itemStyle: {
           color: '#5bc0de'
         }

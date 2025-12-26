@@ -110,6 +110,9 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 import * as echarts from 'echarts'
+import { getWarehouseList } from '@/api/warehouse'
+import { getInventoryList } from '@/api/inventory'
+import { getOrderList } from '@/api/order'
 
 const activeTab = ref(0)
 const ceshi3Ref = ref(null)
@@ -135,8 +138,24 @@ const scrollData = ref([
   { name: '10.蔬菜', rate: '1.8%', amount: '41顿' }
 ])
 
-const initChart3 = () => {
+const initChart3 = async () => {
   chart3 = echarts.init(ceshi3Ref.value)
+  
+  let chartData = { name: '大连仓', value: 75 }
+  
+  try {
+    const response = await getWarehouseList()
+    if (response.code === 200 && response.data && response.data.length > 0) {
+      const warehouse = response.data.find(w => w.name === '大连仓') || response.data[0]
+      chartData = {
+        name: warehouse.name || '大连仓',
+        value: warehouse.utilizationRate || 75
+      }
+    }
+  } catch (error) {
+    console.error('获取仓库数据失败:', error)
+  }
+  
   const option = {
     tooltip: {
       formatter: '{a} <br/>{b} : {c}%'
@@ -234,12 +253,7 @@ const initChart3 = () => {
           fontSize: 12,
           color: '#fff'
         },
-        data: [
-          {
-            value: 75,
-            name: '大连仓'
-          }
-        ]
+        data: [chartData]
       }
     ]
   }
@@ -251,8 +265,24 @@ const initChart3 = () => {
   resizeObserver3.observe(ceshi3Ref.value)
 }
 
-const initChart4 = () => {
+const initChart4 = async () => {
   chart4 = echarts.init(ceshi4Ref.value)
+  
+  let chartData = { name: '青岛仓', value: 82 }
+  
+  try {
+    const response = await getWarehouseList()
+    if (response.code === 200 && response.data && response.data.length > 0) {
+      const warehouse = response.data.find(w => w.name === '青岛仓') || response.data[1] || response.data[0]
+      chartData = {
+        name: warehouse.name || '青岛仓',
+        value: warehouse.utilizationRate || 82
+      }
+    }
+  } catch (error) {
+    console.error('获取仓库数据失败:', error)
+  }
+  
   const option = {
     tooltip: {
       formatter: '{a} <br/>{b} : {c}%'
@@ -350,12 +380,7 @@ const initChart4 = () => {
           fontSize: 12,
           color: '#fff'
         },
-        data: [
-          {
-            value: 82,
-            name: '青岛仓'
-          }
-        ]
+        data: [chartData]
       }
     ]
   }
@@ -367,8 +392,24 @@ const initChart4 = () => {
   resizeObserver4.observe(ceshi4Ref.value)
 }
 
-const initChart5 = () => {
+const initChart5 = async () => {
   chart5 = echarts.init(ceshi5Ref.value)
+  
+  let chartData = { name: '宁波仓', value: 68 }
+  
+  try {
+    const response = await getWarehouseList()
+    if (response.code === 200 && response.data && response.data.length > 0) {
+      const warehouse = response.data.find(w => w.name === '宁波仓') || response.data[2] || response.data[0]
+      chartData = {
+        name: warehouse.name || '宁波仓',
+        value: warehouse.utilizationRate || 68
+      }
+    }
+  } catch (error) {
+    console.error('获取仓库数据失败:', error)
+  }
+  
   const option = {
     tooltip: {
       formatter: '{a} <br/>{b} : {c}%'
@@ -466,12 +507,7 @@ const initChart5 = () => {
           fontSize: 12,
           color: '#fff'
         },
-        data: [
-          {
-            value: 68,
-            name: '宁波仓'
-          }
-        ]
+        data: [chartData]
       }
     ]
   }
