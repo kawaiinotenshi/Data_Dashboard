@@ -157,7 +157,21 @@ docker exec -it logistics-mysql bash
 
 ```
 大数据面板/
-├── docker-compose.yml          # Docker Compose 配置文件
+├── deploy/                     # 部署配置文件
+│   ├── docker-compose.yml     # Docker Compose 配置文件
+│   ├── docker-compose-db.yml  # Docker 数据库配置文件
+│   ├── pytest.ini             # Pytest 配置文件
+│   └── requirements-test.txt  # Python 测试依赖
+├── docs/                       # 文档目录
+│   ├── CHANGELOG.md           # 项目变更日志
+│   ├── DEPLOY.md              # Docker 部署文档
+│   ├── DEPLOY_LOCAL.md        # 本地部署文档
+│   ├── DOCKER_DB.md           # Docker 数据库部署文档
+│   └── 环境配置参考.md         # 环境配置参考文档
+├── scripts/                    # 脚本目录
+│   ├── log-utility.ps1        # 日志工具脚本
+│   ├── start-docker-db.ps1    # 启动 Docker 数据库脚本
+│   └── stop-docker-db.ps1     # 停止 Docker 数据库脚本
 ├── FrontEnd/                   # 前端项目
 │   ├── Dockerfile              # 前端 Docker 镜像构建文件
 │   ├── nginx.conf              # Nginx 配置文件
@@ -366,7 +380,7 @@ MYSQL_USER=app_user
 MYSQL_PASSWORD=app_password
 ```
 
-修改 `docker-compose.yml`：
+修改 `deploy/docker-compose.yml`：
 
 ```yaml
 environment:
@@ -440,7 +454,7 @@ docker-compose up -d
 ## 常见问题
 
 ### Q: 如何修改前端访问端口？
-A: 修改 `docker-compose.yml` 中 frontend 服务的 ports 配置。
+A: 修改 `deploy/docker-compose.yml` 中 frontend 服务的 ports 配置。
 
 ### Q: 如何查看数据库数据？
 A: 使用 MySQL 客户端连接或进入容器：

@@ -35,7 +35,7 @@ CREATE TABLE customs_clearance (
     country VARCHAR(50) NOT NULL COMMENT '国家',
     product_type VARCHAR(100) COMMENT '产品类型',
     quantity DECIMAL(10,2) COMMENT '数量(吨)',
-    year_month VARCHAR(7) COMMENT '年月(yyyy-MM)',
+    `year_month` VARCHAR(7) COMMENT '年月(yyyy-MM)',
     growth_rate DECIMAL(5,2) COMMENT '同比增长率(%)',
     created_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='清关数据表';
@@ -94,7 +94,7 @@ INSERT INTO inventory_ratio (enterprise_name, ratio, month) VALUES
 ('其他', 7.50, '2025-12');
 
 -- 清关数据
-INSERT INTO customs_clearance (country, product_type, quantity, year_month, growth_rate) VALUES 
+INSERT INTO customs_clearance (country, product_type, quantity, `year_month`, growth_rate) VALUES 
 ('英国', '电子产品', 4500.00, '2025-12', 12.50),
 ('英国', '服装', 3200.00, '2025-12', 8.30),
 ('英国', '食品', 2800.00, '2025-12', 15.20),
