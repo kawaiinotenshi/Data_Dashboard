@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.logistics.mapper.CustomerMapper">
+
+    <resultMap id="BaseResultMap" type="com.logistics.entity.Customer">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="contact_person" property="contactPerson" jdbcType="VARCHAR"/>
+        <result column="phone" property="phone" jdbcType="VARCHAR"/>
+        <result column="address" property="address" jdbcType="VARCHAR"/>
+        <result column="created_time" property="createdTime" jdbcType="TIMESTAMP"/>
+        <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <select id="selectCustomerStatistics" resultType="java.util.Map">
+        SELECT 
+            COUNT(*) as totalCount,
+            COUNT(DISTINCT address) as addressCount,
+            COUNT(DISTINCT contact_person) as contactPersonCount
+        FROM customer
+    </select>
+
+    <select id="selectCustomersByName" resultMap="BaseResultMap">
+        SELECT * FROM customer
+        WHERE name LIKE CONCAT('%', #{name}, '%')
+        ORDER BY created_time DESC
+    </select>
+
+    <select id="selectCustomersByAddress" resultMap="BaseResultMap">
+        SELECT * FROM customer
+        WHERE address LIKE CONCAT('%', #{address}, '%')
+        ORDER BY created_time DESC
+    </select>
+
+    <select id="selectCustomerOrderCount" resultType="java.util.Map">
+        SELECT 
+            c.id,
+            c.name,
+            c.contact_person,
+            c.phone,
+            c.address,
+            COUNT(o.id) as orderCount,
+            COALESCE(SUM(o.order_amount), 0) as totalOrderAmount
+        FROM customer c
+        LEFT JOIN orders o ON c.name = o.customer_name
+        GROUP BY c.id, c.name, c.contact_person, c.phone, c.address
+        ORDER BY orderCount DESC
+    </select>
+
+</mapper>

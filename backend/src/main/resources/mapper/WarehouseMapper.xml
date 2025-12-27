@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.logistics.mapper.WarehouseMapper">
+
+    <resultMap id="BaseResultMap" type="com.logistics.entity.Warehouse">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="location" property="location" jdbcType="VARCHAR"/>
+        <result column="area" property="area" jdbcType="DECIMAL"/>
+        <result column="utilization_rate" property="utilizationRate" jdbcType="DECIMAL"/>
+        <result column="capacity" property="capacity" jdbcType="DECIMAL"/>
+        <result column="throughput" property="throughput" jdbcType="DECIMAL"/>
+        <result column="created_time" property="createdTime" jdbcType="TIMESTAMP"/>
+        <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <select id="selectWarehouseStatistics" resultType="java.util.Map">
+        SELECT 
+            COUNT(*) as totalCount,
+            SUM(capacity) as totalCapacity,
+            SUM(throughput) as totalThroughput,
+            AVG(utilization_rate) as avgUtilizationRate,
+            MAX(capacity) as maxCapacity,
+            MIN(capacity) as minCapacity
+        FROM warehouse
+    </select>
+
+    <select id="selectWarehousesByLocation" resultMap="BaseResultMap">
+        SELECT * FROM warehouse
+        WHERE location LIKE CONCAT('%', #{location}, '%')
+        ORDER BY capacity DESC
+    </select>
+
+    <select id="selectWarehousesByUtilizationRange" resultMap="BaseResultMap">
+        SELECT * FROM warehouse
+        WHERE utilization_rate BETWEEN #{minRate} AND #{maxRate}
+        ORDER BY utilization_rate DESC
+    </select>
+
+    <select id="selectWarehouseCapacityRanking" resultType="java.util.Map">
+        SELECT 
+            id,
+            name,
+            location,
+            capacity,
+            throughput,
+            utilization_rate,
+            (throughput / capacity * 100) as efficiency
+        FROM warehouse
+        ORDER BY capacity DESC
+        LIMIT 10
+    </select>
+
+</mapper>

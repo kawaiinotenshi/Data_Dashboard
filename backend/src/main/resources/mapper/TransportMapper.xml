@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.logistics.mapper.TransportMapper">
+
+    <resultMap id="BaseResultMap" type="com.logistics.entity.Transport">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="vehicle_type" property="vehicleType" jdbcType="VARCHAR"/>
+        <result column="vehicle_count" property="vehicleCount" jdbcType="INTEGER"/>
+        <result column="total_distance" property="totalDistance" jdbcType="DECIMAL"/>
+        <result column="month" property="month" jdbcType="VARCHAR"/>
+        <result column="created_time" property="createdTime" jdbcType="TIMESTAMP"/>
+        <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <select id="selectTransportStatistics" resultType="java.util.Map">
+        SELECT 
+            COUNT(*) as totalCount,
+            SUM(vehicle_count) as totalVehicleCount,
+            SUM(total_distance) as totalDistance,
+            AVG(total_distance) as avgDistance,
+            MAX(total_distance) as maxDistance,
+            MIN(total_distance) as minDistance,
+            COUNT(DISTINCT vehicle_type) as vehicleTypeCount,
+            COUNT(DISTINCT month) as monthCount
+        FROM transport
+    </select>
+
+    <select id="selectTransportByMonth" resultMap="BaseResultMap">
+        SELECT * FROM transport
+        WHERE month = #{month}
+        ORDER BY total_distance DESC
+    </select>
+
+    <select id="selectTransportByVehicleType" resultMap="BaseResultMap">
+        SELECT * FROM transport
+        WHERE vehicle_type = #{vehicleType}
+        ORDER BY month DESC
+    </select>
+
+    <select id="selectTransportTrend" resultType="java.util.Map">
+        SELECT 
+            month,
+            SUM(vehicle_count) as totalVehicleCount,
+            SUM(total_distance) as totalDistance,
+            AVG(total_distance) as avgDistance,
+            COUNT(DISTINCT vehicle_type) as vehicleTypeCount
+        FROM transport
+        GROUP BY month
+        ORDER BY month ASC
+    </select>
+
+    <select id="selectTransportByVehicleTypeGroup" resultType="java.util.Map">
+        SELECT 
+            vehicle_type,
+            SUM(vehicle_count) as totalVehicleCount,
+            SUM(total_distance) as totalDistance,
+            AVG(total_distance) as avgDistance,
+            COUNT(*) as recordCount
+        FROM transport
+        GROUP BY vehicle_type
+        ORDER BY totalDistance DESC
+    </select>
+
+</mapper>

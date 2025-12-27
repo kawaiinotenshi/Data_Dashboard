@@ -1,5 +1,53 @@
 # 更新日志
 
+## [2025-12-28]
+
+### MyBatis-Plus架构最佳实践
+- 实现统一异常处理机制（GlobalExceptionHandler）
+- 集成SLF4J日志系统，配置日志级别和输出格式
+- 添加性能优化配置（SQL性能分析、分页优化）
+- 实现代码生成器最佳实践（CodeGenerator）
+- 添加代码生成器使用指南文档（CODE_GENERATOR_GUIDE.md）
+
+### 架构改进
+- **GlobalExceptionHandler**: 统一处理所有异常类型
+  - 业务异常（BusinessException）
+  - 数据库异常（DuplicateKeyException, DataIntegrityViolationException）
+  - 参数验证异常（MethodArgumentNotValidException）
+  - 系统异常（Exception）
+- **日志配置**: 分层日志管理
+  - 开发环境：DEBUG级别，控制台输出
+  - 生产环境：INFO级别，文件输出
+  - SQL日志：MyBatis-Plus SQL性能分析
+- **性能优化**:
+  - MyBatis-Plus性能分析插件
+  - 分页插件优化
+  - 批量操作优化
+
+### 代码生成器
+- **CodeGenerator**: 自动化代码生成工具
+  - Entity实体类生成
+  - Mapper接口生成
+  - Service接口和实现类生成
+  - Controller控制器生成
+  - 支持自定义模板和配置
+- **生成器配置**: generator.properties
+  - 数据库连接配置
+  - 包名和模块名配置
+  - 表名前缀和后缀配置
+  - 作者和日期配置
+
+### 项目维护
+- 验证项目运行状态（后端和前端服务正常）
+- 清理冗余文件（删除临时日志文件）
+- 验证项目结构完整性
+- 准备Git版本控制提交
+
+### 文档
+- 添加MyBatis-Plus重构文档（MYBATIS_PLUS_REFACTOR.md）
+- 添加代码生成器使用指南（CODE_GENERATOR_GUIDE.md）
+- 更新项目变更日志（CHANGELOG.md）
+
 ## [2025-12-26]
 
 ### 新增功能

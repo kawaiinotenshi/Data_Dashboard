@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.logistics.mapper.SupplierMapper">
+
+    <resultMap id="BaseResultMap" type="com.logistics.entity.Supplier">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="contact_person" property="contactPerson" jdbcType="VARCHAR"/>
+        <result column="phone" property="phone" jdbcType="VARCHAR"/>
+        <result column="address" property="address" jdbcType="VARCHAR"/>
+        <result column="created_time" property="createdTime" jdbcType="TIMESTAMP"/>
+        <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <select id="selectSupplierStatistics" resultType="java.util.Map">
+        SELECT 
+            COUNT(*) as totalCount,
+            COUNT(DISTINCT address) as addressCount,
+            COUNT(DISTINCT contact_person) as contactPersonCount
+        FROM supplier
+    </select>
+
+    <select id="selectSuppliersByName" resultMap="BaseResultMap">
+        SELECT * FROM supplier
+        WHERE name LIKE CONCAT('%', #{name}, '%')
+        ORDER BY created_time DESC
+    </select>
+
+    <select id="selectSuppliersByAddress" resultMap="BaseResultMap">
+        SELECT * FROM supplier
+        WHERE address LIKE CONCAT('%', #{address}, '%')
+        ORDER BY created_time DESC
+    </select>
+
+    <select id="selectSupplierByContactRanking" resultType="java.util.Map">
+        SELECT 
+            id,
+            name,
+            contact_person,
+            phone,
+            address,
+            created_time
+        FROM supplier
+        ORDER BY created_time DESC
+        LIMIT 10
+    </select>
+
+</mapper>
