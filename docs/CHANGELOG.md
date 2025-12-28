@@ -2,6 +2,28 @@
 
 ## [2025-12-28]
 
+### 项目启动器开发
+- 开发可视化项目启动器（launcher.py）
+- 实现环境验证功能（Java、Node.js、MySQL、Docker、Maven、Nginx）
+- 实现配置管理功能（路径、端口、数据库配置）
+- 实现服务控制功能（启动/停止/重启服务）
+- 实现日志监控功能（实时日志显示和过滤）
+- 添加端口冲突检测和自动进程清理
+- 添加启动器使用指南文档（LAUNCHER_GUIDE.md）
+
+### MCP MySQL配置修复
+- 修复MCP MySQL连接问题（spawn uvx ENOENT错误）
+- 安装uv工具包（python -m pip install uv）
+- 配置正确的MCP启动命令（python -m uv tool run --from mysql-mcp-server mysql_mcp_server）
+- 验证MCP MySQL连接成功（端口3307，数据库logistics_db）
+- 添加MCP配置修复文档（MCP_MYSQL_FIX.md）
+
+### 数据库优化
+- 修复数据库schema问题（添加is_deleted和version字段）
+- 创建数据库修复脚本（fix_schema.sql）
+- 创建数据库初始化脚本（init.sql）
+- 验证数据库表结构和数据完整性
+
 ### MyBatis-Plus架构最佳实践
 - 实现统一异常处理机制（GlobalExceptionHandler）
 - 集成SLF4J日志系统，配置日志级别和输出格式
@@ -46,6 +68,8 @@
 ### 文档
 - 添加MyBatis-Plus重构文档（MYBATIS_PLUS_REFACTOR.md）
 - 添加代码生成器使用指南（CODE_GENERATOR_GUIDE.md）
+- 添加项目启动器使用指南（LAUNCHER_GUIDE.md）
+- 添加MCP MySQL配置修复文档（MCP_MYSQL_FIX.md）
 - 更新项目变更日志（CHANGELOG.md）
 
 ## [2025-12-26]

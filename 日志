@@ -1,0 +1,124 @@
+[2025-12-28 14:44:46] [INFO] 开始检查环境依赖...
+[2025-12-28 14:44:46] [SUCCESS] 环境检查完成
+[2025-12-28 14:46:45] [INFO] 开始检查环境依赖...
+[2025-12-28 14:46:45] [SUCCESS] 环境检查完成
+[2025-12-28 14:46:46] [INFO] 开始检查环境依赖...
+[2025-12-28 14:46:46] [SUCCESS] 环境检查完成
+[2025-12-28 14:46:48] [INFO] 开始检查环境依赖...
+[2025-12-28 14:46:48] [SUCCESS] 环境检查完成
+[2025-12-28 14:46:48] [INFO] 开始检查环境依赖...
+[2025-12-28 14:46:48] [SUCCESS] 环境检查完成
+[2025-12-28 14:46:48] [INFO] 开始检查环境依赖...
+[2025-12-28 14:46:48] [SUCCESS] 环境检查完成
+[2025-12-28 14:46:48] [INFO] 开始检查环境依赖...
+[2025-12-28 14:46:48] [SUCCESS] 环境检查完成
+[2025-12-28 14:46:56] [INFO] 正在启动 MySQL 服务...
+[2025-12-28 14:46:56] [INFO] MySQL Docker 容器已启动
+[2025-12-28 14:46:56] [ERROR] MySQL 服务启动失败: 'StringVar' object has no attribute 'config'
+[2025-12-28 14:46:58] [INFO] 正在启动 后端 服务...
+[2025-12-28 14:46:58] [ERROR] 后端 服务启动失败: 'StringVar' object has no attribute 'config'
+[2025-12-28 14:47:00] [INFO] [后端] 
+[2025-12-28 14:47:00] [INFO] [后端] .   ____          _            __ _ _
+[2025-12-28 14:47:00] [INFO] [后端] /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+[2025-12-28 14:47:00] [INFO] [后端] ( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+[2025-12-28 14:47:00] [INFO] [后端] \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+[2025-12-28 14:47:00] [INFO] [后端] '  |____| .__|_| |_|_| |_\__, | / / / /
+[2025-12-28 14:47:00] [INFO] [后端] =========|_|==============|___/=/_/_/_/
+[2025-12-28 14:47:00] [INFO] [后端] :: Spring Boot ::               (v2.7.18)
+[2025-12-28 14:47:00] [INFO] [后端] 
+[2025-12-28 14:47:00] [INFO] [后端] 2025-12-28 14:47:00.230  INFO 32436 --- [           main] com.logistics.LogisticsApplication       : Starting LogisticsApplication v1.0.0 using Java 1.8.0_392 on KawaiiTenshi with PID 32436 (C:\Users\15071\Documents\大数据面板\backend\target\logistics-dashboard-1.0.0.jar started by 15071 in C:\Users\15071\Documents\大数据面板\backend)
+[2025-12-28 14:47:00] [INFO] [后端] 2025-12-28 14:47:00.233 DEBUG 32436 --- [           main] com.logistics.LogisticsApplication       : Running with Spring Boot v2.7.18, Spring v5.3.31
+[2025-12-28 14:47:00] [INFO] [后端] 2025-12-28 14:47:00.235  INFO 32436 --- [           main] com.logistics.LogisticsApplication       : No active profile set, falling back to 1 default profile: "default"
+[2025-12-28 14:47:00] [INFO] 开始启动所有服务...
+[2025-12-28 14:47:01] [INFO] 正在启动 MySQL 服务...
+[2025-12-28 14:47:01] [INFO] [后端] 2025-12-28 14:47:01.874  INFO 32436 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8080 (http)
+[2025-12-28 14:47:01] [INFO] [后端] 2025-12-28 14:47:01.891  INFO 32436 --- [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+[2025-12-28 14:47:01] [INFO] MySQL Docker 容器已启动
+[2025-12-28 14:47:01] [INFO] [后端] 2025-12-28 14:47:01.891  INFO 32436 --- [           main] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.83]
+[2025-12-28 14:47:01] [ERROR] MySQL 服务启动失败: 'StringVar' object has no attribute 'config'
+[2025-12-28 14:47:01] [INFO] [后端] 2025-12-28 14:47:01.999  INFO 32436 --- [           main] o.a.c.c.C.[Tomcat].[localhost].[/api]    : Initializing Spring embedded WebApplicationContext
+[2025-12-28 14:47:02] [INFO] [后端] 2025-12-28 14:47:01.999  INFO 32436 --- [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1683 ms
+[2025-12-28 14:47:02] [INFO] [后端] Logging initialized using 'class org.apache.ibatis.logging.stdout.StdOutImpl' adapter.
+[2025-12-28 14:47:02] [INFO] [后端] Registered plugin: 'com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor@3590fc5b'
+[2025-12-28 14:47:02] [INFO] [后端] Parsed mapper file: 'class path resource [mapper/CustomerMapper.xml]'
+[2025-12-28 14:47:02] [INFO] [后端] Parsed mapper file: 'class path resource [mapper/InventoryMapper.xml]'
+[2025-12-28 14:47:02] [INFO] [后端] Parsed mapper file: 'class path resource [mapper/OrderMapper.xml]'
+[2025-12-28 14:47:02] [INFO] [后端] Parsed mapper file: 'class path resource [mapper/SupplierMapper.xml]'
+[2025-12-28 14:47:02] [INFO] [后端] Parsed mapper file: 'class path resource [mapper/TransportMapper.xml]'
+[2025-12-28 14:47:02] [INFO] [后端] Parsed mapper file: 'class path resource [mapper/WarehouseMapper.xml]'
+[2025-12-28 14:47:03] [INFO] [后端] _ _   |_  _ _|_. ___ _ |    _
+[2025-12-28 14:47:03] [INFO] [后端] | | |\/|_)(_| | |_\  |_)||_|_\
+[2025-12-28 14:47:03] [INFO] [后端] /               |
+[2025-12-28 14:47:03] [INFO] [后端] 3.5.3.1
+[2025-12-28 14:47:04] [INFO] [后端] 2025-12-28 14:47:04.235  WARN 32436 --- [           main] ConfigServletWebServerApplicationContext : Exception encountered during context initialization - cancelling refresh attempt: org.springframework.context.ApplicationContextException: Failed to start bean 'webServerStartStop'; nested exception is org.springframework.boot.web.server.PortInUseException: Port 8080 is already in use
+[2025-12-28 14:47:04] [INFO] [后端] 2025-12-28 14:47:04.242  INFO 32436 --- [           main] o.apache.catalina.core.StandardService   : Stopping service [Tomcat]
+[2025-12-28 14:47:04] [INFO] [后端] 2025-12-28 14:47:04.251  INFO 32436 --- [           main] ConditionEvaluationReportLoggingListener :
+[2025-12-28 14:47:04] [INFO] [后端] 
+[2025-12-28 14:47:04] [INFO] [后端] Error starting ApplicationContext. To display the conditions report re-run your application with 'debug' enabled.
+[2025-12-28 14:47:04] [INFO] [后端] 2025-12-28 14:47:04.278 ERROR 32436 --- [           main] o.s.b.d.LoggingFailureAnalysisReporter   :
+[2025-12-28 14:47:04] [INFO] [后端] 
+[2025-12-28 14:47:04] [INFO] [后端] ***************************
+[2025-12-28 14:47:04] [INFO] [后端] APPLICATION FAILED TO START
+[2025-12-28 14:47:04] [INFO] [后端] ***************************
+[2025-12-28 14:47:04] [INFO] [后端] 
+[2025-12-28 14:47:04] [INFO] [后端] Description:
+[2025-12-28 14:47:04] [INFO] [后端] 
+[2025-12-28 14:47:04] [INFO] [后端] Web server failed to start. Port 8080 was already in use.
+[2025-12-28 14:47:04] [INFO] [后端] 
+[2025-12-28 14:47:04] [INFO] [后端] Action:
+[2025-12-28 14:47:04] [INFO] [后端] 
+[2025-12-28 14:47:04] [INFO] [后端] Identify and stop the process that's listening on port 8080 or configure this application to listen on another port.
+[2025-12-28 14:47:04] [INFO] [后端] 
+[2025-12-28 14:47:08] [INFO] 正在启动 后端 服务...
+[2025-12-28 14:47:08] [ERROR] 后端 服务启动失败: 'StringVar' object has no attribute 'config'
+[2025-12-28 14:47:09] [INFO] [后端] 
+[2025-12-28 14:47:09] [INFO] [后端] .   ____          _            __ _ _
+[2025-12-28 14:47:09] [INFO] [后端] /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+[2025-12-28 14:47:09] [INFO] [后端] ( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+[2025-12-28 14:47:09] [INFO] [后端] \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+[2025-12-28 14:47:09] [INFO] [后端] '  |____| .__|_| |_|_| |_\__, | / / / /
+[2025-12-28 14:47:09] [INFO] [后端] =========|_|==============|___/=/_/_/_/
+[2025-12-28 14:47:09] [INFO] [后端] :: Spring Boot ::               (v2.7.18)
+[2025-12-28 14:47:09] [INFO] [后端] 
+[2025-12-28 14:47:09] [INFO] [后端] 2025-12-28 14:47:09.562  INFO 16372 --- [           main] com.logistics.LogisticsApplication       : Starting LogisticsApplication v1.0.0 using Java 1.8.0_392 on KawaiiTenshi with PID 16372 (C:\Users\15071\Documents\大数据面板\backend\target\logistics-dashboard-1.0.0.jar started by 15071 in C:\Users\15071\Documents\大数据面板\backend)
+[2025-12-28 14:47:09] [INFO] [后端] 2025-12-28 14:47:09.567 DEBUG 16372 --- [           main] com.logistics.LogisticsApplication       : Running with Spring Boot v2.7.18, Spring v5.3.31
+[2025-12-28 14:47:09] [INFO] [后端] 2025-12-28 14:47:09.568  INFO 16372 --- [           main] com.logistics.LogisticsApplication       : No active profile set, falling back to 1 default profile: "default"
+[2025-12-28 14:47:11] [INFO] [后端] 2025-12-28 14:47:11.871  INFO 16372 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8080 (http)
+[2025-12-28 14:47:11] [INFO] [后端] 2025-12-28 14:47:11.885  INFO 16372 --- [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+[2025-12-28 14:47:11] [INFO] [后端] 2025-12-28 14:47:11.886  INFO 16372 --- [           main] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.83]
+[2025-12-28 14:47:11] [INFO] [后端] 2025-12-28 14:47:11.994  INFO 16372 --- [           main] o.a.c.c.C.[Tomcat].[localhost].[/api]    : Initializing Spring embedded WebApplicationContext
+[2025-12-28 14:47:11] [INFO] [后端] 2025-12-28 14:47:11.994  INFO 16372 --- [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 2320 ms
+[2025-12-28 14:47:12] [INFO] [后端] Logging initialized using 'class org.apache.ibatis.logging.stdout.StdOutImpl' adapter.
+[2025-12-28 14:47:12] [INFO] [后端] Registered plugin: 'com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor@3590fc5b'
+[2025-12-28 14:47:12] [INFO] [后端] Parsed mapper file: 'class path resource [mapper/CustomerMapper.xml]'
+[2025-12-28 14:47:12] [INFO] [后端] Parsed mapper file: 'class path resource [mapper/InventoryMapper.xml]'
+[2025-12-28 14:47:12] [INFO] [后端] Parsed mapper file: 'class path resource [mapper/OrderMapper.xml]'
+[2025-12-28 14:47:12] [INFO] [后端] Parsed mapper file: 'class path resource [mapper/SupplierMapper.xml]'
+[2025-12-28 14:47:13] [INFO] [后端] Parsed mapper file: 'class path resource [mapper/TransportMapper.xml]'
+[2025-12-28 14:47:13] [INFO] [后端] Parsed mapper file: 'class path resource [mapper/WarehouseMapper.xml]'
+[2025-12-28 14:47:13] [INFO] [后端] _ _   |_  _ _|_. ___ _ |    _
+[2025-12-28 14:47:13] [INFO] [后端] | | |\/|_)(_| | |_\  |_)||_|_\
+[2025-12-28 14:47:13] [INFO] [后端] /               |
+[2025-12-28 14:47:13] [INFO] [后端] 3.5.3.1
+[2025-12-28 14:47:14] [INFO] [后端] 2025-12-28 14:47:14.665  WARN 16372 --- [           main] ConfigServletWebServerApplicationContext : Exception encountered during context initialization - cancelling refresh attempt: org.springframework.context.ApplicationContextException: Failed to start bean 'webServerStartStop'; nested exception is org.springframework.boot.web.server.PortInUseException: Port 8080 is already in use
+[2025-12-28 14:47:14] [INFO] [后端] 2025-12-28 14:47:14.673  INFO 16372 --- [           main] o.apache.catalina.core.StandardService   : Stopping service [Tomcat]
+[2025-12-28 14:47:14] [INFO] [后端] 2025-12-28 14:47:14.689  INFO 16372 --- [           main] ConditionEvaluationReportLoggingListener :
+[2025-12-28 14:47:14] [INFO] [后端] 
+[2025-12-28 14:47:14] [INFO] [后端] Error starting ApplicationContext. To display the conditions report re-run your application with 'debug' enabled.
+[2025-12-28 14:47:14] [INFO] [后端] 2025-12-28 14:47:14.739 ERROR 16372 --- [           main] o.s.b.d.LoggingFailureAnalysisReporter   :
+[2025-12-28 14:47:14] [INFO] [后端] 
+[2025-12-28 14:47:14] [INFO] [后端] ***************************
+[2025-12-28 14:47:14] [INFO] [后端] APPLICATION FAILED TO START
+[2025-12-28 14:47:14] [INFO] [后端] ***************************
+[2025-12-28 14:47:14] [INFO] [后端] 
+[2025-12-28 14:47:14] [INFO] [后端] Description:
+[2025-12-28 14:47:14] [INFO] [后端] 
+[2025-12-28 14:47:14] [INFO] [后端] Web server failed to start. Port 8080 was already in use.
+[2025-12-28 14:47:14] [INFO] [后端] 
+[2025-12-28 14:47:14] [INFO] [后端] Action:
+[2025-12-28 14:47:14] [INFO] [后端] 
+[2025-12-28 14:47:14] [INFO] [后端] Identify and stop the process that's listening on port 8080 or configure this application to listen on another port.
+[2025-12-28 14:47:15] [INFO] [后端] 
+[2025-12-28 14:47:25] [INFO] 正在启动 前端 服务...
+[2025-12-28 14:47:25] [ERROR] 前端 服务启动失败: [WinError 2] 系统找不到指定的文件。
+[2025-12-28 14:47:27] [SUCCESS] 所有服务启动完成

@@ -15,7 +15,9 @@ CREATE TABLE warehouse (
     capacity DECIMAL(10,2) COMMENT '容量(吨)',
     throughput DECIMAL(10,2) COMMENT '流转量(吨)',
     created_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    updated_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间'
+    updated_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    is_deleted TINYINT DEFAULT 0 COMMENT '逻辑删除(0:未删除, 1:已删除)',
+    version INT DEFAULT 0 COMMENT '乐观锁版本号'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='仓库信息表';
 
 -- 2. 库存占比表
