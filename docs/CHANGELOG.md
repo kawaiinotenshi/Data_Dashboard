@@ -1,5 +1,40 @@
 # 更新日志
 
+## [2025-12-29]
+
+### SQL防注入实现
+- 实现SQL注入检测和防护工具类（SqlInjectionUtils.java）
+  - 检测SQL注入关键词（SELECT, INSERT, UPDATE, DELETE, DROP等）
+  - 检测SQL注释符号（--, #, /* */）
+  - 检测SQL逻辑操作符（OR, AND, UNION）
+  - 提供输入清理和验证方法
+- 实现XSS过滤器（XssFilter.java）
+  - 过滤HTML标签和JavaScript代码
+  - 转义特殊字符（<, >, ', ", (, )）
+  - 清除eval和javascript:等危险代码
+  - 实现请求包装器（XssRequestWrapper）
+- 添加参数验证到VO类
+  - 使用@NotBlank, @NotNull, @Size等注解
+  - 实现输入长度和格式验证
+  - 添加自定义错误消息
+
+### 编译错误修复
+- 修复MyBatis-Plus代码生成器API更新问题
+  - 修正CodeGenerator.java中的enableSwagger()方法调用
+  - 修正EnhancedCodeGenerator.java中的enableSwagger()方法调用
+  - 移除过时的boolean参数
+
+### 依赖更新
+- 添加Jakarta Servlet API依赖
+- 添加Jakarta Validation API依赖
+- 更新Spring Boot版本兼容性
+
+### Git版本控制
+- 解决GitHub推送被拒绝问题（敏感信息暴露）
+- 添加日志文件到.gitignore
+- 清理包含敏感信息的提交历史
+- 重新提交安全增强代码
+
 ## [2025-12-28]
 
 ### 项目启动器开发

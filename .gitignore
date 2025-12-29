@@ -18,3 +18,4 @@ target/
 screenshots/
 tests/__pycache__/
 fix-curl-alias.ps1
+日志
