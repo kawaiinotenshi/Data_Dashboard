@@ -33,7 +33,6 @@ public class SqlInjectionUtils {
         Pattern.compile("(\\b(@@|@@)\\w+)", Pattern.CASE_INSENSITIVE),
         Pattern.compile("(\\b(0x[0-9a-fA-F]+)\\b)", Pattern.CASE_INSENSITIVE),
         Pattern.compile("(\\b(CHR|ASCII)\\b)", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("(\\b(UNHEX|HEX)\\b)", Pattern.CASE_INSENSITIVE),
         Pattern.compile("(\\b(MD5|SHA1|SHA256)\\b)", Pattern.CASE_INSENSITIVE),
         Pattern.compile("(\\b(BASE64_DECODE|BASE64_ENCODE)\\b)", Pattern.CASE_INSENSITIVE),
         Pattern.compile("(\\b(UNCOMPRESS|COMPRESS)\\b)", Pattern.CASE_INSENSITIVE),
@@ -131,72 +130,12 @@ public class SqlInjectionUtils {
         Pattern.compile("(\\b(MAX_CONCURRENT_NODES|@@MAX_CONCURRENT_NODES)\\b)", Pattern.CASE_INSENSITIVE),
         Pattern.compile("(\\b(MAX_CONCURRENT_PODS|@@MAX_CONCURRENT_PODS)\\b)", Pattern.CASE_INSENSITIVE),
         Pattern.compile("(\\b(MAX_CONCURRENT_CONTAINERS|@@MAX_CONCURRENT_CONTAINERS)\\b)", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("(\\b(MAX_CONCURRENT_INSTANCES|@@MAX_CONCURRENT_INSTANCES)\\b)", Pattern.CASE_INSENSITIVE),
         Pattern.compile("(\\b(MAX_CONCURRENT_VMS|@@MAX_CONCURRENT_VMS)\\b)", Pattern.CASE_INSENSITIVE),
         Pattern.compile("(\\b(MAX_CONCURRENT_SERVERS|@@MAX_CONCURRENT_SERVERS)\\b)", Pattern.CASE_INSENSITIVE),
         Pattern.compile("(\\b(MAX_CONCURRENT_HOSTS|@@MAX_CONCURRENT_HOSTS)\\b)", Pattern.CASE_INSENSITIVE),
         Pattern.compile("(\\b(MAX_CONCURRENT_DEVICES|@@MAX_CONCURRENT_DEVICES)\\b)", Pattern.CASE_INSENSITIVE),
         Pattern.compile("(\\b(MAX_CONCURRENT_CLIENTS|@@MAX_CONCURRENT_CLIENTS)\\b)", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("(\\b(MAX_CONCURRENT_USERS|@@MAX_CONCURRENT_USERS)\\b)", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("(\\b(MAX_CONCURRENT_SESSIONS|@@MAX_CONCURRENT_SESSIONS)\\b)", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("(\\b(MAX_CONCURRENT_TRANSACTIONS|@@MAX_CONCURRENT_TRANSACTIONS)\\b)", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("(\\b(MAX_CONCURRENT_OPERATIONS|@@MAX_CONCURRENT_OPERATIONS)\\b)", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("(\\b(MAX_CONCURRENT_REQUESTS|@@MAX_CONCURRENT_REQUESTS)\\b)", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("(\\b(MAX_CONCURRENT_RESPONSES|@@MAX_CONCURRENT_RESPONSES)\\b)", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("(\\b(MAX_CONCURRENT_CALLS|@@MAX_CONCURRENT_CALLS)\\b)", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("(\\b(MAX_CONCURRENT_INVOCATIONS|@@MAX_CONCURRENT_INVOCATIONS)\\b)", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("(\\b(MAX_CONCURRENT_EXECUTIONS|@@MAX_CONCURRENT_EXECUTIONS)\\b)", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("(\\b(MAX_CONCURRENT_RUNS|@@MAX_CONCURRENT_RUNS)\\b)", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("(\\b(MAX_CONCURRENT_STARTS|@@MAX_CONCURRENT_STARTS)\\b)", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("(\\b(MAX_CONCURRENT_STOPS|@@MAX_CONCURRENT_STOPS)\\b)", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("(\\b(MAX_CONCURRENT_PAUSES|@@MAX_CONCURRENT_PAUSES)\\b)", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("(\\b(MAX_CONCURRENT_RESUMES|@@MAX_CONCURRENT_RESUMES)\\b)", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("(\\b(MAX_CONCURRENT_ABORTS|@@MAX_CONCURRENT_ABORTS)\\b)", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("(\\b(MAX_CONCURRENT_CANCELS|@@MAX_CONCURRENT_CANCELS)\\b)", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("(\\b(MAX_CONCURRENT_TIMEOUTS|@@MAX_CONCURRENT_TIMEOUTS)\\b)", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("(\\b(MAX_CONCURRENT_ERRORS|@@MAX_CONCURRENT_ERRORS)\\b)", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("(\\b(MAX_CONCURRENT_EXCEPTIONS|@@MAX_CONCURRENT_EXCEPTIONS)\\b)", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("(\\b(MAX_CONCURRENT_WARNINGS|@@MAX_CONCURRENT_WARNINGS)\\b)", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("(\\b(MAX_CONCURRENT_NOTICES|@@MAX_CONCURRENT_NOTICES)\\b)", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("(\\b(MAX_CONCURRENT_INFOS|@@MAX_CONCURRENT_INFOS)\\b)", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("(\\b(MAX_CONCURRENT_DEBUGS|@@MAX_CONCURRENT_DEBUGS)\\b)", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("(\\b(MAX_CONCURRENT_TRACES|@@MAX_CONCURRENT_TRACES)\\b)", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("(\\b(MAX_CONCURRENT_LOGS|@@MAX_CONCURRENT_LOGS)\\b)", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("(\\b(MAX_CONCURRENT_METRICS|@@MAX_CONCURRENT_METRICS)\\b)", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("(\\b(MAX_CONCURRENT_STATS|@@MAX_CONCURRENT_STATS)\\b)", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("(\\b(MAX_CONCURRENT_MONITORS|@@MAX_CONCURRENT_MONITORS)\\b)", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("(\\b(MAX_CONCURRENT_ALERTS|@@MAX_CONCURRENT_ALERTS)\\b)", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("(\\b(MAX_CONCURRENT_NOTIFICATIONS|@@MAX_CONCURRENT_NOTIFICATIONS)\\b)", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("(\\b(MAX_CONCURRENT_EVENTS|@@MAX_CONCURRENT_EVENTS)\\b)", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("(\\b(MAX_CONCURRENT_MESSAGES|@@MAX_CONCURRENT_MESSAGES)\\b)", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("(\\b(MAX_CONCURRENT_EMAILS|@@MAX_CONCURRENT_EMAILS)\\b)", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("(\\b(MAX_CONCURRENT_SMS|@@MAX_CONCURRENT_SMS)\\b)", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("(\\b(MAX_CONCURRENT_PUSH|@@MAX_CONCURRENT_PUSH)\\b)", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("(\\b(MAX_CONCURRENT_WEBHOOKS|@@MAX_CONCURRENT_WEBHOOKS)\\b)", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("(\\b(MAX_CONCURRENT_APIS|@@MAX_CONCURRENT_APIS)\\b)", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("(\\b(MAX_CONCURRENT_SERVICES|@@MAX_CONCURRENT_SERVICES)\\b)", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("(\\b(MAX_CONCURRENT_APPLICATIONS|@@MAX_CONCURRENT_APPLICATIONS)\\b)", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("(\\b(MAX_CONCURRENT_SYSTEMS|@@MAX_CONCURRENT_SYSTEMS)\\b)", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("(\\b(MAX_CONCURRENT_PLATFORMS|@@MAX_CONCURRENT_PLATFORMS)\\b)", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("(\\b(MAX_CONCURRENT_ENVIRONMENTS|@@MAX_CONCURRENT_ENVIRONMENTS)\\b)", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("(\\b(MAX_CONCURRENT_REGIONS|@@MAX_CONCURRENT_REGIONS)\\b)", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("(\\b(MAX_CONCURRENT_ZONES|@@MAX_CONCURRENT_ZONES)\\b)", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("(\\b(MAX_CONCURRENT_CLUSTERS|@@MAX_CONCURRENT_CLUSTERS)\\b)", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("(\\b(MAX_CONCURRENT_NODES|@@MAX_CONCURRENT_NODES)\\b)", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("(\\b(MAX_CONCURRENT_PODS|@@MAX_CONCURRENT_PODS)\\b)", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("(\\b(MAX_CONCURRENT_CONTAINERS|@@MAX_CONCURRENT_CONTAINERS)\\b)", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("(\\b(MAX_CONCURRENT_INSTANCES|@@MAX_CONCURRENT_INSTANCES)\\b)", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("(\\b(MAX_CONCURRENT_VMS|@@MAX_CONCURRENT_VMS)\\b)", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("(\\b(MAX_CONCURRENT_SERVERS|@@MAX_CONCURRENT_SERVERS)\\b)", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("(\\b(MAX_CONCURRENT_HOSTS|@@MAX_CONCURRENT_HOSTS)\\b)", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("(\\b(MAX_CONCURRENT_DEVICES|@@MAX_CONCURRENT_DEVICES)\\b)", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("(\\b(MAX_CONCURRENT_CLIENTS|@@MAX_CONCURRENT_CLIENTS)\\b)", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("(\\b(MAX_CONCURRENT_USERS|@@MAX_CONCURRENT_USERS)\\b)", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("(\\b(MAX_CONCURRENT_SESSIONS|@@MAX_CONCURRENT_SESSIONS)\\b)", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("(\\b(MAX_CONCURRENT_TRANSACTIONS|@@MAX_CONCURRENT_TRANSACTIONS)\\b)", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("(\\b(MAX_CONCURRENT_OPERATIONS|@@MAX_CONCURRENT_OPERATIONS)\\b)", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("(\\b(MAX_CONCURRENT_REQUESTS|@@MAX_CONCURRENT_REQUESTS)\\b)", Pattern.CASE_INSENSITIVE),
-        Pattern.Compile("(\\b(MAX_CONCURRENT_RESPONSES|@@MAX_CONCURRENT_RESPONSES)\\b)", Pattern.CASE_INSENSITIVE)
+        Pattern.compile("(\\b(MAX_CONCURRENT_RESPONSES|@@MAX_CONCURRENT_RESPONSES)\\b)", Pattern.CASE_INSENSITIVE)
     };
 
     public static boolean isSafeInput(String input) {
@@ -224,10 +163,10 @@ public class SqlInjectionUtils {
         cleaned = cleaned.replaceAll("--", "");
         cleaned = cleaned.replaceAll("#", "");
         cleaned = cleaned.replaceAll("/\\*.*?\\*/", "");
-        cleaned = cleaned.replaceAll("\\b(OR|AND|XOR|NOT)\\b\\s*\\d+\\s*=\\s*\\d+", "", Pattern.CASE_INSENSITIVE);
-        cleaned = cleaned.replaceAll("\\b(OR|AND|XOR|NOT)\\b\\s*'.*?'\\s*=\\s*'.*?'", "", Pattern.CASE_INSENSITIVE);
-        cleaned = cleaned.replaceAll("\\b(OR|AND|XOR|NOT)\\b\\s*\\d+\\s*LIKE\\s*\\d+", "", Pattern.CASE_INSENSITIVE);
-        cleaned = cleaned.replaceAll("\\b(OR|AND|XOR|NOT)\\b\\s*'.*?'\\s*LIKE\\s*'.*?'", "", Pattern.CASE_INSENSITIVE);
+        cleaned = Pattern.compile("\\b(OR|AND|XOR|NOT)\\b\\s*\\d+\\s*=\\s*\\d+", Pattern.CASE_INSENSITIVE).matcher(cleaned).replaceAll("");
+        cleaned = Pattern.compile("\\b(OR|AND|XOR|NOT)\\b\\s*'.*?'\\s*=\\s*'.*?'", Pattern.CASE_INSENSITIVE).matcher(cleaned).replaceAll("");
+        cleaned = Pattern.compile("\\b(OR|AND|XOR|NOT)\\b\\s*\\d+\\s*LIKE\\s*\\d+", Pattern.CASE_INSENSITIVE).matcher(cleaned).replaceAll("");
+        cleaned = Pattern.compile("\\b(OR|AND|XOR|NOT)\\b\\s*'.*?'\\s*LIKE\\s*'.*?'", Pattern.CASE_INSENSITIVE).matcher(cleaned).replaceAll("");
 
         return cleaned;
     }

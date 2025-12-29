@@ -1,7 +1,6 @@
 package com.logistics.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.logistics.entity.Inventory;
 import com.logistics.mapper.InventoryMapper;
 import com.logistics.service.InventoryService;
@@ -15,20 +14,30 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class InventoryServiceImpl extends ServiceImpl<InventoryMapper, Inventory> implements InventoryService {
+public class InventoryServiceImpl extends BaseEntityServiceImpl<InventoryMapper, Inventory> implements InventoryService {
+    @Override
+    public String getEntityName() {
+        return "库存记录";
+    }
+
+    @Override
+    public Class<?> getVOClass() {
+        return InventoryVO.class;
+    }
+
+    @Override
+    public Class<?> getRequestVOClass() {
+        return InventoryRequestVO.class;
+    }
+
     @Override
     public List<Inventory> getAllInventory() {
-        return list();
+        return getAllEntities();
     }
 
     @Override
     public List<InventoryVO> getAllInventoryVOs() {
-        List<Inventory> inventories = list();
-        return inventories.stream().map(inventory -> {
-            InventoryVO inventoryVO = new InventoryVO();
-            BeanUtils.copyProperties(inventory, inventoryVO);
-            return inventoryVO;
-        }).collect(java.util.stream.Collectors.toList());
+        return getAllEntityVOs(this::convertToInventoryVO);
     }
 
     @Override
@@ -43,76 +52,48 @@ public class InventoryServiceImpl extends ServiceImpl<InventoryMapper, Inventory
         QueryWrapper<Inventory> wrapper = new QueryWrapper<>();
         wrapper.eq("warehouse_id", warehouseId);
         List<Inventory> inventories = list(wrapper);
-        return inventories.stream().map(inventory -> {
-            InventoryVO inventoryVO = new InventoryVO();
-            BeanUtils.copyProperties(inventory, inventoryVO);
-            return inventoryVO;
-        }).collect(java.util.stream.Collectors.toList());
+        return convertToVOList(inventories, this::convertToInventoryVO);
     }
 
     @Override
     public InventoryVO getInventoryById(Long id) {
-        Inventory inventory = getById(id);
-        if (inventory == null) {
-            return null;
-        }
-        InventoryVO inventoryVO = new InventoryVO();
-        BeanUtils.copyProperties(inventory, inventoryVO);
-        return inventoryVO;
+        return getEntityById(id, this::convertToInventoryVO);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean createInventory(InventoryRequestVO inventoryRequestVO) {
-        Inventory inventory = new Inventory();
-        BeanUtils.copyProperties(inventoryRequestVO, inventory);
-        return save(inventory);
+        return createEntity(inventoryRequestVO, Inventory.class);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean updateInventory(Long id, InventoryRequestVO inventoryRequestVO) {
-        Inventory inventory = getById(id);
-        if (inventory == null) {
-            throw new ResourceNotFoundException("库存记录", id);
-        }
-        BeanUtils.copyProperties(inventoryRequestVO, inventory);
-        return updateById(inventory);
+        return updateEntity(id, inventoryRequestVO);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean deleteInventory(Long id) {
-        return removeById(id);
+        return deleteEntity(id);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean batchDeleteInventories(List<Long> ids) {
-        return removeByIds(ids);
+        return batchDeleteEntities(ids);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean batchCreateInventories(List<InventoryRequestVO> inventoryRequestVOs) {
-        if (inventoryRequestVOs == null || inventoryRequestVOs.isEmpty()) {
-            return false;
-        }
-        List<Inventory> inventories = inventoryRequestVOs.stream().map(vo -> {
-            Inventory inventory = new Inventory();
-            BeanUtils.copyProperties(vo, inventory);
-            return inventory;
-        }).collect(java.util.stream.Collectors.toList());
-        return saveBatch(inventories, 500);
+        return batchCreateEntities(inventoryRequestVOs, Inventory.class);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean batchUpdateInventories(List<Inventory> inventories) {
-        if (inventories == null || inventories.isEmpty()) {
-            return false;
-        }
-        return updateBatchById(inventories, 500);
+        return batchUpdateEntities(inventories);
     }
 
     @Override
@@ -123,11 +104,7 @@ public class InventoryServiceImpl extends ServiceImpl<InventoryMapper, Inventory
     @Override
     public List<InventoryVO> getInventoryByMonth(String month) {
         List<Inventory> inventories = baseMapper.selectInventoryByMonth(month);
-        return inventories.stream().map(inventory -> {
-            InventoryVO inventoryVO = new InventoryVO();
-            BeanUtils.copyProperties(inventory, inventoryVO);
-            return inventoryVO;
-        }).collect(java.util.stream.Collectors.toList());
+        return convertToVOList(inventories, this::convertToInventoryVO);
     }
 
     @Override
@@ -138,5 +115,11 @@ public class InventoryServiceImpl extends ServiceImpl<InventoryMapper, Inventory
     @Override
     public List<Map<String, Object>> getInventoryTrend() {
         return baseMapper.selectInventoryTrend();
+    }
+
+    private InventoryVO convertToInventoryVO(Inventory inventory) {
+        InventoryVO inventoryVO = new InventoryVO();
+        BeanUtils.copyProperties(inventory, inventoryVO);
+        return inventoryVO;
     }
 }

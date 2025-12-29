@@ -1,7 +1,6 @@
 package com.logistics.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.logistics.entity.Transport;
 import com.logistics.mapper.TransportMapper;
 import com.logistics.service.TransportService;
@@ -15,20 +14,30 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class TransportServiceImpl extends ServiceImpl<TransportMapper, Transport> implements TransportService {
+public class TransportServiceImpl extends BaseEntityServiceImpl<TransportMapper, Transport> implements TransportService {
+    @Override
+    public String getEntityName() {
+        return "运输记录";
+    }
+
+    @Override
+    public Class<?> getVOClass() {
+        return TransportVO.class;
+    }
+
+    @Override
+    public Class<?> getRequestVOClass() {
+        return TransportRequestVO.class;
+    }
+
     @Override
     public List<Transport> getAllTransports() {
-        return list();
+        return getAllEntities();
     }
 
     @Override
     public List<TransportVO> getAllTransportVOs() {
-        List<Transport> transports = list();
-        return transports.stream().map(transport -> {
-            TransportVO transportVO = new TransportVO();
-            BeanUtils.copyProperties(transport, transportVO);
-            return transportVO;
-        }).collect(java.util.stream.Collectors.toList());
+        return getAllEntityVOs(this::convertToTransportVO);
     }
 
     @Override
@@ -36,53 +45,36 @@ public class TransportServiceImpl extends ServiceImpl<TransportMapper, Transport
         QueryWrapper<Transport> wrapper = new QueryWrapper<>();
         wrapper.eq("status", status);
         List<Transport> transports = list(wrapper);
-        return transports.stream().map(transport -> {
-            TransportVO transportVO = new TransportVO();
-            BeanUtils.copyProperties(transport, transportVO);
-            return transportVO;
-        }).collect(java.util.stream.Collectors.toList());
+        return convertToVOList(transports, this::convertToTransportVO);
     }
 
     @Override
     public TransportVO getTransportById(Long id) {
-        Transport transport = getById(id);
-        if (transport == null) {
-            return null;
-        }
-        TransportVO transportVO = new TransportVO();
-        BeanUtils.copyProperties(transport, transportVO);
-        return transportVO;
+        return getEntityById(id, this::convertToTransportVO);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean createTransport(TransportRequestVO transportRequestVO) {
-        Transport transport = new Transport();
-        BeanUtils.copyProperties(transportRequestVO, transport);
-        return save(transport);
+        return createEntity(transportRequestVO, Transport.class);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean updateTransport(Long id, TransportRequestVO transportRequestVO) {
-        Transport transport = getById(id);
-        if (transport == null) {
-            throw new ResourceNotFoundException("运输记录", id);
-        }
-        BeanUtils.copyProperties(transportRequestVO, transport);
-        return updateById(transport);
+        return updateEntity(id, transportRequestVO);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean deleteTransport(Long id) {
-        return removeById(id);
+        return deleteEntity(id);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean batchDeleteTransports(List<Long> ids) {
-        return removeByIds(ids);
+        return batchDeleteEntities(ids);
     }
 
     @Override
@@ -93,21 +85,13 @@ public class TransportServiceImpl extends ServiceImpl<TransportMapper, Transport
     @Override
     public List<TransportVO> getTransportByMonth(String month) {
         List<Transport> transports = baseMapper.selectTransportByMonth(month);
-        return transports.stream().map(transport -> {
-            TransportVO transportVO = new TransportVO();
-            BeanUtils.copyProperties(transport, transportVO);
-            return transportVO;
-        }).collect(java.util.stream.Collectors.toList());
+        return convertToVOList(transports, this::convertToTransportVO);
     }
 
     @Override
     public List<TransportVO> getTransportByVehicleType(String vehicleType) {
         List<Transport> transports = baseMapper.selectTransportByVehicleType(vehicleType);
-        return transports.stream().map(transport -> {
-            TransportVO transportVO = new TransportVO();
-            BeanUtils.copyProperties(transport, transportVO);
-            return transportVO;
-        }).collect(java.util.stream.Collectors.toList());
+        return convertToVOList(transports, this::convertToTransportVO);
     }
 
     @Override
@@ -118,5 +102,23 @@ public class TransportServiceImpl extends ServiceImpl<TransportMapper, Transport
     @Override
     public List<Map<String, Object>> getTransportByVehicleTypeGroup() {
         return baseMapper.selectTransportByVehicleTypeGroup();
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean batchUpdateTransports(List<Transport> transports) {
+        return batchUpdateEntities(transports);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean batchCreateTransports(List<TransportRequestVO> transportRequestVOs) {
+        return batchCreateEntities(transportRequestVOs, Transport.class);
+    }
+
+    private TransportVO convertToTransportVO(Transport transport) {
+        TransportVO transportVO = new TransportVO();
+        BeanUtils.copyProperties(transport, transportVO);
+        return transportVO;
     }
 }

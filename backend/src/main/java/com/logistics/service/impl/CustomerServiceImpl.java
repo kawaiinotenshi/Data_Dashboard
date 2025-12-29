@@ -1,6 +1,5 @@
 package com.logistics.service.impl;
 
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.logistics.entity.Customer;
 import com.logistics.mapper.CustomerMapper;
 import com.logistics.service.CustomerService;
@@ -14,85 +13,71 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class CustomerServiceImpl extends ServiceImpl<CustomerMapper, Customer> implements CustomerService {
+public class CustomerServiceImpl extends BaseEntityServiceImpl<CustomerMapper, Customer> implements CustomerService {
+    @Override
+    public String getEntityName() {
+        return "客户";
+    }
+
+    @Override
+    public Class<?> getVOClass() {
+        return CustomerVO.class;
+    }
+
+    @Override
+    public Class<?> getRequestVOClass() {
+        return CustomerRequestVO.class;
+    }
+
     @Override
     public List<Customer> getAllCustomers() {
-        return list();
+        return getAllEntities();
     }
 
     @Override
     public List<CustomerVO> getAllCustomerVOs() {
-        List<Customer> customers = list();
-        return customers.stream().map(customer -> {
-            CustomerVO customerVO = new CustomerVO();
-            BeanUtils.copyProperties(customer, customerVO);
-            return customerVO;
-        }).collect(java.util.stream.Collectors.toList());
+        return getAllEntityVOs(this::convertToCustomerVO);
     }
 
     @Override
     public CustomerVO getCustomerById(Long id) {
-        Customer customer = getById(id);
-        if (customer == null) {
-            return null;
-        }
-        CustomerVO customerVO = new CustomerVO();
-        BeanUtils.copyProperties(customer, customerVO);
-        return customerVO;
+        return getEntityById(id, this::convertToCustomerVO);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean createCustomer(CustomerRequestVO customerRequestVO) {
-        Customer customer = new Customer();
-        BeanUtils.copyProperties(customerRequestVO, customer);
-        return save(customer);
+        return createEntity(customerRequestVO, Customer.class);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean updateCustomer(Long id, CustomerRequestVO customerRequestVO) {
-        Customer customer = getById(id);
-        if (customer == null) {
-            throw new ResourceNotFoundException("客户", id);
-        }
-        BeanUtils.copyProperties(customerRequestVO, customer);
-        return updateById(customer);
+        return updateEntity(id, customerRequestVO);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean deleteCustomer(Long id) {
-        return removeById(id);
+        return deleteEntity(id);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean batchDeleteCustomers(List<Long> ids) {
-        return removeByIds(ids);
+        return batchDeleteEntities(ids);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean batchCreateCustomers(List<CustomerRequestVO> customerRequestVOs) {
-        if (customerRequestVOs == null || customerRequestVOs.isEmpty()) {
-            return false;
-        }
-        List<Customer> customers = customerRequestVOs.stream().map(vo -> {
-            Customer customer = new Customer();
-            BeanUtils.copyProperties(vo, customer);
-            return customer;
-        }).collect(java.util.stream.Collectors.toList());
-        return saveBatch(customers, 500);
+        return batchCreateEntities(customerRequestVOs, Customer.class);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean batchUpdateCustomers(List<Customer> customers) {
-        if (customers == null || customers.isEmpty()) {
-            return false;
-        }
-        return updateBatchById(customers, 500);
+        return batchUpdateEntities(customers);
     }
 
     @Override
@@ -103,25 +88,23 @@ public class CustomerServiceImpl extends ServiceImpl<CustomerMapper, Customer> i
     @Override
     public List<CustomerVO> getCustomersByName(String name) {
         List<Customer> customers = baseMapper.selectCustomersByName(name);
-        return customers.stream().map(customer -> {
-            CustomerVO customerVO = new CustomerVO();
-            BeanUtils.copyProperties(customer, customerVO);
-            return customerVO;
-        }).collect(java.util.stream.Collectors.toList());
+        return convertToVOList(customers, this::convertToCustomerVO);
     }
 
     @Override
     public List<CustomerVO> getCustomersByAddress(String address) {
         List<Customer> customers = baseMapper.selectCustomersByAddress(address);
-        return customers.stream().map(customer -> {
-            CustomerVO customerVO = new CustomerVO();
-            BeanUtils.copyProperties(customer, customerVO);
-            return customerVO;
-        }).collect(java.util.stream.Collectors.toList());
+        return convertToVOList(customers, this::convertToCustomerVO);
     }
 
     @Override
     public List<Map<String, Object>> getCustomerOrderCount() {
         return baseMapper.selectCustomerOrderCount();
+    }
+
+    private CustomerVO convertToCustomerVO(Customer customer) {
+        CustomerVO customerVO = new CustomerVO();
+        BeanUtils.copyProperties(customer, customerVO);
+        return customerVO;
     }
 }

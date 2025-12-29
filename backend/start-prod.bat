@@ -1,0 +1,3 @@
+@echo off
+echo Starting Logistics Dashboard in Production Mode...
+java -jar -Dspring.profiles.active=prod target/logistics-dashboard.jar

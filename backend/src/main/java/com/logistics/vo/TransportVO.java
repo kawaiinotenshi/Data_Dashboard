@@ -11,6 +11,7 @@ public class TransportVO {
     private Integer vehicleCount;
     private BigDecimal totalDistance;
     private String month;
+    private String status;
     private LocalDateTime createdTime;
     private LocalDateTime updatedTime;
 }

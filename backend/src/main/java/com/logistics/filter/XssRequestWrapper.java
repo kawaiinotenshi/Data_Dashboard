@@ -1,7 +1,7 @@
 package com.logistics.filter;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletRequestWrapper;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
 
 public class XssRequestWrapper extends HttpServletRequestWrapper {
 

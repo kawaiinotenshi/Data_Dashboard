@@ -1,18 +1,18 @@
 package com.logistics.config;
 
 import com.baomidou.mybatisplus.annotation.DbType;
+import com.baomidou.mybatisplus.core.MybatisConfiguration;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.BlockAttackInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.OptimisticLockerInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
+import com.baomidou.mybatisplus.extension.spring.MybatisSqlSessionFactoryBean;
 import com.logistics.interceptor.SqlPerformanceInterceptor;
+import javax.sql.DataSource;
 import org.apache.ibatis.session.SqlSessionFactory;
-import org.mybatis.spring.SqlSessionFactoryBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
-
-import javax.sql.DataSource;
 
 @Configuration
 public class MyBatisPlusConfig {
@@ -33,14 +33,14 @@ public class MyBatisPlusConfig {
     
     @Bean
     public SqlSessionFactory sqlSessionFactory(DataSource dataSource) throws Exception {
-        SqlSessionFactoryBean sessionFactory = new SqlSessionFactoryBean();
+        MybatisSqlSessionFactoryBean sessionFactory = new MybatisSqlSessionFactoryBean();
         sessionFactory.setDataSource(dataSource);
         sessionFactory.setMapperLocations(new PathMatchingResourcePatternResolver()
             .getResources("classpath:mapper/*.xml"));
+        sessionFactory.setPlugins(mybatisPlusInterceptor(), sqlPerformanceInterceptor());
         
-        org.apache.ibatis.session.Configuration configuration = new org.apache.ibatis.session.Configuration();
+        MybatisConfiguration configuration = new MybatisConfiguration();
         configuration.setMapUnderscoreToCamelCase(true);
-        configuration.addInterceptor(sqlPerformanceInterceptor());
         
         sessionFactory.setConfiguration(configuration);
         return sessionFactory.getObject();

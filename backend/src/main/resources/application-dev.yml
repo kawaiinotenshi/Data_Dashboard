@@ -1,0 +1,17 @@
+spring:
+  datasource:
+    driver-class-name: com.p6spy.engine.spy.P6SpyDriver
+    url: jdbc:p6spy:mysql://localhost:3307/logistics_db?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+    username: root
+    password: root
+
+logging:
+  level:
+    root: info
+    com.logistics: debug
+    com.logistics.mapper: debug
+    com.baomidou.mybatisplus: debug
+    org.springframework: info
+    org.springframework.web: info
+    org.hibernate.SQL: debug
+    org.hibernate.type.descriptor.sql.BasicBinder: trace

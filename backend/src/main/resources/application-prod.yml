@@ -1,0 +1,23 @@
+spring:
+  datasource:
+    driver-class-name: com.p6spy.engine.spy.P6SpyDriver
+    url: jdbc:p6spy:mysql://${DB_HOST:mysql}:${DB_PORT:3306}/${DB_NAME:logistics_db}?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=true&allowPublicKeyRetrieval=true
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
+springdoc:
+  swagger-ui:
+    enabled: false
+
+logging:
+  level:
+    root: warn
+    com.logistics: info
+    com.logistics.mapper: warn
+    com.baomidou.mybatisplus: warn
+    org.springframework: warn
+    org.springframework.web: warn
+  file:
+    name: /var/log/logistics-dashboard/application.log
+    max-size: 50MB
+    max-history: 90

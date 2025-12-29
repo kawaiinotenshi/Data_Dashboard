@@ -1,7 +1,6 @@
 package com.logistics.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.logistics.entity.Order;
 import com.logistics.mapper.OrderMapper;
 import com.logistics.service.OrderService;
@@ -15,20 +14,30 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements OrderService {
+public class OrderServiceImpl extends BaseEntityServiceImpl<OrderMapper, Order> implements OrderService {
+    @Override
+    public String getEntityName() {
+        return "订单";
+    }
+
+    @Override
+    public Class<?> getVOClass() {
+        return OrderVO.class;
+    }
+
+    @Override
+    public Class<?> getRequestVOClass() {
+        return OrderRequestVO.class;
+    }
+
     @Override
     public List<Order> getAllOrders() {
-        return list();
+        return getAllEntities();
     }
 
     @Override
     public List<OrderVO> getAllOrderVOs() {
-        List<Order> orders = list();
-        return orders.stream().map(order -> {
-            OrderVO orderVO = new OrderVO();
-            BeanUtils.copyProperties(order, orderVO);
-            return orderVO;
-        }).collect(java.util.stream.Collectors.toList());
+        return getAllEntityVOs(this::convertToOrderVO);
     }
 
     @Override
@@ -36,76 +45,48 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         QueryWrapper<Order> wrapper = new QueryWrapper<>();
         wrapper.eq("status", status);
         List<Order> orders = list(wrapper);
-        return orders.stream().map(order -> {
-            OrderVO orderVO = new OrderVO();
-            BeanUtils.copyProperties(order, orderVO);
-            return orderVO;
-        }).collect(java.util.stream.Collectors.toList());
+        return convertToVOList(orders, this::convertToOrderVO);
     }
 
     @Override
     public OrderVO getOrderById(Long id) {
-        Order order = getById(id);
-        if (order == null) {
-            return null;
-        }
-        OrderVO orderVO = new OrderVO();
-        BeanUtils.copyProperties(order, orderVO);
-        return orderVO;
+        return getEntityById(id, this::convertToOrderVO);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean createOrder(OrderRequestVO orderRequestVO) {
-        Order order = new Order();
-        BeanUtils.copyProperties(orderRequestVO, order);
-        return save(order);
+        return createEntity(orderRequestVO, Order.class);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean updateOrder(Long id, OrderRequestVO orderRequestVO) {
-        Order order = getById(id);
-        if (order == null) {
-            throw new ResourceNotFoundException("订单", id);
-        }
-        BeanUtils.copyProperties(orderRequestVO, order);
-        return updateById(order);
+        return updateEntity(id, orderRequestVO);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean deleteOrder(Long id) {
-        return removeById(id);
+        return deleteEntity(id);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean batchDeleteOrders(List<Long> ids) {
-        return removeByIds(ids);
+        return batchDeleteEntities(ids);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean batchCreateOrders(List<OrderRequestVO> orderRequestVOs) {
-        if (orderRequestVOs == null || orderRequestVOs.isEmpty()) {
-            return false;
-        }
-        List<Order> orders = orderRequestVOs.stream().map(vo -> {
-            Order order = new Order();
-            BeanUtils.copyProperties(vo, order);
-            return order;
-        }).collect(java.util.stream.Collectors.toList());
-        return saveBatch(orders, 500);
+        return batchCreateEntities(orderRequestVOs, Order.class);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean batchUpdateOrders(List<Order> orders) {
-        if (orders == null || orders.isEmpty()) {
-            return false;
-        }
-        return updateBatchById(orders, 500);
+        return batchUpdateEntities(orders);
     }
 
     @Override
@@ -126,10 +107,12 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     @Override
     public List<OrderVO> getOrdersByCustomerName(String customerName) {
         List<Order> orders = baseMapper.selectOrdersByCustomerName(customerName);
-        return orders.stream().map(order -> {
-            OrderVO orderVO = new OrderVO();
-            BeanUtils.copyProperties(order, orderVO);
-            return orderVO;
-        }).collect(java.util.stream.Collectors.toList());
+        return convertToVOList(orders, this::convertToOrderVO);
+    }
+
+    private OrderVO convertToOrderVO(Order order) {
+        OrderVO orderVO = new OrderVO();
+        BeanUtils.copyProperties(order, orderVO);
+        return orderVO;
     }
 }

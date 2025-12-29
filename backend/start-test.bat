@@ -1,0 +1,3 @@
+@echo off
+echo Starting Logistics Dashboard in Test Mode...
+java -jar -Dspring.profiles.active=test target/logistics-dashboard.jar
