@@ -19,3 +19,7 @@ screenshots/
 tests/__pycache__/
 fix-curl-alias.ps1
 日志
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
