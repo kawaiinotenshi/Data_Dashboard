@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
 from datetime import datetime
 from theme_manager import ThemeManager
+from theme_switch import ThemeSwitch
 from logger_config import setup_logger
 from field_translations import get_table_name, get_field_name, get_status_value
 import csv
@@ -20,9 +21,24 @@ class DataManagementWindow:
         self.root.title("物流管理系统 - 数据管理")
         self.root.geometry("1200x700")
         
+        self.center_window()
+        self.force_top()
+        
         self.apply_theme()
         self.create_widgets()
         self.load_tables()
+    
+    def center_window(self):
+        self.root.update_idletasks()
+        width = self.root.winfo_width()
+        height = self.root.winfo_height()
+        x = (self.root.winfo_screenwidth() // 2) - (width // 2)
+        y = (self.root.winfo_screenheight() // 2) - (height // 2)
+        self.root.geometry(f'{width}x{height}+{x}+{y}')
+    
+    def force_top(self):
+        self.root.attributes('-topmost', True)
+        self.root.after(3000, lambda: self.root.attributes('-topmost', False))
 
     def apply_theme(self):
         theme = self.theme_manager.get_current_theme()
@@ -38,63 +54,70 @@ class DataManagementWindow:
         
         self.root.configure(bg=colors['background'])
         
-        main_frame = tk.Frame(self.root, bg=colors['background'])
-        main_frame.pack(fill=tk.BOTH, expand=True, padx=spacing['large'], pady=spacing['large'])
+        self.main_frame = tk.Frame(self.root, bg=colors['background'])
+        self.main_frame.pack(fill=tk.BOTH, expand=True, padx=spacing['large'], pady=spacing['large'])
 
-        left_frame = tk.Frame(main_frame, width=220, bg=colors['surface'], relief=tk.RAISED, bd=1)
-        left_frame.pack(side=tk.LEFT, fill=tk.Y, padx=(0, spacing['normal']))
-        left_frame.pack_propagate(False)
+        self.left_frame = tk.Frame(self.main_frame, width=220, bg=colors['surface'], relief=tk.RAISED, bd=1)
+        self.left_frame.pack(side=tk.LEFT, fill=tk.Y, padx=(0, spacing['normal']))
+        self.left_frame.pack_propagate(False)
 
-        tk.Label(left_frame, text="数据表", font=(fonts['family'], fonts['size']['large'], 'bold'), bg=colors['primary'], fg=colors['light']).pack(fill=tk.X, pady=spacing['normal'])
+        tk.Label(self.left_frame, text="数据表", font=(fonts['family'], fonts['size']['large'], 'bold'), bg=colors['primary'], fg=colors['text']).pack(fill=tk.X, pady=spacing['normal'])
         
-        self.table_listbox = tk.Listbox(left_frame, font=(fonts['family'], fonts['size']['normal']), width=28, relief=tk.FLAT, bd=0, selectbackground=colors['accent'], selectforeground=colors['light'])
+        self.table_listbox = tk.Listbox(self.left_frame, font=(fonts['family'], fonts['size']['normal']), width=28, relief=tk.FLAT, bd=0, selectbackground=colors['accent'], selectforeground=colors['text'])
         self.table_listbox.pack(fill=tk.BOTH, expand=True, padx=spacing['small'], pady=spacing['small'])
         self.table_listbox.bind('<<ListboxSelect>>', self.on_table_select)
 
-        right_frame = tk.Frame(main_frame, bg=colors['surface'], relief=tk.RAISED, bd=1)
-        right_frame.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
+        self.right_frame = tk.Frame(self.main_frame, bg=colors['surface'], relief=tk.RAISED, bd=1)
+        self.right_frame.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
 
-        search_frame = tk.Frame(right_frame, bg=colors['light'], height=60)
-        search_frame.pack(fill=tk.X, padx=spacing['normal'], pady=spacing['normal'])
-        search_frame.pack_propagate(False)
+        self.search_frame = tk.Frame(self.right_frame, bg=colors['card'], height=60)
+        self.search_frame.pack(fill=tk.X, padx=spacing['normal'], pady=spacing['normal'])
+        self.search_frame.pack_propagate(False)
 
-        tk.Label(search_frame, text="搜索:", font=(fonts['family'], fonts['size']['normal']), bg=colors['light'], fg=colors['primary']).pack(side=tk.LEFT, padx=spacing['normal'])
-        self.search_entry = tk.Entry(search_frame, font=(fonts['family'], fonts['size']['small']), width=35, relief=tk.SOLID, bd=1)
+        tk.Label(self.search_frame, text="搜索:", font=(fonts['family'], fonts['size']['normal']), bg=colors['card'], fg=colors['text']).pack(side=tk.LEFT, padx=spacing['normal'])
+        self.search_entry = tk.Entry(self.search_frame, font=(fonts['family'], fonts['size']['small']), width=35, relief=tk.SOLID, bd=1)
         self.search_entry.pack(side=tk.LEFT, padx=spacing['small'])
         self.search_entry.bind('<Return>', lambda e: self.search_data())
         
         search_button = tk.Button(
-            search_frame,
+            self.search_frame,
             text="搜索",
             font=(fonts['family'], fonts['size']['small']),
             bg=colors['accent'],
-            fg=colors['light'],
+            fg=colors['text'],
             width=8,
             relief=tk.FLAT,
             cursor="hand2",
             activebackground=colors['secondary'],
-            activeforeground=colors['light'],
+            activeforeground=colors['text'],
             command=self.search_data
         )
         search_button.pack(side=tk.LEFT, padx=spacing['small'])
 
-        refresh_button = tk.Button(
-            search_frame,
+        self.refresh_button = tk.Button(
+            self.search_frame,
             text="刷新",
             font=(fonts['family'], fonts['size']['small']),
             bg=colors['text_secondary'],
-            fg=colors['light'],
+            fg=colors['text'],
             width=8,
             relief=tk.FLAT,
             cursor="hand2",
             activebackground=colors['secondary'],
-            activeforeground=colors['light'],
+            activeforeground=colors['text'],
             command=self.refresh_data
         )
-        refresh_button.pack(side=tk.LEFT, padx=spacing['small'])
+        self.refresh_button.pack(side=tk.LEFT, padx=spacing['small'])
 
-        tree_frame = tk.Frame(right_frame, bg=colors['surface'])
-        tree_frame.pack(fill=tk.BOTH, expand=True, padx=spacing['normal'], pady=(0, spacing['normal']))
+        self.theme_switch = ThemeSwitch(
+            self.search_frame,
+            self.theme_manager,
+            command=self.toggle_theme
+        )
+        self.theme_switch.pack(side=tk.LEFT, padx=spacing['small'])
+
+        self.tree_frame = tk.Frame(self.right_frame, bg=colors['surface'])
+        self.tree_frame.pack(fill=tk.BOTH, expand=True, padx=spacing['normal'], pady=(0, spacing['normal']))
 
         style = ttk.Style()
         style.configure("Treeview", 
@@ -105,35 +128,43 @@ class DataManagementWindow:
                        foreground=colors['text'])
         style.configure("Treeview.Heading", 
                        font=(fonts['family'], fonts['size']['normal'], 'bold'),
-                       background='#1a252f',
-                       foreground='#ffffff')
+                       background=colors['card'],
+                       foreground=colors['text'])
         style.map("Treeview", 
                  background=[('selected', colors['accent'])],
-                 foreground=[('selected', colors['light'])])
+                 foreground=[('selected', colors['text'])])
 
-        self.tree = ttk.Treeview(tree_frame, show='headings', selectmode='extended', style="Treeview")
+        self.tree = ttk.Treeview(self.tree_frame, show='headings', selectmode='extended', style="Treeview")
         self.tree.pack(fill=tk.BOTH, expand=True)
         
-        scrollbar_y = ttk.Scrollbar(tree_frame, orient=tk.VERTICAL, command=self.tree.yview)
+        scrollbar_y = ttk.Scrollbar(self.tree_frame, orient=tk.VERTICAL, command=self.tree.yview)
         scrollbar_y.pack(side=tk.RIGHT, fill=tk.Y)
         self.tree.configure(yscrollcommand=scrollbar_y.set)
 
-        scrollbar_x = ttk.Scrollbar(tree_frame, orient=tk.HORIZONTAL, command=self.tree.xview)
+        scrollbar_x = ttk.Scrollbar(self.tree_frame, orient=tk.HORIZONTAL, command=self.tree.xview)
         scrollbar_x.pack(side=tk.BOTTOM, fill=tk.X)
         self.tree.configure(xscrollcommand=scrollbar_x.set)
 
-        button_frame = tk.Frame(right_frame, bg=colors['light'], height=60)
-        button_frame.pack(fill=tk.X, padx=spacing['normal'], pady=spacing['normal'])
-        button_frame.pack_propagate(False)
+        self.button_frame = tk.Frame(self.right_frame, bg=colors['light'], height=60)
+        self.button_frame.pack(fill=tk.X, padx=spacing['normal'], pady=spacing['normal'])
+        self.button_frame.pack_propagate(False)
 
-        tk.Button(button_frame, text="新增", font=(fonts['family'], fonts['size']['normal'], 'bold'), bg=colors['success'], fg=colors['light'], width=10, relief=tk.FLAT, cursor="hand2", activebackground=colors['secondary'], activeforeground=colors['light'], command=self.add_data).pack(side=tk.LEFT, padx=spacing['small'])
-        tk.Button(button_frame, text="修改", font=(fonts['family'], fonts['size']['normal'], 'bold'), bg=colors['accent'], fg=colors['light'], width=10, relief=tk.FLAT, cursor="hand2", activebackground=colors['secondary'], activeforeground=colors['light'], command=self.edit_data).pack(side=tk.LEFT, padx=spacing['small'])
-        tk.Button(button_frame, text="删除", font=(fonts['family'], fonts['size']['normal'], 'bold'), bg=colors['danger'], fg=colors['light'], width=10, relief=tk.FLAT, cursor="hand2", activebackground=colors['secondary'], activeforeground=colors['light'], command=self.delete_data).pack(side=tk.LEFT, padx=spacing['small'])
-        tk.Button(button_frame, text="批量删除", font=(fonts['family'], fonts['size']['normal'], 'bold'), bg=colors['danger'], fg=colors['light'], width=10, relief=tk.FLAT, cursor="hand2", activebackground=colors['secondary'], activeforeground=colors['light'], command=self.batch_delete).pack(side=tk.LEFT, padx=spacing['small'])
-        tk.Button(button_frame, text="统计", font=(fonts['family'], fonts['size']['normal'], 'bold'), bg=colors['accent'], fg=colors['light'], width=10, relief=tk.FLAT, cursor="hand2", activebackground=colors['secondary'], activeforeground=colors['light'], command=self.show_statistics).pack(side=tk.LEFT, padx=spacing['small'])
-        tk.Button(button_frame, text="导出", font=(fonts['family'], fonts['size']['normal'], 'bold'), bg=colors['warning'], fg=colors['light'], width=10, relief=tk.FLAT, cursor="hand2", activebackground=colors['secondary'], activeforeground=colors['light'], command=self.export_data).pack(side=tk.LEFT, padx=spacing['small'])
-        tk.Button(button_frame, text="设置", font=(fonts['family'], fonts['size']['normal'], 'bold'), bg=colors['primary'], fg=colors['light'], width=10, relief=tk.FLAT, cursor="hand2", activebackground=colors['secondary'], activeforeground=colors['light'], command=self.show_settings).pack(side=tk.LEFT, padx=spacing['small'])
-        tk.Button(button_frame, text="退出", font=(fonts['family'], fonts['size']['normal'], 'bold'), bg=colors['text_secondary'], fg=colors['light'], width=10, relief=tk.FLAT, cursor="hand2", activebackground=colors['secondary'], activeforeground=colors['light'], command=self.root.quit).pack(side=tk.RIGHT, padx=spacing['small'])
+        self.add_button = tk.Button(self.button_frame, text="新增", font=(fonts['family'], fonts['size']['normal'], 'bold'), bg=colors['success'], fg=colors['light'], width=10, relief=tk.FLAT, cursor="hand2", activebackground=colors['secondary'], activeforeground=colors['light'], command=self.add_data)
+        self.add_button.pack(side=tk.LEFT, padx=spacing['small'])
+        self.edit_button = tk.Button(self.button_frame, text="修改", font=(fonts['family'], fonts['size']['normal'], 'bold'), bg=colors['accent'], fg=colors['light'], width=10, relief=tk.FLAT, cursor="hand2", activebackground=colors['secondary'], activeforeground=colors['light'], command=self.edit_data)
+        self.edit_button.pack(side=tk.LEFT, padx=spacing['small'])
+        self.delete_button = tk.Button(self.button_frame, text="删除", font=(fonts['family'], fonts['size']['normal'], 'bold'), bg=colors['danger'], fg=colors['light'], width=10, relief=tk.FLAT, cursor="hand2", activebackground=colors['secondary'], activeforeground=colors['light'], command=self.delete_data)
+        self.delete_button.pack(side=tk.LEFT, padx=spacing['small'])
+        self.batch_delete_button = tk.Button(self.button_frame, text="批量删除", font=(fonts['family'], fonts['size']['normal'], 'bold'), bg=colors['danger'], fg=colors['light'], width=10, relief=tk.FLAT, cursor="hand2", activebackground=colors['secondary'], activeforeground=colors['light'], command=self.batch_delete)
+        self.batch_delete_button.pack(side=tk.LEFT, padx=spacing['small'])
+        self.statistics_button = tk.Button(self.button_frame, text="统计", font=(fonts['family'], fonts['size']['normal'], 'bold'), bg=colors['accent'], fg=colors['light'], width=10, relief=tk.FLAT, cursor="hand2", activebackground=colors['secondary'], activeforeground=colors['light'], command=self.show_statistics)
+        self.statistics_button.pack(side=tk.LEFT, padx=spacing['small'])
+        self.export_button = tk.Button(self.button_frame, text="导出", font=(fonts['family'], fonts['size']['normal'], 'bold'), bg=colors['warning'], fg=colors['light'], width=10, relief=tk.FLAT, cursor="hand2", activebackground=colors['secondary'], activeforeground=colors['light'], command=self.export_data)
+        self.export_button.pack(side=tk.LEFT, padx=spacing['small'])
+        self.settings_button = tk.Button(self.button_frame, text="设置", font=(fonts['family'], fonts['size']['normal'], 'bold'), bg=colors['primary'], fg=colors['light'], width=10, relief=tk.FLAT, cursor="hand2", activebackground=colors['secondary'], activeforeground=colors['light'], command=self.show_settings)
+        self.settings_button.pack(side=tk.LEFT, padx=spacing['small'])
+        self.exit_button = tk.Button(self.button_frame, text="退出", font=(fonts['family'], fonts['size']['normal'], 'bold'), bg=colors['text_secondary'], fg=colors['light'], width=10, relief=tk.FLAT, cursor="hand2", activebackground=colors['secondary'], activeforeground=colors['light'], command=self.root.quit)
+        self.exit_button.pack(side=tk.RIGHT, padx=spacing['small'])
 
         self.tree.bind('<Double-Button-1>', lambda e: self.edit_data())
 
@@ -269,11 +300,17 @@ class DataManagementWindow:
         
         dialog = tk.Toplevel(self.root)
         dialog.title(title)
-        dialog.geometry("600x500")
-        dialog.resizable(False, False)
+        dialog.geometry("800x600")
+        dialog.resizable(True, True)
         dialog.configure(bg=colors['background'])
         dialog.transient(self.root)
         dialog.grab_set()
+        
+        dialog.center_window = lambda: self._center_dialog(dialog)
+        dialog.center_window()
+        
+        dialog.force_top = lambda: self._force_dialog_top(dialog)
+        dialog.force_top()
 
         frame = tk.Frame(dialog, bg=colors['surface'], padx=spacing['xlarge'], pady=spacing['xlarge'], relief=tk.RAISED, bd=1)
         frame.pack(fill=tk.BOTH, expand=True, padx=spacing['large'], pady=spacing['large'])
@@ -285,7 +322,8 @@ class DataManagementWindow:
             row_frame = tk.Frame(frame, bg=colors['surface'])
             row_frame.pack(fill=tk.X, pady=spacing['normal'])
 
-            tk.Label(row_frame, text=f"{col}:", font=(fonts['family'], fonts['size']['normal'], 'bold'), bg=colors['surface'], fg=colors['text'], width=18, anchor='e').pack(side=tk.LEFT, padx=(0, spacing['small']))
+            translated_col = get_field_name(self.current_table, col)
+            tk.Label(row_frame, text=f"{translated_col}:", font=(fonts['family'], fonts['size']['normal'], 'bold'), bg=colors['surface'], fg=colors['header'], width=18, anchor='e').pack(side=tk.LEFT, padx=(0, spacing['small']))
             
             entry = tk.Entry(row_frame, font=(fonts['family'], fonts['size']['small']), relief=tk.SOLID, bd=1)
             entry.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(0, spacing['small']))
@@ -306,7 +344,7 @@ class DataManagementWindow:
             for col in columns:
                 value = entries[col].get().strip()
                 if not value:
-                    messagebox.showwarning("警告", f"{col}不能为空")
+                    messagebox.showwarning("警告", f"{get_field_name(self.current_table, col)}不能为空")
                     return
                 data[col] = value
 
@@ -326,6 +364,18 @@ class DataManagementWindow:
             else:
                 logger.error(f"数据保存失败: {result}")
                 messagebox.showerror("错误", result)
+    
+    def _center_dialog(self, dialog):
+        dialog.update_idletasks()
+        width = dialog.winfo_width()
+        height = dialog.winfo_height()
+        x = (dialog.winfo_screenwidth() // 2) - (width // 2)
+        y = (dialog.winfo_screenheight() // 2) - (height // 2)
+        dialog.geometry(f'{width}x{height}+{x}+{y}')
+    
+    def _force_dialog_top(self, dialog):
+        dialog.attributes('-topmost', True)
+        dialog.after(3000, lambda: dialog.attributes('-topmost', False))
 
     def batch_delete(self):
         if not self.current_table:
@@ -564,8 +614,154 @@ class DataManagementWindow:
         self.theme_manager.set_theme(theme_name)
         logger.info(f"主题已切换为: {theme_name}")
         
-        self.apply_theme()
-        
         dialog.destroy()
         
-        messagebox.showinfo("成功", f"主题已切换为 {theme_name}\n请重启应用程序以完全应用新主题")
+        self.apply_theme()
+        self.create_widgets()
+        
+        if self.current_table:
+            self.refresh_data()
+
+    def toggle_theme(self):
+        self.theme_manager.toggle_theme()
+        
+        self.apply_theme()
+        self.update_widgets_theme()
+        
+        if self.current_table:
+            self.refresh_data()
+    
+    def update_widgets_theme(self):
+        theme = self.theme_manager.get_current_theme()
+        colors = theme['colors']
+        fonts = theme['fonts']
+        
+        try:
+            self.root.configure(bg=colors['background'])
+            
+            if hasattr(self, 'main_frame'):
+                self.main_frame.configure(bg=colors['background'])
+            
+            if hasattr(self, 'left_frame'):
+                self.left_frame.configure(bg=colors['surface'])
+            
+            if hasattr(self, 'right_frame'):
+                self.right_frame.configure(bg=colors['surface'])
+            
+            if hasattr(self, 'search_frame'):
+                self.search_frame.configure(bg=colors['card'])
+            
+            if hasattr(self, 'search_entry'):
+                self.search_entry.configure(
+                    bg=colors['background'],
+                    fg=colors['text'],
+                    insertbackground=colors['primary']
+                )
+            
+            if hasattr(self, 'refresh_button'):
+                self.refresh_button.configure(
+                    bg=colors['primary'],
+                    fg=colors['background'],
+                    activebackground=colors['hover_dark'],
+                    activeforeground=colors['background']
+                )
+            
+            if hasattr(self, 'theme_switch'):
+                self.theme_switch.update_appearance()
+            
+            if hasattr(self, 'table_listbox'):
+                self.table_listbox.configure(
+                    bg=colors['card'],
+                    fg=colors['text'],
+                    selectbackground=colors['primary'],
+                    selectforeground=colors['background']
+                )
+            
+            if hasattr(self, 'tree_frame'):
+                self.tree_frame.configure(bg=colors['surface'])
+            
+            if hasattr(self, 'tree'):
+                style = ttk.Style()
+                style.theme_use('clam')
+                style.configure("Treeview",
+                               background=colors['surface'],
+                               foreground=colors['text'],
+                               fieldbackground=colors['surface'],
+                               rowheight=fonts['size']['normal'] * 2 + 8)
+                style.configure("Treeview.Heading", 
+                               background=colors['header'],
+                               foreground=colors['text'],
+                               borderwidth=0)
+                style.map("Treeview",
+                         background=[('selected', colors['primary'])],
+                         foreground=[('selected', colors['background'])])
+            
+            if hasattr(self, 'button_frame'):
+                self.button_frame.configure(bg=colors['light'])
+            
+            if hasattr(self, 'add_button'):
+                self.add_button.configure(
+                    bg=colors['success'],
+                    fg=colors['background'],
+                    activebackground=colors['hover_dark'],
+                    activeforeground=colors['background']
+                )
+            
+            if hasattr(self, 'edit_button'):
+                self.edit_button.configure(
+                    bg=colors['warning'],
+                    fg=colors['background'],
+                    activebackground=colors['hover_dark'],
+                    activeforeground=colors['background']
+                )
+            
+            if hasattr(self, 'delete_button'):
+                self.delete_button.configure(
+                    bg=colors['danger'],
+                    fg=colors['background'],
+                    activebackground=colors['hover_dark'],
+                    activeforeground=colors['background']
+                )
+            
+            if hasattr(self, 'batch_delete_button'):
+                self.batch_delete_button.configure(
+                    bg=colors['danger'],
+                    fg=colors['background'],
+                    activebackground=colors['hover_dark'],
+                    activeforeground=colors['background']
+                )
+            
+            if hasattr(self, 'statistics_button'):
+                self.statistics_button.configure(
+                    bg=colors['accent'],
+                    fg=colors['background'],
+                    activebackground=colors['hover_dark'],
+                    activeforeground=colors['background']
+                )
+            
+            if hasattr(self, 'export_button'):
+                self.export_button.configure(
+                    bg=colors['accent'],
+                    fg=colors['background'],
+                    activebackground=colors['hover_dark'],
+                    activeforeground=colors['background']
+                )
+            
+            if hasattr(self, 'settings_button'):
+                self.settings_button.configure(
+                    bg=colors['primary'],
+                    fg=colors['background'],
+                    activebackground=colors['hover_dark'],
+                    activeforeground=colors['background']
+                )
+            
+            if hasattr(self, 'exit_button'):
+                self.exit_button.configure(
+                    bg=colors['text_secondary'],
+                    fg=colors['background'],
+                    activebackground=colors['hover_dark'],
+                    activeforeground=colors['background']
+                )
+            
+        except Exception as e:
+            logger.error(f"更新控件主题时出错: {e}")

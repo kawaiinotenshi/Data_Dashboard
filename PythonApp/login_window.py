@@ -19,8 +19,23 @@ class LoginWindow:
         
         self.root.protocol("WM_DELETE_WINDOW", self.on_close)
         
+        self.center_window()
+        self.force_top()
+        
         self.apply_theme()
         self.create_widgets()
+    
+    def center_window(self):
+        self.root.update_idletasks()
+        width = self.root.winfo_width()
+        height = self.root.winfo_height()
+        x = (self.root.winfo_screenwidth() // 2) - (width // 2)
+        y = (self.root.winfo_screenheight() // 2) - (height // 2)
+        self.root.geometry(f'{width}x{height}+{x}+{y}')
+    
+    def force_top(self):
+        self.root.attributes('-topmost', True)
+        self.root.after(3000, lambda: self.root.attributes('-topmost', False))
 
     def apply_theme(self):
         theme = self.theme_manager.get_current_theme()

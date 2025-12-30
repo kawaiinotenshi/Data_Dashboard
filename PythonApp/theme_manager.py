@@ -101,6 +101,16 @@ class ThemeManager:
         else:
             logger.warning(f"未找到主题: {theme_name}")
     
+    def toggle_theme(self):
+        """切换主题"""
+        if self.current_theme == 'lightness':
+            self.current_theme = 'darkness'
+        else:
+            self.current_theme = 'lightness'
+        self.save_user_settings()
+        logger.info(f"主题已切换为: {self.current_theme}")
+        return self.get_current_theme()
+    
     def is_feature_enabled(self, feature_name):
         """检查灰度测试功能是否启用"""
         if not GRAYSCALE_TESTING['enabled']:

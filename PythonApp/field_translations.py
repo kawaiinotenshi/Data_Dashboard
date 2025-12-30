@@ -5,37 +5,53 @@
 
 # 数据表字段翻译映射
 FIELD_TRANSLATIONS = {
-    'orders': {
-        'table_name': '订单',
+    'business_quarterly': {
+        'table_name': '业务季度数据',
         'fields': {
-            'id': '订单ID',
-            'order_number': '订单编号',
-            'customer_name': '客户名称',
-            'product_name': '产品名称',
-            'quantity': '数量',
-            'price': '价格',
-            'status': '状态',
-            'order_date': '订单日期',
-            'delivery_date': '配送日期',
+            'id': 'ID',
+            'year': '年份',
+            'quarter': '季度',
+            'business_type': '业务类型',
+            'amount': '金额',
+            'growth_rate': '增长率',
+            'created_time': '创建时间'
+        }
+    },
+    'customer': {
+        'table_name': '客户',
+        'fields': {
+            'id': '客户ID',
+            'name': '客户名称',
+            'contact_person': '联系人',
+            'phone': '电话',
+            'address': '地址',
             'created_time': '创建时间',
             'updated_time': '更新时间',
             'is_deleted': '是否删除',
             'version': '版本'
         }
     },
-    'inventory': {
-        'table_name': '库存',
+    'customs_clearance': {
+        'table_name': '海关清关',
         'fields': {
-            'id': '库存ID',
-            'product_name': '产品名称',
+            'id': 'ID',
+            'country': '国家',
+            'product_type': '产品类型',
+            'quantity': '数量',
+            'year_month': '年月',
+            'growth_rate': '增长率',
+            'created_time': '创建时间'
+        }
+    },
+    'in_out_record': {
+        'table_name': '进出记录',
+        'fields': {
+            'id': 'ID',
+            'record_date': '记录日期',
+            'type': '类型',
             'quantity': '数量',
             'warehouse_id': '仓库ID',
-            'location': '位置',
-            'status': '状态',
-            'created_time': '创建时间',
-            'updated_time': '更新时间',
-            'is_deleted': '是否删除',
-            'version': '版本'
+            'created_time': '创建时间'
         }
     },
     'inventory_ratio': {
@@ -51,7 +67,51 @@ FIELD_TRANSLATIONS = {
             'version': '版本'
         }
     },
-    'warehouses': {
+    'orders': {
+        'table_name': '订单',
+        'fields': {
+            'id': '订单ID',
+            'order_no': '订单编号',
+            'customer_name': '客户名称',
+            'order_amount': '订单金额',
+            'order_date': '订单日期',
+            'status': '状态',
+            'created_time': '创建时间',
+            'updated_time': '更新时间',
+            'is_deleted': '是否删除',
+            'version': '版本'
+        }
+    },
+    'supplier': {
+        'table_name': '供应商',
+        'fields': {
+            'id': '供应商ID',
+            'name': '供应商名称',
+            'contact_person': '联系人',
+            'phone': '电话',
+            'address': '地址',
+            'created_time': '创建时间',
+            'updated_time': '更新时间',
+            'is_deleted': '是否删除',
+            'version': '版本'
+        }
+    },
+    'transport': {
+        'table_name': '运输',
+        'fields': {
+            'id': '运输ID',
+            'vehicle_type': '车辆类型',
+            'vehicle_count': '车辆数量',
+            'total_distance': '总距离',
+            'month': '月份',
+            'status': '状态',
+            'created_time': '创建时间',
+            'updated_time': '更新时间',
+            'is_deleted': '是否删除',
+            'version': '版本'
+        }
+    },
+    'warehouse': {
         'table_name': '仓库',
         'fields': {
             'id': '仓库ID',
@@ -67,87 +127,15 @@ FIELD_TRANSLATIONS = {
             'version': '版本'
         }
     },
-    'transport': {
-        'table_name': '运输',
-        'fields': {
-            'id': '运输ID',
-            'order_id': '订单ID',
-            'vehicle_number': '车辆编号',
-            'driver_name': '司机姓名',
-            'status': '状态',
-            'departure_time': '出发时间',
-            'arrival_time': '到达时间',
-            'created_time': '创建时间',
-            'updated_time': '更新时间',
-            'is_deleted': '是否删除',
-            'version': '版本'
-        }
-    },
-    'suppliers': {
-        'table_name': '供应商',
-        'fields': {
-            'id': '供应商ID',
-            'name': '名称',
-            'contact': '联系方式',
-            'address': '地址',
-            'created_time': '创建时间',
-            'updated_time': '更新时间',
-            'is_deleted': '是否删除',
-            'version': '版本'
-        }
-    },
-    'customers': {
-        'table_name': '客户',
-        'fields': {
-            'id': '客户ID',
-            'name': '名称',
-            'phone': '电话',
-            'email': '邮箱',
-            'address': '地址',
-            'created_time': '创建时间',
-            'updated_time': '更新时间',
-            'is_deleted': '是否删除',
-            'version': '版本'
-        }
-    },
-    'warehouse_utilization': {
-        'table_name': '仓库利用率',
+    'warehouse_distribution': {
+        'table_name': '仓库分布',
         'fields': {
             'id': 'ID',
-            'warehouse_name': '仓库名称',
-            'utilization_rate': '利用率',
-            'month': '月份',
-            'created_time': '创建时间',
-            'updated_time': '更新时间',
-            'is_deleted': '是否删除',
-            'version': '版本'
-        }
-    },
-    'transport_efficiency': {
-        'table_name': '运输效率',
-        'fields': {
-            'id': 'ID',
-            'vehicle_number': '车辆编号',
-            'efficiency': '效率',
-            'month': '月份',
-            'created_time': '创建时间',
-            'updated_time': '更新时间',
-            'is_deleted': '是否删除',
-            'version': '版本'
-        }
-    },
-    'order_statistics': {
-        'table_name': '订单统计',
-        'fields': {
-            'id': 'ID',
-            'month': '月份',
-            'total_orders': '总订单数',
-            'completed_orders': '完成订单数',
-            'pending_orders': '待处理订单数',
-            'created_time': '创建时间',
-            'updated_time': '更新时间',
-            'is_deleted': '是否删除',
-            'version': '版本'
+            'province': '省份',
+            'city': '城市',
+            'warehouse_count': '仓库数量',
+            'total_capacity': '总容量',
+            'created_time': '创建时间'
         }
     }
 }

@@ -29,7 +29,7 @@ APP_CONFIG = {
     'author': '物流管理团队',
     'description': '高效、安全的物流数据管理解决方案',
     'icon': None,  # 可以设置为图标文件路径
-    'theme': 'industrial',  # industrial, modern, classic
+    'theme': 'lightness',  # lightness, darkness
     'language': 'zh_CN',
     'auto_save': True,
     'auto_save_interval': 300,  # 秒
@@ -44,41 +44,31 @@ APP_CONFIG = {
 
 # AB测试配置
 AB_TESTING = {
-    'enabled': True,
+    'enabled': False,
     'test_groups': {
         'control': {
             'name': '控制组',
-            'description': '使用标准界面',
+            'description': '使用明亮风格界面',
             'features': {
-                'theme': 'industrial',
+                'theme': 'lightness',
                 'layout': 'standard',
                 'animations': False
             }
         },
         'variant_a': {
             'name': '实验组A',
-            'description': '使用现代化界面',
+            'description': '使用暗黑风格界面',
             'features': {
-                'theme': 'modern',
+                'theme': 'darkness',
                 'layout': 'compact',
                 'animations': True
-            }
-        },
-        'variant_b': {
-            'name': '实验组B',
-            'description': '使用经典界面',
-            'features': {
-                'theme': 'classic',
-                'layout': 'expanded',
-                'animations': False
             }
         }
     },
     'current_group': 'control',  # 默认分组
     'allocation_ratio': {
         'control': 0.5,
-        'variant_a': 0.25,
-        'variant_b': 0.25
+        'variant_a': 0.5
     }
 }
 
@@ -115,107 +105,109 @@ GRAYSCALE_TESTING = {
 
 # 主题配置
 THEMES = {
-    'industrial': {
-        'name': '工业风格',
-        'description': '简洁、专业的工业风格界面',
+    'lightness': {
+        'name': '明亮风格',
+        'description': '明亮、清晰的界面设计',
         'colors': {
-            'primary': '#2c3e50',
-            'secondary': '#34495e',
-            'accent': '#3498db',
-            'success': '#27ae60',
-            'warning': '#f39c12',
-            'danger': '#e74c3c',
+            'primary': '#2196F3',
+            'secondary': '#757575',
+            'accent': '#FF4081',
+            'success': '#4CAF50',
+            'warning': '#FF9800',
+            'danger': '#F44336',
             'light': '#ecf0f1',
             'dark': '#2c3e50',
-            'background': '#f5f5f5',
-            'surface': '#ffffff',
-            'text': '#2c3e50',
-            'text_secondary': '#7f8c8d'
+            'background': '#FFFFFF',
+            'surface': '#F5F5F5',
+            'card': '#FFFFFF',
+            'dialog': '#FFFFFF',
+            'text': '#212121',
+            'text_secondary': '#757575',
+            'header': '#0066cc',
+            'border_light': '#E0E0E0',
+            'border_normal': '#BDBDBD',
+            'border_dark': '#616161',
+            'hover_light': '#F5F5F5',
+            'hover_dark': '#E0E0E0',
+            'status_active': '#2196F3',
+            'status_inactive': '#BDBDBD'
         },
         'fonts': {
-            'family': '微软雅黑',
+            'family': 'Microsoft YaHei',
             'size': {
-                'small': 9,
-                'normal': 10,
-                'large': 12,
-                'xlarge': 14
+                'small': 10,
+                'normal': 12,
+                'large': 14,
+                'xlarge': 16,
+                'title': 16,
+                'heading': 18
+            },
+            'weight': {
+                'normal': 'normal',
+                'bold': 'bold'
             }
         },
         'spacing': {
-            'small': 5,
-            'normal': 10,
-            'large': 15,
-            'xlarge': 20
-        },
-        'border_radius': 2
-    },
-    'modern': {
-        'name': '现代风格',
-        'description': '清新、现代的界面设计',
-        'colors': {
-            'primary': '#3498db',
-            'secondary': '#2980b9',
-            'accent': '#e74c3c',
-            'success': '#2ecc71',
-            'warning': '#f1c40f',
-            'danger': '#e74c3c',
-            'light': '#ecf0f1',
-            'dark': '#34495e',
-            'background': '#ffffff',
-            'surface': '#f8f9fa',
-            'text': '#2c3e50',
-            'text_secondary': '#7f8c8d'
-        },
-        'fonts': {
-            'family': '微软雅黑',
-            'size': {
-                'small': 9,
-                'normal': 10,
-                'large': 12,
-                'xlarge': 14
-            }
-        },
-        'spacing': {
-            'small': 8,
-            'normal': 12,
-            'large': 18,
+            'tiny': 2,
+            'small': 4,
+            'normal': 8,
+            'medium': 12,
+            'large': 16,
             'xlarge': 24
         },
         'border_radius': 6
     },
-    'classic': {
-        'name': '经典风格',
-        'description': '传统、稳重的界面设计',
+    'darkness': {
+        'name': '暗黑风格',
+        'description': '暗黑、舒适的界面设计',
         'colors': {
-            'primary': '#34495e',
-            'secondary': '#2c3e50',
-            'accent': '#3498db',
-            'success': '#27ae60',
-            'warning': '#f39c12',
-            'danger': '#c0392b',
+            'primary': '#64B5F6',
+            'secondary': '#9E9E9E',
+            'accent': '#FF80AB',
+            'success': '#81C784',
+            'warning': '#FFB74D',
+            'danger': '#E57373',
             'light': '#ecf0f1',
             'dark': '#2c3e50',
-            'background': '#f5f5f5',
-            'surface': '#ffffff',
-            'text': '#2c3e50',
-            'text_secondary': '#7f8c8d'
+            'background': '#121212',
+            'surface': '#1E1E1E',
+            'card': '#2D2D2D',
+            'dialog': '#2D2D2D',
+            'text': '#FFFFFF',
+            'text_secondary': '#B0B0B0',
+            'header': '#4da6ff',
+            'border_light': '#424242',
+            'border_normal': '#616161',
+            'border_dark': '#757575',
+            'hover_light': '#2D2D2D',
+            'hover_dark': '#424242',
+            'status_active': '#64B5F6',
+            'status_inactive': '#616161'
         },
         'fonts': {
-            'family': '宋体',
+            'family': 'Microsoft YaHei',
             'size': {
-                'small': 9,
-                'normal': 11,
-                'large': 13,
-                'xlarge': 15
+                'small': 10,
+                'normal': 12,
+                'large': 14,
+                'xlarge': 16,
+                'title': 16,
+                'heading': 18
+            },
+            'weight': {
+                'normal': 'normal',
+                'bold': 'bold'
             }
         },
         'spacing': {
-            'small': 5,
-            'normal': 10,
-            'large': 15,
-            'xlarge': 20
+            'tiny': 2,
+            'small': 4,
+            'normal': 8,
+            'medium': 12,
+            'large': 16,
+            'xlarge': 24
         },
-        'border_radius': 0
+        'border_radius': 6
     }
 }
 
@@ -265,7 +257,7 @@ def get_theme(theme_name=None):
     if theme_name is None:
         theme_name = APP_CONFIG['theme']
     
-    return THEMES.get(theme_name, THEMES['industrial'])
+    return THEMES.get(theme_name, THEMES['lightness'])
 
 # 获取当前AB测试组配置
 def get_ab_test_group():
