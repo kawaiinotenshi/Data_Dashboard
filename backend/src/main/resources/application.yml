@@ -26,12 +26,6 @@ mybatis-plus:
       logic-not-delete-value: 0
   mapper-locations: classpath:mapper/*.xml
 
-springfox:
-  documentation:
-    swagger-ui:
-      enabled: ${SWAGGER_ENABLED:true}
-    enabled: ${SWAGGER_ENABLED:true}
-
 logging:
   level:
     root: info
