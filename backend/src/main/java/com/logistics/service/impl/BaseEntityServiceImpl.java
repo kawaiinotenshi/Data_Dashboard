@@ -1,5 +1,6 @@
 package com.logistics.service.impl;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.logistics.common.exception.ResourceNotFoundException;
 import org.springframework.beans.BeanUtils;
@@ -10,7 +11,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public abstract class BaseEntityServiceImpl<M, T> extends ServiceImpl<M, T> {
+public abstract class BaseEntityServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, T> {
 
     protected abstract String getEntityName();
 

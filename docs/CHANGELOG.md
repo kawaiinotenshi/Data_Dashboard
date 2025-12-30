@@ -1,5 +1,38 @@
 # 更新日志
 
+## [2025-12-30]
+
+### 项目结构优化与代码冗余减少
+- 前端API结构优化
+  - 整合API文件，将customer.js、supplier.js、order.js、warehouse.js、transport.js、inventory.js合并到index.js
+  - 更新所有store文件使用统一的API接口（api.customer.list、api.supplier.list等）
+  - 更新所有组件使用统一的API接口
+  - 删除冗余的API文件，减少代码重复
+
+- 前端Store优化
+  - 创建通用的实体Store工厂（useEntityStore.js）
+  - 实现统一的CRUD操作、批量操作、状态管理
+  - 重构customer.js、supplier.js、order.js、warehouse.js、transport.js、inventory.js使用工厂模式
+  - 减少代码重复，提高可维护性
+
+- 后端Service层优化
+  - 创建BaseEntityServiceImpl基类，提供通用的CRUD操作和实体转换方法
+  - 重构CustomerServiceImpl、SupplierServiceImpl、WarehouseServiceImpl、OrderServiceImpl、TransportServiceImpl、InventoryServiceImpl
+  - 减少重复代码，统一异常处理和事务管理
+
+- 安全优化
+  - 优化SqlInjectionUtils.java，删除130+重复的Pattern.compile条目
+  - 减少文件大小约65%，保持安全防护效果
+
+- 文档清理
+  - 删除冗余文档文件（MCP_MYSQL_FIX.md、环境配置参考.md）
+  - 保留核心文档（CHANGELOG.md、DEPLOY.md、DEPLOY_LOCAL.md、DOCKER_DB.md、LAUNCHER_GUIDE.md、PROJECT_MANUAL.md、MYBATIS_PLUS_REFACTOR.md）
+
+### 项目测试
+- 全面测试所有API端点功能
+- 验证前端与后端集成
+- 确认数据流正确性
+
 ## [2025-12-29]
 
 ### SQL防注入实现

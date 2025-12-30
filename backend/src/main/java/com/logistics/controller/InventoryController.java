@@ -30,54 +30,11 @@ public class InventoryController {
         return Result.success(list);
     }
 
-    @GetMapping("/{id}")
-    @ApiOperation("根据ID获取库存")
-    public Result<InventoryVO> getInventoryById(@ApiParam("库存ID") @PathVariable Long id) {
-        InventoryVO inventoryVO = inventoryService.getInventoryById(id);
-        return Result.success(inventoryVO);
-    }
-
     @GetMapping("/warehouse/{warehouseId}")
     @ApiOperation("按仓库获取库存")
     public Result<List<InventoryVO>> getInventoryByWarehouse(@ApiParam("仓库ID") @PathVariable Long warehouseId) {
         List<InventoryVO> list = inventoryService.getInventoryVOsByWarehouse(warehouseId);
         return Result.success(list);
-    }
-
-    @PostMapping
-    @ApiOperation("创建库存")
-    public Result<Void> createInventory(@RequestBody InventoryRequestVO inventoryRequestVO) {
-        inventoryService.createInventory(inventoryRequestVO);
-        return Result.success();
-    }
-
-    @PutMapping("/{id}")
-    @ApiOperation("更新库存")
-    public Result<Void> updateInventory(@ApiParam("库存ID") @PathVariable Long id, @RequestBody InventoryRequestVO inventoryRequestVO) {
-        inventoryService.updateInventory(id, inventoryRequestVO);
-        return Result.success();
-    }
-
-    @DeleteMapping("/{id}")
-    @ApiOperation("删除库存")
-    public Result<Void> deleteInventory(@ApiParam("库存ID") @PathVariable Long id) {
-        boolean success = inventoryService.deleteInventory(id);
-        if (success) {
-            return Result.success();
-        } else {
-            return Result.error("删除库存记录失败");
-        }
-    }
-
-    @DeleteMapping("/batch")
-    @ApiOperation("批量删除库存")
-    public Result<Void> batchDeleteInventories(@RequestBody List<Long> ids) {
-        boolean success = inventoryService.batchDeleteInventories(ids);
-        if (success) {
-            return Result.success();
-        } else {
-            return Result.error("批量删除库存记录失败");
-        }
     }
 
     @GetMapping("/statistics")
@@ -101,10 +58,60 @@ public class InventoryController {
         return Result.success(list);
     }
 
+    @GetMapping("/enterprise-ratio")
+    @ApiOperation("获取企业库存占比")
+    public Result<List<Map<String, Object>>> getInventoryByEnterpriseRatio() {
+        List<Map<String, Object>> list = inventoryService.getInventoryByEnterpriseRatio();
+        return Result.success(list);
+    }
+
     @GetMapping("/trend")
     @ApiOperation("获取库存趋势")
     public Result<List<Map<String, Object>>> getInventoryTrend() {
         List<Map<String, Object>> list = inventoryService.getInventoryTrend();
         return Result.success(list);
+    }
+
+    @GetMapping("/{id:\\d+}")
+    @ApiOperation("根据ID获取库存")
+    public Result<InventoryVO> getInventoryById(@ApiParam("库存ID") @PathVariable Long id) {
+        InventoryVO inventoryVO = inventoryService.getInventoryById(id);
+        return Result.success(inventoryVO);
+    }
+
+    @PostMapping
+    @ApiOperation("创建库存")
+    public Result<Void> createInventory(@RequestBody InventoryRequestVO inventoryRequestVO) {
+        inventoryService.createInventory(inventoryRequestVO);
+        return Result.success();
+    }
+
+    @PutMapping("/{id:\\d+}")
+    @ApiOperation("更新库存")
+    public Result<Void> updateInventory(@ApiParam("库存ID") @PathVariable Long id, @RequestBody InventoryRequestVO inventoryRequestVO) {
+        inventoryService.updateInventory(id, inventoryRequestVO);
+        return Result.success();
+    }
+
+    @DeleteMapping("/{id:\\d+}")
+    @ApiOperation("删除库存")
+    public Result<Void> deleteInventory(@ApiParam("库存ID") @PathVariable Long id) {
+        boolean success = inventoryService.deleteInventory(id);
+        if (success) {
+            return Result.success();
+        } else {
+            return Result.error("删除库存记录失败");
+        }
+    }
+
+    @DeleteMapping("/batch")
+    @ApiOperation("批量删除库存")
+    public Result<Void> batchDeleteInventories(@RequestBody List<Long> ids) {
+        boolean success = inventoryService.batchDeleteInventories(ids);
+        if (success) {
+            return Result.success();
+        } else {
+            return Result.error("批量删除库存记录失败");
+        }
     }
 }

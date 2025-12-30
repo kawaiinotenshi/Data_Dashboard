@@ -110,9 +110,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 import * as echarts from 'echarts'
-import { getWarehouseList } from '@/api/warehouse'
-import { getInventoryList } from '@/api/inventory'
-import { getOrderList } from '@/api/order'
+import { api } from '@/api/index'
 
 const activeTab = ref(0)
 const ceshi3Ref = ref(null)
@@ -144,7 +142,7 @@ const initChart3 = async () => {
   let chartData = { name: '大连仓', value: 75 }
   
   try {
-    const response = await getWarehouseList()
+    const response = await api.warehouse.list()
     if (response.code === 200 && response.data && response.data.length > 0) {
       const warehouse = response.data.find(w => w.name === '大连仓') || response.data[0]
       chartData = {
@@ -239,19 +237,22 @@ const initChart3 = async () => {
             value: {
               fontSize: 20,
               fontWeight: 'bolder',
-              color: '#fff'
+              color: '#fff',
+              fontFamily: '微软雅黑, Microsoft YaHei, sans-serif'
             },
             unit: {
               fontSize: 12,
               color: '#fff',
-              padding: [0, 0, 0, 2]
+              padding: [0, 0, 0, 2],
+              fontFamily: '微软雅黑, Microsoft YaHei, sans-serif'
             }
           }
         },
         title: {
           offsetCenter: [0, '-20%'],
           fontSize: 12,
-          color: '#fff'
+          color: '#fff',
+          fontFamily: '微软雅黑, Microsoft YaHei, sans-serif'
         },
         data: [chartData]
       }
@@ -271,7 +272,7 @@ const initChart4 = async () => {
   let chartData = { name: '青岛仓', value: 82 }
   
   try {
-    const response = await getWarehouseList()
+    const response = await api.warehouse.list()
     if (response.code === 200 && response.data && response.data.length > 0) {
       const warehouse = response.data.find(w => w.name === '青岛仓') || response.data[1] || response.data[0]
       chartData = {
@@ -366,19 +367,22 @@ const initChart4 = async () => {
             value: {
               fontSize: 20,
               fontWeight: 'bolder',
-              color: '#fff'
+              color: '#fff',
+              fontFamily: '微软雅黑, Microsoft YaHei, sans-serif'
             },
             unit: {
               fontSize: 12,
               color: '#fff',
-              padding: [0, 0, 0, 2]
+              padding: [0, 0, 0, 2],
+              fontFamily: '微软雅黑, Microsoft YaHei, sans-serif'
             }
           }
         },
         title: {
           offsetCenter: [0, '-20%'],
           fontSize: 12,
-          color: '#fff'
+          color: '#fff',
+          fontFamily: '微软雅黑, Microsoft YaHei, sans-serif'
         },
         data: [chartData]
       }
@@ -398,7 +402,7 @@ const initChart5 = async () => {
   let chartData = { name: '宁波仓', value: 68 }
   
   try {
-    const response = await getWarehouseList()
+    const response = await api.warehouse.list()
     if (response.code === 200 && response.data && response.data.length > 0) {
       const warehouse = response.data.find(w => w.name === '宁波仓') || response.data[2] || response.data[0]
       chartData = {
@@ -493,19 +497,22 @@ const initChart5 = async () => {
             value: {
               fontSize: 20,
               fontWeight: 'bolder',
-              color: '#fff'
+              color: '#fff',
+              fontFamily: '微软雅黑, Microsoft YaHei, sans-serif'
             },
             unit: {
               fontSize: 12,
               color: '#fff',
-              padding: [0, 0, 0, 2]
+              padding: [0, 0, 0, 2],
+              fontFamily: '微软雅黑, Microsoft YaHei, sans-serif'
             }
           }
         },
         title: {
           offsetCenter: [0, '-20%'],
           fontSize: 12,
-          color: '#fff'
+          color: '#fff',
+          fontFamily: '微软雅黑, Microsoft YaHei, sans-serif'
         },
         data: [chartData]
       }

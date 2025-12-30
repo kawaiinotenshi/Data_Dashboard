@@ -36,9 +36,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 import * as echarts from 'echarts'
-import { getWarehouseList } from '@/api/warehouse'
-import { getTransportList } from '@/api/transport'
-import { getOrderList } from '@/api/order'
+import { api } from '@/api/index'
 
 const ceshi8Ref = ref(null)
 const ceshi6Ref = ref(null)
@@ -98,7 +96,7 @@ const initChart8 = async () => {
   ]
   
   try {
-    const response = await getWarehouseList()
+    const response = await api.warehouse.list()
     if (response.code === 200 && response.data) {
       const cityMap = {
         '北京': '北京', '天津': '天津', '上海': '上海', '重庆': '重庆',
@@ -150,11 +148,11 @@ const initChart8 = async () => {
           color: '#fff'
         },
         itemStyle: {
-          normal: {
-            borderColor: '#389BB7',
-            areaColor: '#389BB7'
-          },
-          emphasis: {
+          borderColor: '#389BB7',
+          areaColor: '#389BB7'
+        },
+        emphasis: {
+          itemStyle: {
             areaColor: '#2a333d'
           }
         },
@@ -177,7 +175,7 @@ const initChart6 = async () => {
   let outboundData = [220, 182, 191, 234, 290, 330, 310]
   
   try {
-    const response = await getTransportList()
+    const response = await api.transport.list()
     if (response.code === 200 && response.data) {
       inboundData = response.data.slice(0, 7).map(item => item.vehicleCount || 0)
       outboundData = response.data.slice(0, 7).map(item => item.totalDistance || 0)
@@ -244,7 +242,7 @@ const initChart7 = async () => {
   let deliveryData = [220, 182, 191, 234]
   
   try {
-    const response = await getOrderList()
+    const response = await api.order.list()
     if (response.code === 200 && response.data) {
       const q1Data = response.data.filter(item => {
         if (!item.orderDate) return false

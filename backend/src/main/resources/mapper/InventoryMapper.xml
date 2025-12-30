@@ -40,6 +40,15 @@
         ORDER BY avgRatio DESC
     </select>
 
+    <select id="selectInventoryByEnterpriseRatio" resultType="java.util.Map">
+        SELECT 
+            enterprise_name,
+            ratio,
+            month
+        FROM inventory_ratio
+        ORDER BY ratio DESC
+    </select>
+
     <select id="selectInventoryTrend" resultType="java.util.Map">
         SELECT 
             month,

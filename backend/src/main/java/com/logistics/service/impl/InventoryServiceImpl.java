@@ -113,6 +113,11 @@ public class InventoryServiceImpl extends BaseEntityServiceImpl<InventoryMapper,
     }
 
     @Override
+    public List<Map<String, Object>> getInventoryByEnterpriseRatio() {
+        return baseMapper.selectInventoryByEnterpriseRatio();
+    }
+
+    @Override
     public List<Map<String, Object>> getInventoryTrend() {
         return baseMapper.selectInventoryTrend();
     }

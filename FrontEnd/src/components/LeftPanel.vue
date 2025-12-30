@@ -34,11 +34,12 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 import * as echarts from 'echarts'
-import { getInventoryList } from '@/api/inventory'
-import { getOrderList } from '@/api/order'
+import { api } from '@/api/index'
+import { useOrderStore } from '@/stores/order'
 
 const ceshiRef = ref(null)
 const ceshi2Ref = ref(null)
+const orderStore = useOrderStore()
 let chart1 = null
 let chart2 = null
 let resizeObserver1 = null
@@ -59,15 +60,17 @@ const initChart1 = async () => {
     { name: '大型设备专用仓', value: 3 }
   ]
   try {
-    const response = await getInventoryList()
-    if (response.code === 200 && response.data) {
-      ydata = response.data.map((item, index) => ({
-        name: item.enterpriseName || `仓库${index + 1}`,
+    const response = await api.inventory.getEnterpriseRatio()
+    console.log('企业库存占比API响应:', response)
+    if (response.code === 200 && response.data && response.data.length > 0) {
+      ydata = response.data.map(item => ({
+        name: item.enterprise_name || item.enterpriseName || '未知企业',
         value: item.ratio || 0
       }))
+      console.log('处理后的图表数据:', ydata)
     }
   } catch (error) {
-    console.error('获取库存数据失败:', error)
+    console.error('获取企业库存占比失败:', error)
   }
   const color = [
     '#8d7fec',
@@ -86,7 +89,7 @@ const initChart1 = async () => {
   const option = {
     color: color,
     legend: {
-      orient: 'vartical',
+      orient: 'vertical',
       x: 'left',
       top: 'center',
       left: '53%',
@@ -95,7 +98,8 @@ const initChart1 = async () => {
       itemWidth: 8,
       itemHeight: 8,
       textStyle: {
-        color: '#fff'
+        color: '#fff',
+        fontFamily: '微软雅黑, Microsoft YaHei, sans-serif'
       },
       formatter: function (name) {
         return '' + name
@@ -110,28 +114,24 @@ const initChart1 = async () => {
         center: ['30%', '45%'],
         avoidLabelOverlap: false,
         itemStyle: {
-          normal: {
-            borderColor: '#ffffff',
-            borderWidth: 2
-          }
+          borderColor: '#ffffff',
+          borderWidth: 2
         },
         label: {
-          normal: {
-            show: false,
-            position: 'center'
-          },
-          emphasis: {
+          show: false,
+          position: 'center',
+          fontFamily: '微软雅黑, Microsoft YaHei, sans-serif'
+        },
+        emphasis: {
+          label: {
             show: true,
-            textStyle: {
-              fontSize: '12',
-              fontWeight: 'bold'
-            }
+            fontSize: '12',
+            fontWeight: 'bold',
+            fontFamily: '微软雅黑, Microsoft YaHei, sans-serif'
           }
         },
         labelLine: {
-          normal: {
-            show: false
-          }
+          show: false
         },
         data: ydata
       }
@@ -148,13 +148,8 @@ const initChart1 = async () => {
 const initChart2 = async () => {
   chart2 = echarts.init(ceshi2Ref.value)
   let barData = [120, 132, 101, 134, 90, 230, 210, 180, 200, 190, 220, 250]
-  try {
-    const response = await getOrderList()
-    if (response.code === 200 && response.data) {
-      barData = response.data.slice(0, 12).map(item => item.orderAmount || 0)
-    }
-  } catch (error) {
-    console.error('获取订单数据失败:', error)
+  if (orderStore.orderList.length > 0) {
+    barData = orderStore.orderList.slice(0, 12).map(item => item.orderAmount || 0)
   }
   const option = {
     tooltip: {
@@ -206,7 +201,7 @@ const handleResize = () => {
   chart2 && chart2.resize()
 }
 
-onMounted(() => {
+onMounted(async () => {
   initChart1()
   initChart2()
   window.addEventListener('resize', handleResize)

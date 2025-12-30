@@ -17,5 +17,7 @@ public interface InventoryMapper extends BaseMapper<Inventory> {
     
     List<Map<String, Object>> selectInventoryByEnterpriseRanking();
     
+    List<Map<String, Object>> selectInventoryByEnterpriseRatio();
+    
     List<Map<String, Object>> selectInventoryTrend();
 }

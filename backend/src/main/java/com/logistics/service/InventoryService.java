@@ -25,5 +25,6 @@ public interface InventoryService extends IService<Inventory> {
     Map<String, Object> getInventoryStatistics();
     List<InventoryVO> getInventoryByMonth(String month);
     List<Map<String, Object>> getInventoryByEnterpriseRanking();
+    List<Map<String, Object>> getInventoryByEnterpriseRatio();
     List<Map<String, Object>> getInventoryTrend();
 }
