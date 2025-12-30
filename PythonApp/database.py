@@ -1,19 +1,10 @@
 import mysql.connector
 from mysql.connector import Error
 import re
-import logging
-from datetime import datetime
 from config import DB_CONFIG
+from logger_config import setup_logger
 
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler('database.log', encoding='utf-8'),
-        logging.StreamHandler()
-    ]
-)
-logger = logging.getLogger(__name__)
+logger = setup_logger('database', 'database.log')
 
 
 class DatabaseManager:

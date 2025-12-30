@@ -2,17 +2,10 @@ import tkinter as tk
 from login_window import LoginWindow
 from data_management import DataManagementWindow
 from database import DatabaseManager
-import logging
+from theme_manager import ThemeManager
+from logger_config import setup_logger
 
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler('app.log', encoding='utf-8'),
-        logging.StreamHandler()
-    ]
-)
-logger = logging.getLogger(__name__)
+logger = setup_logger('app', 'app.log')
 
 
 class LogisticsApp:
@@ -21,6 +14,9 @@ class LogisticsApp:
         self.root = tk.Tk()
         self.root.withdraw()
         
+        self.theme_manager = ThemeManager()
+        logger.info(f"主题管理器初始化完成 - 当前主题: {self.theme_manager.current_theme}, AB测试组: {self.theme_manager.ab_test_group}")
+        
         self.db_manager = DatabaseManager()
         
         self.show_login()
@@ -28,7 +24,7 @@ class LogisticsApp:
     def show_login(self):
         logger.info("显示登录窗口")
         login_root = tk.Toplevel(self.root)
-        LoginWindow(login_root, self.on_login_success)
+        LoginWindow(login_root, self.on_login_success, self.theme_manager)
         self.root.wait_window(login_root)
         
         if not login_root.winfo_exists():
@@ -47,7 +43,7 @@ class LogisticsApp:
             self.root.quit()
 
     def show_data_management(self):
-        DataManagementWindow(self.root, self.db_manager)
+        DataManagementWindow(self.root, self.db_manager, self.theme_manager)
 
     def run(self):
         logger.info("进入主循环")

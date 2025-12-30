@@ -1,91 +1,116 @@
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
 from datetime import datetime
+from theme_manager import ThemeManager
+from logger_config import setup_logger
 import csv
 import os
-import logging
 
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler('app.log', encoding='utf-8'),
-        logging.StreamHandler()
-    ]
-)
-logger = logging.getLogger(__name__)
+logger = setup_logger('data_management', 'app.log')
 
 
 class DataManagementWindow:
-    def __init__(self, root, db_manager):
+    def __init__(self, root, db_manager, theme_manager):
         self.root = root
         self.db_manager = db_manager
+        self.theme_manager = theme_manager
         self.current_table = None
         
         self.root.title("物流管理系统 - 数据管理")
         self.root.geometry("1200x700")
         
+        self.apply_theme()
         self.create_widgets()
         self.load_tables()
 
-    def create_widgets(self):
-        self.root.configure(bg="#f0f0f0")
+    def apply_theme(self):
+        theme = self.theme_manager.get_current_theme()
+        colors = theme['colors']
         
-        main_frame = tk.Frame(self.root, bg="#f0f0f0")
-        main_frame.pack(fill=tk.BOTH, expand=True, padx=15, pady=15)
+        self.root.configure(bg=colors['background'])
 
-        left_frame = tk.Frame(main_frame, width=220, bg="white", relief=tk.RAISED, bd=1)
-        left_frame.pack(side=tk.LEFT, fill=tk.Y, padx=(0, 10))
+    def create_widgets(self):
+        theme = self.theme_manager.get_current_theme()
+        colors = theme['colors']
+        fonts = theme['fonts']
+        spacing = theme['spacing']
+        
+        self.root.configure(bg=colors['background'])
+        
+        main_frame = tk.Frame(self.root, bg=colors['background'])
+        main_frame.pack(fill=tk.BOTH, expand=True, padx=spacing['large'], pady=spacing['large'])
+
+        left_frame = tk.Frame(main_frame, width=220, bg=colors['surface'], relief=tk.RAISED, bd=1)
+        left_frame.pack(side=tk.LEFT, fill=tk.Y, padx=(0, spacing['normal']))
         left_frame.pack_propagate(False)
 
-        tk.Label(left_frame, text="数据表", font=("微软雅黑", 14, "bold"), bg="#34495e", fg="white").pack(fill=tk.X, pady=10)
+        tk.Label(left_frame, text="数据表", font=(fonts['family'], fonts['size']['large'], 'bold'), bg=colors['primary'], fg=colors['light']).pack(fill=tk.X, pady=spacing['normal'])
         
-        self.table_listbox = tk.Listbox(left_frame, font=("微软雅黑", 10), width=28, relief=tk.FLAT, bd=0, selectbackground="#3498db", selectforeground="white")
-        self.table_listbox.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
+        self.table_listbox = tk.Listbox(left_frame, font=(fonts['family'], fonts['size']['normal']), width=28, relief=tk.FLAT, bd=0, selectbackground=colors['accent'], selectforeground=colors['light'])
+        self.table_listbox.pack(fill=tk.BOTH, expand=True, padx=spacing['small'], pady=spacing['small'])
         self.table_listbox.bind('<<ListboxSelect>>', self.on_table_select)
 
-        right_frame = tk.Frame(main_frame, bg="white", relief=tk.RAISED, bd=1)
+        right_frame = tk.Frame(main_frame, bg=colors['surface'], relief=tk.RAISED, bd=1)
         right_frame.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
 
-        search_frame = tk.Frame(right_frame, bg="#ecf0f1", height=60)
-        search_frame.pack(fill=tk.X, padx=10, pady=10)
+        search_frame = tk.Frame(right_frame, bg=colors['light'], height=60)
+        search_frame.pack(fill=tk.X, padx=spacing['normal'], pady=spacing['normal'])
         search_frame.pack_propagate(False)
 
-        tk.Label(search_frame, text="搜索:", font=("微软雅黑", 11), bg="#ecf0f1", fg="#2c3e50").pack(side=tk.LEFT, padx=10)
-        self.search_entry = tk.Entry(search_frame, font=("微软雅黑", 10), width=35, relief=tk.SOLID, bd=1)
-        self.search_entry.pack(side=tk.LEFT, padx=5)
+        tk.Label(search_frame, text="搜索:", font=(fonts['family'], fonts['size']['normal']), bg=colors['light'], fg=colors['primary']).pack(side=tk.LEFT, padx=spacing['normal'])
+        self.search_entry = tk.Entry(search_frame, font=(fonts['family'], fonts['size']['small']), width=35, relief=tk.SOLID, bd=1)
+        self.search_entry.pack(side=tk.LEFT, padx=spacing['small'])
         self.search_entry.bind('<Return>', lambda e: self.search_data())
         
         search_button = tk.Button(
             search_frame,
             text="搜索",
-            font=("微软雅黑", 10),
-            bg="#3498db",
-            fg="white",
+            font=(fonts['family'], fonts['size']['small']),
+            bg=colors['accent'],
+            fg=colors['light'],
             width=8,
             relief=tk.FLAT,
             cursor="hand2",
+            activebackground=colors['secondary'],
+            activeforeground=colors['light'],
             command=self.search_data
         )
-        search_button.pack(side=tk.LEFT, padx=5)
+        search_button.pack(side=tk.LEFT, padx=spacing['small'])
 
         refresh_button = tk.Button(
             search_frame,
             text="刷新",
-            font=("微软雅黑", 10),
-            bg="#95a5a6",
-            fg="white",
+            font=(fonts['family'], fonts['size']['small']),
+            bg=colors['text_secondary'],
+            fg=colors['light'],
             width=8,
             relief=tk.FLAT,
             cursor="hand2",
+            activebackground=colors['secondary'],
+            activeforeground=colors['light'],
             command=self.refresh_data
         )
-        refresh_button.pack(side=tk.LEFT, padx=5)
+        refresh_button.pack(side=tk.LEFT, padx=spacing['small'])
 
-        tree_frame = tk.Frame(right_frame, bg="white")
-        tree_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=(0, 10))
+        tree_frame = tk.Frame(right_frame, bg=colors['surface'])
+        tree_frame.pack(fill=tk.BOTH, expand=True, padx=spacing['normal'], pady=(0, spacing['normal']))
 
-        self.tree = ttk.Treeview(tree_frame, show='headings', selectmode='extended')
+        style = ttk.Style()
+        style.configure("Treeview", 
+                       font=(fonts['family'], fonts['size']['small']),
+                       rowheight=25,
+                       background=colors['surface'],
+                       fieldbackground=colors['surface'],
+                       foreground=colors['text'])
+        style.configure("Treeview.Heading", 
+                       font=(fonts['family'], fonts['size']['normal'], 'bold'),
+                       background=colors['primary'],
+                       foreground=colors['light'])
+        style.map("Treeview", 
+                 background=[('selected', colors['accent'])],
+                 foreground=[('selected', colors['light'])])
+
+        self.tree = ttk.Treeview(tree_frame, show='headings', selectmode='extended', style="Treeview")
         self.tree.pack(fill=tk.BOTH, expand=True)
         
         scrollbar_y = ttk.Scrollbar(tree_frame, orient=tk.VERTICAL, command=self.tree.yview)
@@ -96,17 +121,18 @@ class DataManagementWindow:
         scrollbar_x.pack(side=tk.BOTTOM, fill=tk.X)
         self.tree.configure(xscrollcommand=scrollbar_x.set)
 
-        button_frame = tk.Frame(right_frame, bg="#ecf0f1", height=60)
-        button_frame.pack(fill=tk.X, padx=10, pady=10)
+        button_frame = tk.Frame(right_frame, bg=colors['light'], height=60)
+        button_frame.pack(fill=tk.X, padx=spacing['normal'], pady=spacing['normal'])
         button_frame.pack_propagate(False)
 
-        tk.Button(button_frame, text="新增", font=("微软雅黑", 10, "bold"), bg="#27ae60", fg="white", width=10, relief=tk.FLAT, cursor="hand2", command=self.add_data).pack(side=tk.LEFT, padx=5)
-        tk.Button(button_frame, text="修改", font=("微软雅黑", 10, "bold"), bg="#2980b9", fg="white", width=10, relief=tk.FLAT, cursor="hand2", command=self.edit_data).pack(side=tk.LEFT, padx=5)
-        tk.Button(button_frame, text="删除", font=("微软雅黑", 10, "bold"), bg="#c0392b", fg="white", width=10, relief=tk.FLAT, cursor="hand2", command=self.delete_data).pack(side=tk.LEFT, padx=5)
-        tk.Button(button_frame, text="批量删除", font=("微软雅黑", 10, "bold"), bg="#e74c3c", fg="white", width=10, relief=tk.FLAT, cursor="hand2", command=self.batch_delete).pack(side=tk.LEFT, padx=5)
-        tk.Button(button_frame, text="统计", font=("微软雅黑", 10, "bold"), bg="#8e44ad", fg="white", width=10, relief=tk.FLAT, cursor="hand2", command=self.show_statistics).pack(side=tk.LEFT, padx=5)
-        tk.Button(button_frame, text="导出", font=("微软雅黑", 10, "bold"), bg="#f39c12", fg="white", width=10, relief=tk.FLAT, cursor="hand2", command=self.export_data).pack(side=tk.LEFT, padx=5)
-        tk.Button(button_frame, text="退出", font=("微软雅黑", 10, "bold"), bg="#7f8c8d", fg="white", width=10, relief=tk.FLAT, cursor="hand2", command=self.root.quit).pack(side=tk.RIGHT, padx=5)
+        tk.Button(button_frame, text="新增", font=(fonts['family'], fonts['size']['normal'], 'bold'), bg=colors['success'], fg=colors['light'], width=10, relief=tk.FLAT, cursor="hand2", activebackground=colors['secondary'], activeforeground=colors['light'], command=self.add_data).pack(side=tk.LEFT, padx=spacing['small'])
+        tk.Button(button_frame, text="修改", font=(fonts['family'], fonts['size']['normal'], 'bold'), bg=colors['accent'], fg=colors['light'], width=10, relief=tk.FLAT, cursor="hand2", activebackground=colors['secondary'], activeforeground=colors['light'], command=self.edit_data).pack(side=tk.LEFT, padx=spacing['small'])
+        tk.Button(button_frame, text="删除", font=(fonts['family'], fonts['size']['normal'], 'bold'), bg=colors['danger'], fg=colors['light'], width=10, relief=tk.FLAT, cursor="hand2", activebackground=colors['secondary'], activeforeground=colors['light'], command=self.delete_data).pack(side=tk.LEFT, padx=spacing['small'])
+        tk.Button(button_frame, text="批量删除", font=(fonts['family'], fonts['size']['normal'], 'bold'), bg=colors['danger'], fg=colors['light'], width=10, relief=tk.FLAT, cursor="hand2", activebackground=colors['secondary'], activeforeground=colors['light'], command=self.batch_delete).pack(side=tk.LEFT, padx=spacing['small'])
+        tk.Button(button_frame, text="统计", font=(fonts['family'], fonts['size']['normal'], 'bold'), bg=colors['accent'], fg=colors['light'], width=10, relief=tk.FLAT, cursor="hand2", activebackground=colors['secondary'], activeforeground=colors['light'], command=self.show_statistics).pack(side=tk.LEFT, padx=spacing['small'])
+        tk.Button(button_frame, text="导出", font=(fonts['family'], fonts['size']['normal'], 'bold'), bg=colors['warning'], fg=colors['light'], width=10, relief=tk.FLAT, cursor="hand2", activebackground=colors['secondary'], activeforeground=colors['light'], command=self.export_data).pack(side=tk.LEFT, padx=spacing['small'])
+        tk.Button(button_frame, text="设置", font=(fonts['family'], fonts['size']['normal'], 'bold'), bg=colors['primary'], fg=colors['light'], width=10, relief=tk.FLAT, cursor="hand2", activebackground=colors['secondary'], activeforeground=colors['light'], command=self.show_settings).pack(side=tk.LEFT, padx=spacing['small'])
+        tk.Button(button_frame, text="退出", font=(fonts['family'], fonts['size']['normal'], 'bold'), bg=colors['text_secondary'], fg=colors['light'], width=10, relief=tk.FLAT, cursor="hand2", activebackground=colors['secondary'], activeforeground=colors['light'], command=self.root.quit).pack(side=tk.RIGHT, padx=spacing['small'])
 
         self.tree.bind('<Double-Button-1>', lambda e: self.edit_data())
 
@@ -228,39 +254,44 @@ class DataManagementWindow:
             messagebox.showerror("错误", result)
 
     def open_data_dialog(self, title, values=None):
+        theme = self.theme_manager.get_current_theme()
+        colors = theme['colors']
+        fonts = theme['fonts']
+        spacing = theme['spacing']
+        
         dialog = tk.Toplevel(self.root)
         dialog.title(title)
         dialog.geometry("600x500")
         dialog.resizable(False, False)
-        dialog.configure(bg="#f0f0f0")
+        dialog.configure(bg=colors['background'])
         dialog.transient(self.root)
         dialog.grab_set()
 
-        frame = tk.Frame(dialog, bg="white", padx=30, pady=30, relief=tk.RAISED, bd=1)
-        frame.pack(fill=tk.BOTH, expand=True, padx=20, pady=20)
+        frame = tk.Frame(dialog, bg=colors['surface'], padx=spacing['xlarge'], pady=spacing['xlarge'], relief=tk.RAISED, bd=1)
+        frame.pack(fill=tk.BOTH, expand=True, padx=spacing['large'], pady=spacing['large'])
 
         columns = self.tree['columns']
         entries = {}
 
         for i, col in enumerate(columns):
-            row_frame = tk.Frame(frame, bg="white")
-            row_frame.pack(fill=tk.X, pady=8)
+            row_frame = tk.Frame(frame, bg=colors['surface'])
+            row_frame.pack(fill=tk.X, pady=spacing['normal'])
 
-            tk.Label(row_frame, text=f"{col}:", font=("微软雅黑", 11, "bold"), bg="white", fg="#2c3e50", width=18, anchor='e').pack(side=tk.LEFT, padx=(0, 10))
+            tk.Label(row_frame, text=f"{col}:", font=(fonts['family'], fonts['size']['normal'], 'bold'), bg=colors['surface'], fg=colors['text'], width=18, anchor='e').pack(side=tk.LEFT, padx=(0, spacing['small']))
             
-            entry = tk.Entry(row_frame, font=("微软雅黑", 10), relief=tk.SOLID, bd=1)
-            entry.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(0, 10))
+            entry = tk.Entry(row_frame, font=(fonts['family'], fonts['size']['small']), relief=tk.SOLID, bd=1)
+            entry.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(0, spacing['small']))
             
             if values and i < len(values):
                 entry.insert(0, str(values[i]))
             
             entries[col] = entry
 
-        button_frame = tk.Frame(dialog, bg="#f0f0f0")
-        button_frame.pack(pady=10)
+        button_frame = tk.Frame(dialog, bg=colors['background'])
+        button_frame.pack(pady=spacing['normal'])
 
-        tk.Button(button_frame, text="保存", font=("微软雅黑", 11, "bold"), bg="#27ae60", fg="white", width=12, height=2, relief=tk.FLAT, cursor="hand2", command=lambda: save_data()).pack(side=tk.LEFT, padx=10)
-        tk.Button(button_frame, text="取消", font=("微软雅黑", 11, "bold"), bg="#7f8c8d", fg="white", width=12, height=2, relief=tk.FLAT, cursor="hand2", command=dialog.destroy).pack(side=tk.LEFT, padx=10)
+        tk.Button(button_frame, text="保存", font=(fonts['family'], fonts['size']['normal'], 'bold'), bg=colors['success'], fg=colors['light'], width=12, height=2, relief=tk.FLAT, cursor="hand2", activebackground=colors['secondary'], activeforeground=colors['light'], command=lambda: save_data()).pack(side=tk.LEFT, padx=spacing['small'])
+        tk.Button(button_frame, text="取消", font=(fonts['family'], fonts['size']['normal'], 'bold'), bg=colors['text_secondary'], fg=colors['light'], width=12, height=2, relief=tk.FLAT, cursor="hand2", command=dialog.destroy).pack(side=tk.LEFT, padx=spacing['small'])
 
         def save_data():
             data = {}
@@ -398,24 +429,29 @@ class DataManagementWindow:
             messagebox.showinfo("提示", "当前表没有数据")
             return
 
+        theme = self.theme_manager.get_current_theme()
+        colors = theme['colors']
+        fonts = theme['fonts']
+        spacing = theme['spacing']
+        
         dialog = tk.Toplevel(self.root)
         dialog.title(f"数据统计 - {self.current_table}")
         dialog.geometry("600x500")
         dialog.resizable(False, False)
-        dialog.configure(bg="#f0f0f0")
+        dialog.configure(bg=colors['background'])
         dialog.transient(self.root)
         dialog.grab_set()
 
-        frame = tk.Frame(dialog, bg="white", padx=30, pady=30, relief=tk.RAISED, bd=1)
-        frame.pack(fill=tk.BOTH, expand=True, padx=20, pady=20)
+        frame = tk.Frame(dialog, bg=colors['surface'], padx=spacing['xlarge'], pady=spacing['xlarge'], relief=tk.RAISED, bd=1)
+        frame.pack(fill=tk.BOTH, expand=True, padx=spacing['large'], pady=spacing['large'])
 
-        tk.Label(frame, text=f"数据表: {self.current_table}", font=("微软雅黑", 16, "bold"), bg="white", fg="#2c3e50").pack(pady=(0, 20))
+        tk.Label(frame, text=f"数据表: {self.current_table}", font=(fonts['family'], fonts['size']['xlarge'], 'bold'), bg=colors['surface'], fg=colors['primary']).pack(pady=(0, spacing['large']))
 
         total_count = len(data)
         columns = list(data[0].keys())
 
-        stats_text = tk.Text(frame, font=("微软雅黑", 11), bg="#f8f9fa", relief=tk.SOLID, bd=1, height=15, width=50)
-        stats_text.pack(fill=tk.BOTH, expand=True, pady=10)
+        stats_text = tk.Text(frame, font=(fonts['family'], fonts['size']['normal']), bg=colors['light'], relief=tk.SOLID, bd=1, height=15, width=50)
+        stats_text.pack(fill=tk.BOTH, expand=True, pady=spacing['normal'])
 
         stats_text.insert(tk.END, f"总记录数: {total_count}\n")
         stats_text.insert(tk.END, f"字段数量: {len(columns)}\n")
@@ -435,7 +471,93 @@ class DataManagementWindow:
 
         stats_text.config(state=tk.DISABLED)
 
-        button_frame = tk.Frame(dialog, bg="#f0f0f0")
-        button_frame.pack(pady=10)
+        button_frame = tk.Frame(dialog, bg=colors['background'])
+        button_frame.pack(pady=spacing['normal'])
 
-        tk.Button(button_frame, text="关闭", font=("微软雅黑", 11, "bold"), bg="#7f8c8d", fg="white", width=12, height=2, relief=tk.FLAT, cursor="hand2", command=dialog.destroy).pack()
+        tk.Button(button_frame, text="关闭", font=(fonts['family'], fonts['size']['normal'], 'bold'), bg=colors['text_secondary'], fg=colors['light'], width=12, height=2, relief=tk.FLAT, cursor="hand2", activebackground=colors['secondary'], activeforeground=colors['light'], command=dialog.destroy).pack()
+
+    def show_settings(self):
+        theme = self.theme_manager.get_current_theme()
+        colors = theme['colors']
+        fonts = theme['fonts']
+        spacing = theme['spacing']
+        
+        dialog = tk.Toplevel(self.root)
+        dialog.title("系统设置")
+        dialog.geometry("500x600")
+        dialog.resizable(False, False)
+        dialog.configure(bg=colors['background'])
+        dialog.transient(self.root)
+        dialog.grab_set()
+
+        frame = tk.Frame(dialog, bg=colors['surface'], padx=spacing['xlarge'], pady=spacing['xlarge'], relief=tk.RAISED, bd=1)
+        frame.pack(fill=tk.BOTH, expand=True, padx=spacing['large'], pady=spacing['large'])
+
+        tk.Label(frame, text="系统设置", font=(fonts['family'], fonts['size']['xlarge'], 'bold'), bg=colors['surface'], fg=colors['primary']).pack(pady=(0, spacing['large']))
+
+        tk.Label(frame, text=f"当前主题: {theme['name']}", font=(fonts['family'], fonts['size']['normal']), bg=colors['surface'], fg=colors['text']).pack(pady=spacing['small'])
+        tk.Label(frame, text=f"AB测试组: {self.theme_manager.ab_test_group}", font=(fonts['family'], fonts['size']['normal']), bg=colors['surface'], fg=colors['text']).pack(pady=spacing['small'])
+        tk.Label(frame, text=f"用户ID: {self.theme_manager.user_id}", font=(fonts['family'], fonts['size']['small']), bg=colors['surface'], fg=colors['text_secondary']).pack(pady=spacing['small'])
+
+        tk.Label(frame, text="主题切换:", font=(fonts['family'], fonts['size']['normal'], 'bold'), bg=colors['surface'], fg=colors['primary']).pack(pady=(spacing['large'], spacing['normal']))
+
+        theme_frame = tk.Frame(frame, bg=colors['surface'])
+        theme_frame.pack(fill=tk.X, pady=spacing['normal'])
+
+        for theme_name in ['industrial', 'modern', 'classic']:
+            btn = tk.Button(
+                theme_frame,
+                text=theme_name.upper(),
+                font=(fonts['family'], fonts['size']['small']),
+                bg=colors['accent'] if theme_name == self.theme_manager.current_theme else colors['text_secondary'],
+                fg=colors['light'],
+                width=10,
+                relief=tk.FLAT,
+                cursor="hand2",
+                activebackground=colors['secondary'],
+                activeforeground=colors['light'],
+                command=lambda t=theme_name: self.change_theme(t, dialog)
+            )
+            btn.pack(side=tk.LEFT, padx=spacing['small'])
+
+        tk.Label(frame, text="灰度测试功能:", font=(fonts['family'], fonts['size']['normal'], 'bold'), bg=colors['surface'], fg=colors['primary']).pack(pady=(spacing['large'], spacing['normal']))
+
+        from config import GRAYSCALE_TESTING
+        
+        for feature_name, feature in GRAYSCALE_TESTING['features'].items():
+            status = "启用" if self.theme_manager.is_feature_enabled(feature_name) else "禁用"
+            status_color = colors['success'] if self.theme_manager.is_feature_enabled(feature_name) else colors['danger']
+            
+            feature_frame = tk.Frame(frame, bg=colors['surface'])
+            feature_frame.pack(fill=tk.X, pady=spacing['small'])
+            
+            tk.Label(
+                feature_frame,
+                text=f"{feature['name']}: ",
+                font=(fonts['family'], fonts['size']['small']),
+                bg=colors['surface'],
+                fg=colors['text']
+            ).pack(side=tk.LEFT)
+            
+            tk.Label(
+                feature_frame,
+                text=status,
+                font=(fonts['family'], fonts['size']['small'], 'bold'),
+                bg=colors['surface'],
+                fg=status_color
+            ).pack(side=tk.LEFT)
+
+        button_frame = tk.Frame(dialog, bg=colors['background'])
+        button_frame.pack(pady=spacing['normal'])
+
+        tk.Button(button_frame, text="关闭", font=(fonts['family'], fonts['size']['normal'], 'bold'), bg=colors['text_secondary'], fg=colors['light'], width=12, height=2, relief=tk.FLAT, cursor="hand2", activebackground=colors['secondary'], activeforeground=colors['light'], command=dialog.destroy).pack()
+
+    def change_theme(self, theme_name, dialog):
+        self.theme_manager.set_theme(theme_name)
+        logger.info(f"主题已切换为: {theme_name}")
+        
+        self.apply_theme()
+        
+        dialog.destroy()
+        
+        messagebox.showinfo("成功", f"主题已切换为 {theme_name}\n请重启应用程序以完全应用新主题")
