@@ -3,6 +3,7 @@ from tkinter import ttk, messagebox, filedialog
 from datetime import datetime
 from theme_manager import ThemeManager
 from logger_config import setup_logger
+from field_translations import get_table_name, get_field_name, get_status_value
 import csv
 import os
 
@@ -104,8 +105,8 @@ class DataManagementWindow:
                        foreground=colors['text'])
         style.configure("Treeview.Heading", 
                        font=(fonts['family'], fonts['size']['normal'], 'bold'),
-                       background=colors['primary'],
-                       foreground=colors['light'])
+                       background='#1a252f',
+                       foreground='#ffffff')
         style.map("Treeview", 
                  background=[('selected', colors['accent'])],
                  foreground=[('selected', colors['light'])])
@@ -200,11 +201,18 @@ class DataManagementWindow:
         self.tree['columns'] = columns
         
         for col in columns:
-            self.tree.heading(col, text=col)
+            translated_col = get_field_name(self.current_table, col)
+            self.tree.heading(col, text=translated_col)
             self.tree.column(col, width=100, anchor='center')
 
         for row in data:
-            self.tree.insert('', tk.END, values=list(row.values()))
+            values = []
+            for col in columns:
+                value = row[col]
+                if col == 'status' or col == 'is_deleted':
+                    value = get_status_value(str(value))
+                values.append(value)
+            self.tree.insert('', tk.END, values=values)
 
     def add_data(self):
         if not self.current_table:

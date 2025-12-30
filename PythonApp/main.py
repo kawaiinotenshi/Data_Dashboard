@@ -38,6 +38,7 @@ class LogisticsApp:
         success, message = self.db_manager.connect()
         if success:
             logger.info("数据库连接成功，显示数据管理窗口")
+            self.root.deiconify()
             self.show_data_management()
         else:
             logger.error(f"数据库连接失败: {message}")

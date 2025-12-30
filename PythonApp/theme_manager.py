@@ -7,6 +7,9 @@ import json
 import os
 from datetime import datetime
 from config import AB_TESTING, GRAYSCALE_TESTING, THEMES, APP_CONFIG, get_theme, get_ab_test_group
+from logger_config import setup_logger
+
+logger = setup_logger('theme_manager', 'app.log')
 
 class ThemeManager:
     """主题管理器类，负责处理主题切换和AB测试功能"""
