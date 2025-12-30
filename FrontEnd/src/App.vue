@@ -52,7 +52,8 @@ const setScale = () => {
   const clientHeight = document.documentElement.clientHeight
   const scaleX = clientWidth / designWidth
   const scaleY = clientHeight / designHeight
-  const scale = Math.min(scaleX, scaleY)
+  
+  const scale = scaleX * 0.95
 
   if (mainRef.value) {
     mainRef.value.style.transform = `scale(${scale})`

@@ -18,6 +18,7 @@ class LogisticsApp:
         logger.info(f"主题管理器初始化完成 - 当前主题: {self.theme_manager.current_theme}, AB测试组: {self.theme_manager.ab_test_group}")
         
         self.db_manager = DatabaseManager()
+        self.login_success = False
         
         self.show_login()
 
@@ -27,12 +28,13 @@ class LogisticsApp:
         LoginWindow(login_root, self.on_login_success, self.theme_manager)
         self.root.wait_window(login_root)
         
-        if not login_root.winfo_exists():
+        if not self.login_success:
             logger.info("登录窗口被关闭，退出应用程序")
             self.root.quit()
 
     def on_login_success(self):
         logger.info("登录成功，尝试连接数据库")
+        self.login_success = True
         success, message = self.db_manager.connect()
         if success:
             logger.info("数据库连接成功，显示数据管理窗口")
