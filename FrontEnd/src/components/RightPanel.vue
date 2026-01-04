@@ -3,12 +3,25 @@
     <div class="right-top">
       <div id="tab_header">
         <ul>
-          <li :class="{ selected: activeTab === 0 }" @click="activeTab = 0">仓库信息</li>
-          <li :class="{ selected: activeTab === 1 }" @click="activeTab = 1">进关信息</li>
+          <li
+            :class="{ selected: activeTab === 0 }"
+            @click="activeTab = 0"
+          >
+            仓库信息
+          </li>
+          <li
+            :class="{ selected: activeTab === 1 }"
+            @click="activeTab = 1"
+          >
+            进关信息
+          </li>
         </ul>
       </div>
       <div id="tab_content">
-        <div v-show="activeTab === 0" class="dom">
+        <div
+          v-show="activeTab === 0"
+          class="dom"
+        >
           <ul>
             <li>
               <p>仓库数</p>
@@ -55,7 +68,10 @@
             </ul>
           </div>
         </div>
-        <div v-show="activeTab === 1" class="dom">
+        <div
+          v-show="activeTab === 1"
+          class="dom"
+        >
           <div class="listStyle">
             <span>美国：<strong>560</strong>万单</span>
             <span>日本：<strong>36</strong>万单</span>
@@ -79,9 +95,15 @@
           <span>同比</span>
           <span>数量</span>
         </div>
-        <div id="FontScroll" class="myscroll">
+        <div
+          id="FontScroll"
+          class="myscroll"
+        >
           <ul>
-            <li v-for="(item, index) in scrollData" :key="index">
+            <li
+              v-for="(item, index) in scrollData"
+              :key="index"
+            >
               <div class="fontInner clearfix">
                 <span>
                   <b>{{ item.name }}</b>
@@ -99,9 +121,18 @@
         <span>仓库利用比</span>
       </div>
       <div class="right-bottom-t">
-        <div ref="ceshi3Ref" class="b-left echart" />
-        <div ref="ceshi4Ref" class="b-cent echart" />
-        <div ref="ceshi5Ref" class="b-right echart" />
+        <div
+          ref="ceshi3Ref"
+          class="b-left echart"
+        />
+        <div
+          ref="ceshi4Ref"
+          class="b-cent echart"
+        />
+        <div
+          ref="ceshi5Ref"
+          class="b-right echart"
+        />
       </div>
     </div>
   </div>

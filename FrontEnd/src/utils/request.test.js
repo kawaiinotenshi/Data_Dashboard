@@ -1,5 +1,4 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { flushPromises } from '@vue/test-utils'
 import axios from 'axios'
 import request from '../request'
 

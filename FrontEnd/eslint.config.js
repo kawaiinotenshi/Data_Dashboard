@@ -2,6 +2,9 @@ import js from '@eslint/js'
 import vue from 'eslint-plugin-vue'
 
 export default [
+  {
+    ignores: ['node_modules/**', 'dist/**', '.vite/**', 'coverage/**', 'public/**']
+  },
   js.configs.recommended,
   ...vue.configs['flat/recommended'],
   {
@@ -22,7 +25,13 @@ export default [
         exports: 'readonly',
         require: 'readonly',
         __dirname: 'readonly',
-        module: 'readonly'
+        module: 'readonly',
+        localStorage: 'readonly',
+        sessionStorage: 'readonly',
+        alert: 'readonly',
+        confirm: 'readonly',
+        prompt: 'readonly',
+        URL: 'readonly'
       }
     },
     rules: {

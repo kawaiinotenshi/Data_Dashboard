@@ -15,6 +15,9 @@
     <select id="selectTransportStatistics" resultType="java.util.Map">
         SELECT 
             COUNT(*) as totalCount,
+            COUNT(*) as totalTransports,
+            SUM(CASE WHEN status = '运输中' THEN 1 ELSE 0 END) as inProgress,
+            SUM(CASE WHEN status = '已完成' THEN 1 ELSE 0 END) as completed,
             SUM(vehicle_count) as totalVehicleCount,
             SUM(total_distance) as totalDistance,
             AVG(total_distance) as avgDistance,

@@ -19,15 +19,24 @@
         </ul>
       </div>
       <div class="top-bottom">
-        <div ref="ceshi8Ref" class="allnav echart" />
+        <div
+          ref="ceshi8Ref"
+          class="allnav echart"
+        />
       </div>
     </div>
     <div class="center-bottom">
       <div class="bottom-left">
-        <div ref="ceshi6Ref" class="allnav echart" />
+        <div
+          ref="ceshi6Ref"
+          class="allnav echart"
+        />
       </div>
       <div class="bottom-right">
-        <div ref="ceshi7Ref" class="allnav echart" />
+        <div
+          ref="ceshi7Ref"
+          class="allnav echart"
+        />
       </div>
     </div>
   </div>

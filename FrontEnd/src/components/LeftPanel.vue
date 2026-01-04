@@ -20,13 +20,19 @@
       <div class="title">
         <span>各个企业的库存占比</span>
       </div>
-      <div ref="ceshiRef" class="allnav echart" />
+      <div
+        ref="ceshiRef"
+        class="allnav echart"
+      />
     </div>
     <div class="left-bottom">
       <div class="title">
         <span>BBC清关(按年)</span>
       </div>
-      <div ref="ceshi2Ref" class="allnav echart" />
+      <div
+        ref="ceshi2Ref"
+        class="allnav echart"
+      />
     </div>
   </div>
 </template>

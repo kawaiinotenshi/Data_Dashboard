@@ -16,6 +16,9 @@
     <select id="selectOrderStatistics" resultType="java.util.Map">
         SELECT 
             COUNT(*) as totalCount,
+            COUNT(*) as totalOrders,
+            SUM(CASE WHEN status = '待处理' THEN 1 ELSE 0 END) as pendingOrders,
+            SUM(CASE WHEN status = '已完成' THEN 1 ELSE 0 END) as completedOrders,
             SUM(order_amount) as totalAmount,
             AVG(order_amount) as avgAmount,
             MAX(order_amount) as maxAmount,

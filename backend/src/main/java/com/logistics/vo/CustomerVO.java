@@ -10,6 +10,7 @@ public class CustomerVO {
     private String contactPerson;
     private String phone;
     private String address;
+    private String email;
     private LocalDateTime createdTime;
     private LocalDateTime updatedTime;
 }

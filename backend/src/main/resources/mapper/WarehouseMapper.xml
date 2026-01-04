@@ -17,7 +17,10 @@
     <select id="selectWarehouseStatistics" resultType="java.util.Map">
         SELECT 
             COUNT(*) as totalCount,
+            COUNT(*) as totalWarehouses,
             SUM(capacity) as totalCapacity,
+            SUM(throughput) as usedCapacity,
+            SUM(capacity) - SUM(throughput) as availableCapacity,
             SUM(throughput) as totalThroughput,
             AVG(utilization_rate) as avgUtilizationRate,
             MAX(capacity) as maxCapacity,
