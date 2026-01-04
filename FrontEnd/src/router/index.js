@@ -1,35 +1,37 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import LogisticsDashboard from '../views/LogisticsDashboard.vue'
-import SupplyChainDashboard from '../views/SupplyChainDashboard.vue'
-import AdminDashboard from '../views/AdminDashboard.vue'
-import UserManagement from '../components/UserManagement.vue'
 
 const routes = [
   {
+    path: '/login',
+    name: 'Login',
+    component: () => import('../views/Login.vue'),
+    meta: { requiresAuth: false }
+  },
+  {
     path: '/',
     name: 'Home',
-    component: LogisticsDashboard
+    component: () => import('../views/LogisticsDashboard.vue')
   },
   {
     path: '/dashboard',
     name: 'Dashboard',
-    component: LogisticsDashboard
+    component: () => import('../views/LogisticsDashboard.vue')
   },
   {
     path: '/supply-chain',
     name: 'SupplyChain',
-    component: SupplyChainDashboard
+    component: () => import('../views/SupplyChainDashboard.vue')
   },
   {
     path: '/admin',
     name: 'Admin',
-    component: AdminDashboard,
+    component: () => import('../views/AdminDashboard.vue'),
     redirect: '/admin/users',
     children: [
       {
         path: 'users',
         name: 'UserManagement',
-        component: UserManagement
+        component: () => import('../components/UserManagement.vue')
       }
     ]
   }
@@ -37,7 +39,14 @@ const routes = [
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes
+  routes,
+  scrollBehavior(to, from, savedPosition) {
+    if (savedPosition) {
+      return savedPosition
+    } else {
+      return { top: 0 }
+    }
+  }
 })
 
 export default router

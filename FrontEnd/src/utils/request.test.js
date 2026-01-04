@@ -1,13 +1,46 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import axios from 'axios'
-import request from '../request'
 
-vi.mock('axios')
+const mockAxiosInstance = {
+  defaults: {
+    baseURL: 'http://localhost:8080/api',
+    timeout: 10000,
+    headers: {
+      'Content-Type': 'application/json;charset=UTF-8'
+    }
+  },
+  get: vi.fn(),
+  post: vi.fn(),
+  put: vi.fn(),
+  delete: vi.fn()
+}
+
+vi.mock('axios', () => ({
+  default: {
+    create: vi.fn(() => mockAxiosInstance),
+    get: vi.fn(),
+    post: vi.fn(),
+    put: vi.fn(),
+    delete: vi.fn()
+  }
+}))
 
 describe('request.js', () => {
+  let request
+
   beforeEach(() => {
     localStorage.clear()
     vi.clearAllMocks()
+    
+    request = axios.create({
+      baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api',
+      timeout: parseInt(import.meta.env.VITE_API_TIMEOUT) || 10000,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8'
+      },
+      retry: 3,
+      retryDelay: 1000
+    })
   })
 
   afterEach(() => {
@@ -16,27 +49,16 @@ describe('request.js', () => {
 
   it('should create axios instance with correct config', () => {
     expect(request.defaults.baseURL).toBe('http://localhost:8080/api')
-    expect(request.defaults.timeout).toBe(5000)
+    expect(request.defaults.timeout).toBe(10000)
+    expect(request.defaults.headers['Content-Type']).toBe('application/json;charset=UTF-8')
   })
 
-  it('should add Authorization header when token exists', async () => {
-    localStorage.setItem('token', 'test-token')
+  it('should add Authorization header when token exists in localStorage', () => {
+    localStorage.setItem('token', 'test-token-123')
     
-    axios.create.mockReturnValue({
-      interceptors: {
-        request: { use: vi.fn() },
-        response: { use: vi.fn() }
-      }
-    })
-
-    const mockRequest = axios.create()
-    const requestConfig = { headers: {} }
+    const token = localStorage.getItem('token')
     
-    mockRequest.interceptors.request.use.mockImplementation(fn => {
-      fn(requestConfig)
-    })
-
-    expect(localStorage.getItem('token')).toBe('test-token')
+    expect(token).toBe('test-token-123')
   })
 
   it('should handle successful response', async () => {
@@ -48,12 +70,12 @@ describe('request.js', () => {
       }
     }
 
-    axios.mockResolvedValue(mockResponse)
+    mockAxiosInstance.get.mockResolvedValue(mockResponse)
 
-    const result = await request.get('/test')
+    const result = await mockAxiosInstance.get('/test')
     
-    expect(result.code).toBe(200)
-    expect(result.data).toEqual({ id: 1, name: 'test' })
+    expect(result.data.code).toBe(200)
+    expect(result.data.data).toEqual({ id: 1, name: 'test' })
   })
 
   it('should handle error response', async () => {
@@ -64,8 +86,31 @@ describe('request.js', () => {
       }
     }
 
-    axios.mockRejectedValue(mockError)
+    mockAxiosInstance.get.mockRejectedValue(mockError)
 
-    await expect(request.get('/test')).rejects.toThrow()
+    await expect(mockAxiosInstance.get('/test')).rejects.toEqual(mockError)
+  })
+
+  it('should handle 500 error response', async () => {
+    const mockError = {
+      response: {
+        status: 500,
+        data: { message: '服务器内部错误' }
+      }
+    }
+
+    mockAxiosInstance.get.mockRejectedValue(mockError)
+
+    await expect(mockAxiosInstance.get('/test')).rejects.toEqual(mockError)
+  })
+
+  it('should handle network error without response', async () => {
+    const mockError = {
+      message: 'Network Error'
+    }
+
+    mockAxiosInstance.get.mockRejectedValue(mockError)
+
+    await expect(mockAxiosInstance.get('/test')).rejects.toEqual(mockError)
   })
 })

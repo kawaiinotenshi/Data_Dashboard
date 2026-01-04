@@ -13,7 +13,9 @@
       <div class="header-cen">
         <h1>物流仓储大数据展示</h1>
       </div>
-      <div class="header-right" />
+      <div class="header-right">
+        <NavMenu />
+      </div>
     </div>
 
     <div class="content">
@@ -29,6 +31,7 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import LeftPanel from '../components/LeftPanel.vue'
 import CenterPanel from '../components/CenterPanel.vue'
 import RightPanel from '../components/RightPanel.vue'
+import NavMenu from '../components/NavMenu.vue'
 
 const mainRef = ref(null)
 const currentTime = ref('')

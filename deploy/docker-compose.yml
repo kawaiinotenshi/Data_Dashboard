@@ -1,8 +1,44 @@
+version: '3.8'
+
 services:
+  redis:
+    image: redis:7-alpine
+    container_name: logistics-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes --requirepass logistics_redis_password_2024
+    volumes:
+      - redis-data:/data
+    networks:
+      - logistics-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "logistics_redis_password_2024", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    labels:
+      - "com.logistics.service=redis"
+      - "com.logistics.environment=production"
+
   mysql:
     image: mysql:8.0
     container_name: logistics-mysql
-    restart: always
+    restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: logistics_db
@@ -14,10 +50,15 @@ services:
     volumes:
       - ../logistics_db.sql:/docker-entrypoint-initdb.d/init.sql
       - mysql-data:/var/lib/mysql
+      - mysql-config:/etc/mysql/conf.d
     command:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
       - --default-authentication-plugin=mysql_native_password
+      - --max-connections=500
+      - --innodb-buffer-pool-size=512M
+      - --slow-query-log=1
+      - --long-query-time=2
     networks:
       - logistics-network
     healthcheck:
@@ -25,6 +66,23 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    labels:
+      - "com.logistics.service=mysql"
+      - "com.logistics.environment=production"
 
   backend:
     build:
@@ -32,8 +90,9 @@ services:
       dockerfile: Dockerfile
       args:
         SPRING_PROFILES_ACTIVE: prod
+        JAVA_OPTS: "-Xms512m -Xmx1024m -XX:+UseG1GC -XX:MaxGCPauseMillis=200"
     container_name: logistics-backend
-    restart: always
+    restart: unless-stopped
     ports:
       - "8080:8080"
     environment:
@@ -46,8 +105,15 @@ services:
       DB_NAME: logistics_db
       DB_USERNAME: root
       DB_PASSWORD: root
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: logistics_redis_password_2024
+      REDIS_DATABASE: 0
+      JAVA_OPTS: "-Xms512m -Xmx1024m -XX:+UseG1GC -XX:MaxGCPauseMillis=200"
     depends_on:
       mysql:
+        condition: service_healthy
+      redis:
         condition: service_healthy
     networks:
       - logistics-network
@@ -56,7 +122,25 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 60s
+      start_period: 90s
+    deploy:
+      resources:
+        limits:
+          cpus: '1.5'
+          memory: 1.5G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    labels:
+      - "com.logistics.service=backend"
+      - "com.logistics.environment=production"
+    volumes:
+      - backend-logs:/app/logs
 
   frontend:
     build:
@@ -64,8 +148,10 @@ services:
       dockerfile: Dockerfile
       args:
         NODE_ENV: production
+        VITE_API_BASE_URL: /api
+        VITE_API_TIMEOUT: 10000
     container_name: logistics-frontend
-    restart: always
+    restart: unless-stopped
     ports:
       - "80:80"
     depends_on:
@@ -73,11 +159,128 @@ services:
         condition: service_healthy
     networks:
       - logistics-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    labels:
+      - "com.logistics.service=frontend"
+      - "com.logistics.environment=production"
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: logistics-prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=15d'
+    networks:
+      - logistics-network
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:9090/-/healthy"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    labels:
+      - "com.logistics.service=prometheus"
+      - "com.logistics.environment=production"
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: logistics-grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_INSTALL_PLUGINS: ""
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+    depends_on:
+      prometheus:
+        condition: service_healthy
+    networks:
+      - logistics-network
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    labels:
+      - "com.logistics.service=grafana"
+      - "com.logistics.environment=production"
 
 volumes:
+  redis-data:
+    driver: local
   mysql-data:
+    driver: local
+  mysql-config:
+    driver: local
+  backend-logs:
+    driver: local
+  prometheus-data:
+    driver: local
+  grafana-data:
     driver: local
 
 networks:
   logistics-network:
     driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

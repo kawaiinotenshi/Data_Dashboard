@@ -13,7 +13,9 @@
       <div class="header-cen">
         <h1>供应链大数据可视化</h1>
       </div>
-      <div class="header-right" />
+      <div class="header-right">
+        <NavMenu />
+      </div>
     </div>
 
     <div class="content">
@@ -29,6 +31,7 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import SupplyLeftPanel from '../components/SupplyLeftPanel.vue'
 import SupplyCenterPanel from '../components/SupplyCenterPanel.vue'
 import SupplyRightPanel from '../components/SupplyRightPanel.vue'
+import NavMenu from '../components/NavMenu.vue'
 
 const mainRef = ref(null)
 const currentTime = ref('')

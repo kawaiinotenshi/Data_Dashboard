@@ -157,6 +157,7 @@ onUnmounted(() => {
   background: rgba(0, 0, 0, 0.3);
   border-radius: 10px;
   padding: 15px;
+  min-height: 350px;
 }
 
 .center-bottom {
@@ -164,6 +165,9 @@ onUnmounted(() => {
   background: rgba(0, 0, 0, 0.3);
   border-radius: 10px;
   padding: 15px;
+  min-height: 180px;
+  display: flex;
+  flex-direction: column;
 }
 
 .title {
@@ -173,6 +177,7 @@ onUnmounted(() => {
   margin-bottom: 10px;
   border-left: 4px solid #00f2ff;
   padding-left: 10px;
+  flex-shrink: 0;
 }
 
 .allnav {
@@ -187,8 +192,9 @@ onUnmounted(() => {
 .metrics-container {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 15px;
-  height: 100%;
+  gap: 10px;
+  flex: 1;
+  min-height: 0;
 }
 
 .metric-item {
@@ -198,18 +204,19 @@ onUnmounted(() => {
   align-items: center;
   background: rgba(255, 255, 255, 0.1);
   border-radius: 8px;
-  padding: 15px;
+  padding: 8px;
 }
 
 .metric-value {
-  font-size: 24px;
+  font-size: 20px;
   font-weight: bold;
   color: #00f2ff;
-  margin-bottom: 5px;
+  margin-bottom: 3px;
 }
 
 .metric-label {
-  font-size: 14px;
+  font-size: 12px;
   color: #fff;
+  text-align: center;
 }
 </style>

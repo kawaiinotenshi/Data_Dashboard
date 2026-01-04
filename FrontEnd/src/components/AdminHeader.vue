@@ -21,12 +21,24 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
 
 const userName = ref('管理员')
+
+onMounted(() => {
+  const userInfo = localStorage.getItem('userInfo')
+  if (userInfo) {
+    try {
+      const user = JSON.parse(userInfo)
+      userName.value = user.username || '管理员'
+    } catch (error) {
+      console.error('解析用户信息失败:', error)
+    }
+  }
+})
 
 const handleLogout = () => {
   if (confirm('确定要退出登录吗？')) {

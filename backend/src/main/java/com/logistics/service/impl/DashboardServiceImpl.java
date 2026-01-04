@@ -1,15 +1,19 @@
 package com.logistics.service.impl;
 
+import com.logistics.annotation.CacheExpire;
 import com.logistics.mapper.OrderMapper;
 import com.logistics.mapper.WarehouseMapper;
 import com.logistics.mapper.TransportMapper;
 import com.logistics.mapper.CustomerMapper;
 import com.logistics.mapper.SupplierMapper;
 import com.logistics.service.DashboardService;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class DashboardServiceImpl implements DashboardService {
@@ -30,6 +34,7 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
+    @CacheExpire(value = 5, timeUnit = TimeUnit.MINUTES, keyPrefix = "dashboard")
     public Map<String, Object> getDashboardData() {
         Map<String, Object> dashboardData = new HashMap<>();
         

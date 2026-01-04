@@ -2,6 +2,387 @@
 
 ## [2026-01-04]
 
+### 自动化测试和CI/CD流程实现
+- 后端单元测试实现
+  - 创建WarehouseControllerTest.java，测试仓库控制器层
+    - 测试getAllWarehouses()方法
+    - 测试getWarehouseById()方法
+    - 测试createWarehouse()方法
+    - 测试updateWarehouse()方法
+    - 测试deleteWarehouse()方法
+    - 使用Mockito模拟依赖服务
+    - 验证HTTP状态码和响应数据
+
+  - 创建WarehouseServiceTest.java，测试仓库服务层
+    - 测试getAllWarehouses()方法
+    - 测试getWarehouseById()方法
+    - 测试createWarehouse()方法
+    - 测试updateWarehouse()方法
+    - 测试deleteWarehouse()方法
+    - 使用Mockito模拟数据访问层
+    - 验证业务逻辑和数据处理
+
+- 前端单元测试实现
+  - 创建api/index.test.js，测试API层
+    - 测试Order API的所有方法（list、getById、create、update、delete、batchDelete、statistics、getByStatus、getByDateRange、getByCustomer、getTrend、getCustomerOrderCount）
+    - 测试Warehouse API的所有方法（list、getById、create、update、delete、batchDelete、statistics、getByName、getByLocation、getByCapacityRange、getUsageRate）
+    - 测试Inventory API的所有方法（list、getById、create、update、delete、batchDelete、statistics、getByWarehouse、getByProduct、getLowStock、getByCategory、getEnterpriseRanking、getEnterpriseRatio）
+    - 测试Customer API的所有方法（list、getById、create、update、delete、batchDelete、statistics、getByName、getByAddress、getOrderCount）
+    - 测试Supplier API的所有方法（list、getById、create、update、delete、batchDelete、statistics、getByName、getByAddress、getContactRanking）
+    - 测试Transport API的所有方法（list、getById、getByStatus、create、update、delete、batchDelete、statistics、getByMonth、getByVehicleType、getTrend、getByVehicleTypeGroup）
+    - 使用Vitest和Mockito模拟HTTP请求
+    - 验证API调用参数和响应处理
+
+  - 创建stores/useEntityStore.test.js，测试Pinia状态管理
+    - 测试createEntityStore工厂函数
+    - 测试初始状态（dataList、loading、error）
+    - 测试数据获取功能（fetchDataList）
+    - 测试错误处理机制
+    - 测试数据清除功能（clearData）
+    - 测试加载状态管理
+    - 测试自定义配置支持
+    - 使用Vitest和@vue/test-utils模拟Pinia
+
+  - 创建utils/request.test.js，测试HTTP请求工具
+    - 测试axios实例配置
+    - 测试Authorization请求头添加
+    - 测试成功响应处理
+    - 测试错误响应处理
+    - 使用Vitest和Mockito模拟axios
+
+- Vitest测试配置
+  - 更新vite.config.js，添加测试配置
+    - 配置全局变量支持（globals: true）
+    - 配置测试环境为jsdom
+    - 配置测试设置文件（setupFiles）
+    - 配置代码覆盖率报告（text、json、html、lcov）
+    - 配置测试文件包含和排除规则
+    - 配置覆盖率排除目录（node_modules、src/test、dist等）
+
+  - 创建src/test/setup.js，测试环境设置
+    - 模拟ResizeObserver API
+    - 模拟matchMedia API
+    - 配置Vue Test Utils全局存根（transition、transition-group）
+
+  - 更新package.json，添加测试依赖
+    - 添加jsdom依赖（^23.0.0）
+    - 配置测试脚本（test、test:coverage）
+
+- CI/CD流程实现
+  - 创建.github/workflows/ci-cd.yml，GitHub Actions工作流
+    - 配置触发条件（push和pull_request到main和develop分支）
+    - 配置后端测试任务
+      - 使用MySQL 8.0和Redis 7-alpine服务
+      - 设置JDK 11环境
+      - 运行Maven测试（mvn clean test）
+      - 配置环境变量（数据库、Redis连接）
+      - 生成测试报告和覆盖率报告
+      - 构建Docker镜像并推送到Docker Hub
+      - 运行安全扫描（Trivy）
+
+    - 配置前端测试任务
+      - 设置Node.js 18环境
+      - 安装依赖（npm ci）
+      - 运行ESLint代码检查
+      - 运行Vitest单元测试
+      - 生成测试覆盖率报告
+      - 构建生产版本
+      - 构建Docker镜像并推送到Docker Hub
+      - 运行安全扫描（Trivy）
+
+    - 配置部署任务
+      - 依赖后端和前端测试通过
+      - 部署到生产环境（SSH部署）
+      - 运行部署后健康检查
+      - 通知部署状态
+
+  - 配置Docker镜像构建和推送
+    - 使用Docker Buildx构建多架构镜像
+    - 推送到Docker Hub（logistics-dashboard-backend、logistics-dashboard-frontend）
+    - 配置镜像标签（latest、commit SHA、版本号）
+
+  - 配置安全扫描
+    - 使用Trivy扫描Docker镜像漏洞
+    - 配置严重性级别（CRITICAL、HIGH）
+    - 生成安全报告
+
+  - 配置通知机制
+    - 使用GitHub Actions通知
+    - 部署成功/失败通知
+    - 测试结果通知
+
+- 测试覆盖率目标
+  - 后端测试覆盖率目标：80%以上
+  - 前端测试覆盖率目标：70%以上
+  - 关键业务逻辑覆盖率：90%以上
+  - API端点覆盖率：100%
+
+### Redis缓存系统实现
+- Redis依赖配置
+  - 添加spring-boot-starter-data-redis依赖
+  - 添加Jedis Redis客户端依赖
+  - 添加spring-boot-starter-cache依赖
+  - 配置Redis连接池和超时设置
+
+- Redis配置类实现（RedisConfig.java）
+  - 配置RedisTemplate序列化器
+  - 实现Jackson2JsonRedisSerializer JSON序列化
+  - 配置StringRedisSerializer键序列化
+  - 实现CacheManager缓存管理器
+  - 配置缓存TTL为1小时
+  - 禁用空值缓存以提高性能
+
+- Redis工具类实现（RedisUtil.java）
+  - 实现基础操作：set、get、delete、hasKey
+  - 实现过期时间管理：expire、getExpire
+  - 实现计数器功能：increment
+  - 实现Hash操作：hSet、hGet、hGetAll、hDelete
+  - 实现List操作：lSet、lGet、lRemove
+  - 实现Set操作：sAdd、sMembers、sRemove
+  - 实现ZSet操作：zAdd、zRange、zRemove
+  - 提供键模式查询和数据库大小查询
+
+- 自定义缓存注解（CacheExpire.java）
+  - 实现方法级别的缓存控制注解
+  - 支持自定义缓存过期时间
+  - 支持多种时间单位（秒、分、时、天）
+  - 支持自定义缓存键和前缀
+
+- 缓存切面实现（CacheAspect.java）
+  - 实现基于AOP的缓存拦截
+  - 支持缓存命中检测和日志记录
+  - 实现缓存键自动生成策略
+  - 支持方法参数作为缓存键的一部分
+  - 实现缓存自动失效和更新
+
+- 服务层缓存集成
+  - DashboardServiceImpl：仪表盘数据缓存5分钟
+  - WarehouseServiceImpl：仓库数据缓存10分钟
+  - 实现查询方法缓存（@CacheExpire）
+  - 实现更新方法缓存清除（@CacheEvict）
+  - 支持批量操作的缓存管理
+
+- Docker Compose配置增强
+  - 添加Redis服务配置
+  - 配置Redis持久化（AOF模式）
+  - 设置Redis密码认证
+  - 配置Redis健康检查
+  - 配置资源限制（CPU: 0.5核，内存: 512MB）
+  - 配置日志轮转策略
+
+- 应用配置更新（application.yml）
+  - 添加Redis连接配置
+  - 配置Redis连接池参数
+  - 配置Spring Cache默认设置
+  - 设置缓存TTL为1小时
+  - 配置缓存键前缀为"logistics:"
+  - 禁用空值缓存
+
+### 数据库连接池和查询优化
+- HikariCP连接池优化
+  - 增加最大连接数至20，最小空闲连接数至10
+  - 添加连接泄漏检测（60秒阈值）
+  - 配置验证超时为5秒
+  - 设置连接池名称为LogisticsHikariCP
+  - 配置初始化失败超时为1秒
+
+- MySQL连接参数优化
+  - 启用服务器端预处理语句（useServerPrepStmts）
+  - 启用预处理语句缓存（cachePrepStmts）
+  - 配置预处理语句缓存大小为250
+  - 配置预处理语句缓存SQL限制为2048
+  - 启用本地会话状态（useLocalSessionState）
+  - 启用批量语句重写（rewriteBatchedStatements）
+  - 启用结果集元数据缓存（cacheResultSetMetadata）
+  - 启用服务器配置缓存（cacheServerConfiguration）
+  - 禁用自动提交维护（elideSetAutoCommits）
+  - 禁用时间统计（maintainTimeStats）
+  - 配置流式结果网络超时为0
+
+- MyBatis-Plus优化配置（MybatisPlusOptimizationConfig.java）
+  - 配置分页插件，最大限制1000条，默认每页100条
+  - 启用乐观锁拦截器
+  - 启用防止全表更新和删除拦截器
+  - 配置数据库类型为MySQL
+
+- 批量操作工具类实现（BatchOperationUtil.java）
+  - 实现批量插入方法，支持自定义批次大小（默认1000条）
+  - 实现批量更新方法，支持自定义批次大小
+  - 实现批量删除方法，支持自定义批次大小
+  - 实现分批查询方法，支持大数据量查询
+  - 所有批量操作支持事务管理
+  - 提供默认批次大小常量
+
+### Docker镜像瘦身优化
+- FrontEnd Dockerfile优化
+  - 在依赖安装后立即清理npm缓存
+  - 在构建完成后清理node_modules和npm缓存
+  - 添加dumb-init实现正确的进程管理
+  - 清理不必要的系统文件和目录（/var/cache/apk/*、/tmp/*、/var/tmp/*）
+  - 实现非root用户权限配置（nginx用户，UID 1000）
+  - 添加健康检查，每30秒检查一次，超时3秒
+  - 配置启动期10秒，重试3次
+  - 使用dumb-init作为entrypoint，提供正确的信号处理
+
+- Backend Dockerfile优化
+  - 在Maven依赖下载后清理Maven缓存（~/.m2/repository/.cache、~/.m2/repository/org/apache/maven）
+  - 在构建完成后清理target、Maven仓库和临时文件
+  - 添加dumb-init实现正确的进程管理
+  - 清理不必要的系统文件和目录（/var/cache/apk/*、/tmp/*、/var/tmp/*、/root/.cache、/root/.npm）
+  - 实现非root用户权限配置（appuser用户，UID 1000，无家目录，无登录shell）
+  - 优化JVM参数，添加字符串去重（-XX:+UseStringDeduplication）和字符串连接优化（-XX:+OptimizeStringConcat）
+  - 更新健康检查端点为/actuator/health
+  - 使用dumb-init作为entrypoint，提供正确的信号处理
+
+### 性能监控系统实现（Prometheus + Grafana）
+- Spring Boot Actuator集成
+  - 添加spring-boot-starter-actuator依赖
+  - 添加micrometer-registry-prometheus依赖
+  - 配置Actuator端点暴露（health、info、metrics、prometheus）
+  - 配置健康检查详情显示
+  - 配置探针（liveness和readiness）启用
+  - 配置Prometheus导出器启用
+
+- 应用指标配置
+  - 配置应用标签（application、environment）
+  - 配置HTTP请求指标分布（百分位数直方图）
+  - 配置百分位数（0.5、0.95、0.99）
+  - 配置SLA阈值（100ms、200ms、500ms、1s、2s）
+
+- Prometheus配置
+  - 创建prometheus.yml配置文件
+  - 配置抓取间隔为15秒
+  - 配置评估间隔为15秒
+  - 配置logistics-backend任务，每10秒抓取一次指标
+  - 配置Prometheus自身监控
+  - 配置外部标签（monitor: logistics-monitor）
+
+- Grafana配置
+  - 创建Prometheus数据源配置（datasources/prometheus.yml）
+  - 配置数据源类型为prometheus
+  - 配置访问方式为proxy
+  - 配置Prometheus URL为http://prometheus:9090
+  - 设置为默认数据源
+
+- Grafana仪表盘配置
+  - 创建物流仓储系统监控仪表盘（dashboards/logistics-dashboard.json）
+  - 配置请求速率面板（timeseries图表）
+  - 配置平均响应时间面板（gauge图表）
+  - 配置错误率面板（timeseries图表）
+  - 配置JVM堆内存使用率面板（gauge图表）
+  - 配置JVM内存使用面板（timeseries图表）
+  - 配置CPU使用率面板（timeseries图表）
+  - 配置自动刷新间隔为5秒
+  - 配置时间范围为最近1小时
+  - 配置深色主题
+
+- Docker Compose配置增强
+  - 添加Prometheus服务配置
+    - 使用prom/prometheus:latest镜像
+    - 配置端口映射9090:9090
+    - 挂载prometheus.yml配置文件
+    - 挂载prometheus-data数据卷
+    - 配置TSDB数据存储路径
+    - 配置数据保留时间为15天
+    - 配置健康检查
+    - 配置资源限制（CPU: 0.5核，内存: 512MB）
+    - 配置日志轮转策略
+
+  - 添加Grafana服务配置
+    - 使用grafana/grafana:latest镜像
+    - 配置端口映射3000:3000
+    - 配置管理员用户名和密码（admin/admin）
+    - 禁用用户注册
+    - 挂载grafana-data数据卷
+    - 挂载provisioning配置目录
+    - 配置健康检查
+    - 配置资源限制（CPU: 0.5核，内存: 512MB）
+    - 配置日志轮转策略
+
+  - 添加数据卷配置
+    - prometheus-data数据卷
+    - grafana-data数据卷
+
+- 服务访问地址
+  - Prometheus: http://localhost:9090
+  - Grafana: http://localhost:3000（用户名: admin，密码: admin）
+  - 后端指标: http://localhost:8080/api/actuator/prometheus
+  - 健康检查: http://localhost:8080/api/actuator/health
+
+### 后端安全优化实现
+- JWT认证系统实现
+  - 创建JwtUtil工具类，实现JWT token生成、验证和刷新功能
+  - 配置token过期时间为24小时
+  - 实现基于HS512算法的签名机制
+  - 添加token解析和用户信息提取功能
+
+- 安全配置增强（SecurityConfig.java）
+  - 配置JWT认证过滤器，拦截所有受保护请求
+  - 实现无状态会话管理（SessionCreationPolicy.STATELESS）
+  - 配置CORS跨域支持，允许特定来源访问
+  - 配置API端点权限规则：
+    - 公开端点：/api/auth/**、/api/public/**、/api/dashboard/**等
+    - 受保护端点：需要JWT认证
+  - 添加API速率限制拦截器
+
+- API速率限制实现（RateLimitInterceptor.java）
+  - 基于Guava RateLimiter实现令牌桶算法
+  - 配置默认速率限制：每秒10个请求
+  - 实现突发流量控制：允许最多20个并发请求
+  - 基于客户端IP和请求URI的限流策略
+  - 返回429状态码和友好错误消息
+
+- 认证控制器实现（AuthController.java）
+  - 实现登录接口（POST /api/auth/login）
+  - 实现登出接口（POST /api/auth/logout）
+  - 实现token刷新接口（POST /api/auth/refresh）
+  - 实现token验证接口（GET /api/auth/verify）
+  - 统一响应格式，包含code、message和data字段
+
+- 用户认证服务（CustomUserDetailsService.java）
+  - 实现Spring Security UserDetailsService接口
+  - 从数据库加载用户信息
+  - 支持用户角色和权限配置
+  - 实现用户状态验证（启用/禁用）
+
+- 前端认证集成
+  - 创建登录页面组件（Login.vue）
+  - 实现登录表单和验证
+  - 集成token存储（localStorage）
+  - 添加用户信息管理
+  - 实现登录错误处理和提示
+
+- 路由守卫实现（router/index.js）
+  - 配置路由元信息（meta.requiresAuth）
+  - 实现全局前置守卫（beforeEach）
+  - 未认证用户自动跳转到登录页
+  - 已认证用户访问登录页自动跳转到首页
+
+- 请求拦截器增强（utils/request.js）
+  - 自动添加Authorization请求头
+  - 实现token过期自动刷新
+  - 统一错误处理和提示
+  - 添加401未认证处理，自动跳转登录页
+
+- 用户界面优化（AdminHeader.vue）
+  - 显示当前登录用户名
+  - 从localStorage读取用户信息
+  - 添加登出功能（待实现）
+
+### 编译错误修复
+- 修复Java 8兼容性问题
+  - 替换Map.of()为HashMap构造（Java 9+特性）
+  - 替换HttpServletResponse.SC_TOO_MANY_REQUESTS为429（Java 11+常量）
+  - 确保所有代码兼容Java 8环境
+
+### 项目构建验证
+- 后端项目编译成功（mvn clean compile）
+- 后端项目打包成功（mvn package -DskipTests）
+- 生成可执行JAR文件（logistics-dashboard-1.0.0.jar）
+- 验证所有依赖正确加载
+
+## [2026-01-04]
+
 ### Docker容器化部署实现
 - 实现完整的Docker容器化部署方案
   - 创建docker-compose.yml配置文件，定义MySQL、Backend、Frontend三个服务
