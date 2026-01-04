@@ -1,51 +1,58 @@
-version: '3.8'
-
 services:
   mysql:
     image: mysql:8.0
     container_name: logistics-mysql
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: logistics_db
       MYSQL_USER: logistics
-      MYSQL_PASSWORD: logistics123
+      MYSQL_PASSWORD: root
       TZ: Asia/Shanghai
     ports:
-      - "3306:3306"
+      - "3307:3306"
     volumes:
-      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ../logistics_db.sql:/docker-entrypoint-initdb.d/init.sql
       - mysql-data:/var/lib/mysql
     command:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
+      - --default-authentication-plugin=mysql_native_password
     networks:
       - logistics-network
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot123"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
       interval: 10s
       timeout: 5s
       retries: 5
 
   backend:
     build:
-      context: ./backend
+      context: ../backend
       dockerfile: Dockerfile
+      args:
+        SPRING_PROFILES_ACTIVE: prod
     container_name: logistics-backend
     restart: always
     ports:
       - "8080:8080"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/logistics_db?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/logistics_db?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
       SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: root123
+      SPRING_DATASOURCE_PASSWORD: root
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: logistics_db
+      DB_USERNAME: root
+      DB_PASSWORD: root
     depends_on:
       mysql:
         condition: service_healthy
     networks:
       - logistics-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/api/warehouses"]
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/warehouse/list"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -53,14 +60,17 @@ services:
 
   frontend:
     build:
-      context: ./FrontEnd
+      context: ../FrontEnd
       dockerfile: Dockerfile
+      args:
+        NODE_ENV: production
     container_name: logistics-frontend
     restart: always
     ports:
       - "80:80"
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
     networks:
       - logistics-network
 
