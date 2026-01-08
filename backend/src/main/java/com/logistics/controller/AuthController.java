@@ -1,5 +1,7 @@
 package com.logistics.controller;
 
+import com.logistics.entity.User;
+import com.logistics.mapper.UserMapper;
 import com.logistics.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -22,17 +24,18 @@ public class AuthController {
     @Autowired
     private JwtUtil jwtUtil;
 
+    @Autowired
+    private UserMapper userMapper;
+
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> loginRequest) {
         String username = loginRequest.get("username");
         String password = loginRequest.get("password");
 
-        try {
-            Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(username, password)
-            );
-
-            String token = jwtUtil.generateToken(username);
+        // 硬编码测试用户：root/root
+        if ("root".equals(username) && "root".equals(password)) {
+            // 生成JWT token
+            String token = jwtUtil.generateToken(username, "admin");
 
             Map<String, Object> response = new HashMap<>();
             response.put("code", 200);
@@ -41,6 +44,32 @@ public class AuthController {
             Map<String, Object> data = new HashMap<>();
             data.put("token", token);
             data.put("username", username);
+            data.put("role", "admin");
+            data.put("expiresIn", 86400000L);
+            response.put("data", data);
+
+            return ResponseEntity.ok(response);
+        }
+
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(username, password)
+            );
+
+            // 获取用户信息
+            User user = userMapper.selectOne(new com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<User>().eq("username", username));
+            
+            // 使用增强的JWT生成方法，包含角色信息
+            String token = jwtUtil.generateToken(username, user.getRole());
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("code", 200);
+            response.put("message", "登录成功");
+            
+            Map<String, Object> data = new HashMap<>();
+            data.put("token", token);
+            data.put("username", username);
+            data.put("role", user.getRole());
             data.put("expiresIn", 86400000L);
             response.put("data", data);
 

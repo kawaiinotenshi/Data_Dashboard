@@ -19,7 +19,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 import java.time.Duration;
 
 @Configuration
-// @EnableCaching 临时禁用缓存配置
+@EnableCaching
 public class RedisConfig {
 
     @Bean

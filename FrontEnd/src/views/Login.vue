@@ -52,6 +52,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import request from '../utils/request'
+import websocketService from '../utils/websocket'
 
 const router = useRouter()
 const loginForm = ref({
@@ -69,15 +70,20 @@ const handleLogin = async () => {
     const response = await request.post('/auth/login', loginForm.value)
     
     if (response.code === 200) {
-      const { token, username } = response.data
-      
-      localStorage.setItem('token', token)
-      localStorage.setItem('userInfo', JSON.stringify({ username }))
-      
-      router.push('/')
-    } else {
-      errorMessage.value = response.message || '登录失败'
-    }
+        const { token, username, role } = response.data
+        
+        localStorage.setItem('token', token)
+        localStorage.setItem('userInfo', JSON.stringify({ username, role }))
+        
+        router.push('/')
+        
+        // 登录成功后初始化WebSocket连接
+        setTimeout(() => {
+          websocketService.connect()
+        }, 500)
+      } else {
+        errorMessage.value = response.message || '登录失败'
+      }
   } catch (error) {
     console.error('登录错误:', error)
     errorMessage.value = error.response?.data?.message || '登录失败，请检查用户名和密码'

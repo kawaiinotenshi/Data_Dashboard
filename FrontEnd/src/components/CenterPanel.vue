@@ -62,119 +62,253 @@ let resizeObserver7 = null
 const warehouseStore = useWarehouseStore()
 const warehouseData = computed(() => warehouseStore.warehouseList)
 
-const initChart8 = async () => {
-  chart8 = echarts.init(ceshi8Ref.value)
-  try {
-    const response = await fetch('https://geo.datav.aliyun.com/areas_v3/bound/100000_full.json')
-    const chinaJson = await response.json()
-    echarts.registerMap('china', chinaJson)
-  } catch (error) {
-    console.error('加载中国地图数据失败:', error)
+// 城市坐标映射
+  const cityCoordinates = {
+    '北京': [116.4074, 39.9042],
+    '天津': [117.2008, 39.0842],
+    '上海': [121.4737, 31.2304],
+    '重庆': [106.5501, 29.5630],
+    '深圳': [114.0579, 22.5431],
+    '广州': [113.2644, 23.1291],
+    '杭州': [120.1551, 30.2741],
+    '南京': [118.7969, 32.0603],
+    '成都': [104.0668, 30.5728],
+    '武汉': [114.3055, 30.5928],
+    '西安': [108.9398, 34.3416],
+    '苏州': [120.5853, 31.2989],
+    '郑州': [113.6254, 34.7466],
+    '青岛': [120.3826, 36.0671],
+    '宁波': [121.5498, 29.8683],
+    '长沙': [112.9388, 28.2282],
+    '大连': [121.6147, 38.9140],
+    '厦门': [118.0894, 24.4798],
+    '济南': [117.1200, 36.6513],
+    '哈尔滨': [126.6425, 45.7560],
+    '沈阳': [123.4328, 41.8045],
+    '福州': [119.2965, 26.0745],
+    '长春': [125.3245, 43.8171],
+    '石家庄': [114.5149, 38.0428],
+    '昆明': [102.7122, 25.0406],
+    '南昌': [115.8922, 28.6820],
+    '贵阳': [106.7135, 26.5783],
+    '太原': [112.5489, 37.8570],
+    '南宁': [108.3200, 22.8241],
+    '合肥': [117.2831, 31.8612],
+    '乌鲁木齐': [87.6168, 43.8256],
+    '兰州': [103.8343, 36.0611],
+    '呼和浩特': [111.6708, 40.8183],
+    '海口': [110.1999, 20.0440],
+    '银川': [106.2323, 38.4865],
+    '西宁': [101.7782, 36.6172],
+    '拉萨': [91.1175, 29.6469],
+    '呼和浩特': [111.6708, 40.8183],
+    '拉萨': [91.1175, 29.6469]
   }
-  
-  let mapData = [
-    { name: '北京', value: 1500 },
-    { name: '天津', value: 800 },
-    { name: '上海', value: 1800 },
-    { name: '重庆', value: 900 },
-    { name: '河北', value: 600 },
-    { name: '河南', value: 700 },
-    { name: '云南', value: 400 },
-    { name: '辽宁', value: 650 },
-    { name: '黑龙江', value: 500 },
-    { name: '湖南', value: 550 },
-    { name: '安徽', value: 480 },
-    { name: '山东', value: 1200 },
-    { name: '新疆', value: 300 },
-    { name: '江苏', value: 1600 },
-    { name: '浙江', value: 1400 },
-    { name: '江西', value: 450 },
-    { name: '湖北', value: 580 },
-    { name: '广西', value: 420 },
-    { name: '甘肃', value: 320 },
-    { name: '山西', value: 380 },
-    { name: '内蒙古', value: 350 },
-    { name: '陕西', value: 460 },
-    { name: '吉林', value: 520 },
-    { name: '福建', value: 850 },
-    { name: '贵州', value: 390 },
-    { name: '广东', value: 1900 },
-    { name: '青海', value: 280 },
-    { name: '西藏', value: 250 },
-    { name: '四川', value: 750 },
-    { name: '宁夏', value: 270 },
-    { name: '海南', value: 310 },
-    { name: '台湾', value: 600 },
-    { name: '香港', value: 1100 },
-    { name: '澳门', value: 500 }
-  ]
-  
-  try {
-    // 使用缓存的仓库数据，确保warehouseData.value是数组
-    if (Array.isArray(warehouseData.value) && warehouseData.value.length > 0) {
-      const cityMap = {
-        '北京': '北京', '天津': '天津', '上海': '上海', '重庆': '重庆',
-        '河北': '河北', '河南': '河南', '云南': '云南', '辽宁': '辽宁',
-        '黑龙江': '黑龙江', '湖南': '湖南', '安徽': '安徽', '山东': '山东',
-        '新疆': '新疆', '江苏': '江苏', '浙江': '浙江', '江西': '江西',
-        '湖北': '湖北', '广西': '广西', '甘肃': '甘肃', '山西': '山西',
-        '内蒙古': '内蒙古', '陕西': '陕西', '吉林': '吉林', '福建': '福建',
-        '贵州': '贵州', '广东': '广东', '青海': '青海', '西藏': '西藏',
-        '四川': '四川', '宁夏': '宁夏', '海南': '海南', '台湾': '台湾',
-        '香港': '香港', '澳门': '澳门'
-      }
-      
-      mapData = mapData.map(item => {
-        const warehouse = warehouseData.value.find(w => w.location && cityMap[w.location] === item.name)
-        return {
-          name: item.name,
-          value: warehouse ? warehouse.capacity || item.value : item.value
-        }
-      })
+
+  // 库存异常的仓库列表
+  const alertWarehouses = ref([])
+
+  // 初始化地图
+  const initChart8 = async () => {
+    chart8 = echarts.init(ceshi8Ref.value)
+    try {
+      const response = await fetch('https://geo.datav.aliyun.com/areas_v3/bound/100000_full.json')
+      const chinaJson = await response.json()
+      echarts.registerMap('china', chinaJson)
+    } catch (error) {
+      console.error('加载中国地图数据失败:', error)
     }
-  } catch (error) {
-    console.error('获取仓库数据失败:', error)
-  }
-  
-  const option = {
-    tooltip: {
-      trigger: 'item'
-    },
-    visualMap: {
-      min: 0,
-      max: 2000,
-      left: 'left',
-      top: 'bottom',
-      text: ['高', '低'],
-      inRange: {
-        color: ['#e0f3f8', '#abd9e9', '#74add1', '#4575b4', '#313695']
-      },
-      calculable: true
-    },
-    series: [
-      {
-        name: '仓库分布',
-        type: 'map',
-        mapType: 'china',
-        roam: true,
-        label: {
-          show: true,
-          color: '#fff'
-        },
-        itemStyle: {
-          borderColor: '#389BB7',
-          areaColor: '#389BB7'
-        },
-        emphasis: {
-          itemStyle: {
-            areaColor: '#2a333d'
-          }
-        },
-        data: mapData
-      }
+    
+    let mapData = [
+      { name: '北京', value: 1500 },
+      { name: '天津', value: 800 },
+      { name: '上海', value: 1800 },
+      { name: '重庆', value: 900 },
+      { name: '河北', value: 600 },
+      { name: '河南', value: 700 },
+      { name: '云南', value: 400 },
+      { name: '辽宁', value: 650 },
+      { name: '黑龙江', value: 500 },
+      { name: '湖南', value: 550 },
+      { name: '安徽', value: 480 },
+      { name: '山东', value: 1200 },
+      { name: '新疆', value: 300 },
+      { name: '江苏', value: 1600 },
+      { name: '浙江', value: 1400 },
+      { name: '江西', value: 450 },
+      { name: '湖北', value: 580 },
+      { name: '广西', value: 420 },
+      { name: '甘肃', value: 320 },
+      { name: '山西', value: 380 },
+      { name: '内蒙古', value: 350 },
+      { name: '陕西', value: 460 },
+      { name: '吉林', value: 520 },
+      { name: '福建', value: 850 },
+      { name: '贵州', value: 390 },
+      { name: '广东', value: 1900 },
+      { name: '青海', value: 280 },
+      { name: '西藏', value: 250 },
+      { name: '四川', value: 750 },
+      { name: '宁夏', value: 270 },
+      { name: '海南', value: 310 },
+      { name: '台湾', value: 600 },
+      { name: '香港', value: 1100 },
+      { name: '澳门', value: 500 }
     ]
-  }
-  chart8.setOption(option)
+    
+    // 准备仓库散点数据
+    let scatterData = []
+    let normalWarehouses = []
+    let warningWarehouses = []
+    let errorWarehouses = []
+    
+    try {
+      // 使用缓存的仓库数据，确保warehouseData.value是数组
+      if (Array.isArray(warehouseData.value) && warehouseData.value.length > 0) {
+        const cityMap = {
+          '北京': '北京', '天津': '天津', '上海': '上海', '重庆': '重庆',
+          '河北': '河北', '河南': '河南', '云南': '云南', '辽宁': '辽宁',
+          '黑龙江': '黑龙江', '湖南': '湖南', '安徽': '安徽', '山东': '山东',
+          '新疆': '新疆', '江苏': '江苏', '浙江': '浙江', '江西': '江西',
+          '湖北': '湖北', '广西': '广西', '甘肃': '甘肃', '山西': '山西',
+          '内蒙古': '内蒙古', '陕西': '陕西', '吉林': '吉林', '福建': '福建',
+          '贵州': '贵州', '广东': '广东', '青海': '青海', '西藏': '西藏',
+          '四川': '四川', '宁夏': '宁夏', '海南': '海南', '台湾': '台湾',
+          '香港': '香港', '澳门': '澳门'
+        }
+        
+        // 更新地图数据
+        mapData = mapData.map(item => {
+          const warehouse = warehouseData.value.find(w => w.location && cityMap[w.location] === item.name)
+          return {
+            name: item.name,
+            value: warehouse ? warehouse.capacity || item.value : item.value
+          }
+        })
+        
+        // 准备散点数据
+        warehouseData.value.forEach(warehouse => {
+          const city = warehouse.location || '北京'
+          const coords = cityCoordinates[city]
+          if (coords) {
+            const scatterItem = {
+              name: warehouse.name,
+              value: [...coords, warehouse.utilizationRate || 0],
+              warehouseId: warehouse.id,
+              utilizationRate: warehouse.utilizationRate || 0,
+              capacity: warehouse.capacity || 0
+            }
+            
+            scatterData.push(scatterItem)
+            
+            // 根据库存状态分类
+            if (warehouse.utilizationRate < 20 || warehouse.utilizationRate > 80) {
+              if (warehouse.utilizationRate < 20) {
+                warningWarehouses.push(scatterItem)
+              } else {
+                errorWarehouses.push(scatterItem)
+              }
+            } else {
+              normalWarehouses.push(scatterItem)
+            }
+          }
+        })
+      }
+    } catch (error) {
+      console.error('获取仓库数据失败:', error)
+    }
+    
+    const option = {
+      tooltip: {
+        trigger: 'item'
+      },
+      visualMap: {
+        min: 0,
+        max: 2000,
+        left: 'left',
+        top: 'bottom',
+        text: ['高', '低'],
+        inRange: {
+          color: ['#e0f3f8', '#abd9e9', '#74add1', '#4575b4', '#313695']
+        },
+        calculable: true
+      },
+      series: [
+        {
+          name: '仓库分布',
+          type: 'map',
+          mapType: 'china',
+          roam: true,
+          label: {
+            show: true,
+            color: '#fff'
+          },
+          itemStyle: {
+            borderColor: '#389BB7',
+            areaColor: '#389BB7'
+          },
+          emphasis: {
+            itemStyle: {
+              areaColor: '#2a333d'
+            }
+          },
+          data: mapData
+        },
+        {
+          name: '正常仓库',
+          type: 'scatter',
+          coordinateSystem: 'geo',
+          symbolSize: 8,
+          itemStyle: {
+            color: '#52c41a'
+          },
+          data: normalWarehouses
+        },
+        {
+          name: '低库存警告',
+          type: 'scatter',
+          coordinateSystem: 'geo',
+          symbolSize: 12,
+          itemStyle: {
+            color: '#faad14',
+            borderColor: '#fff',
+            borderWidth: 2
+          },
+          // 闪烁效果
+          effect: {
+            show: true,
+            period: 2,
+            trailLength: 0.1,
+            symbol: 'circle',
+            symbolSize: 20,
+            color: '#faad14'
+          },
+          data: warningWarehouses
+        },
+        {
+          name: '高库存警告',
+          type: 'scatter',
+          coordinateSystem: 'geo',
+          symbolSize: 15,
+          itemStyle: {
+            color: '#f5222d',
+            borderColor: '#fff',
+            borderWidth: 2
+          },
+          // 闪烁效果
+          effect: {
+            show: true,
+            period: 1,
+            trailLength: 0.2,
+            symbol: 'circle',
+            symbolSize: 25,
+            color: '#f5222d'
+          },
+          data: errorWarehouses
+        }
+      ]
+    }
+    chart8.setOption(option)
 
   resizeObserver8 = new ResizeObserver(() => {
     chart8.resize()

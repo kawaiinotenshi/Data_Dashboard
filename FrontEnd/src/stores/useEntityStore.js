@@ -4,7 +4,7 @@ import { ref } from 'vue'
 // 创建一个全局的请求缓存对象，用于存储不同store的请求Promise
 const globalRequestCache = new Map()
 
-export function createEntityStore(storeName, apiFunction, entityName, dataListName = 'dataList', fetchFunctionName = 'fetchDataList', clearFunctionName = 'clearData') {
+export function createEntityStore(storeName, apiFunction, entityName, dataListName = 'dataList', fetchFunctionName = 'fetchDataList', clearFunctionName = 'clearData', updateFunctionName = 'updateDataList') {
   return defineStore(storeName, () => {
     const dataList = ref([])
     const loading = ref(false)
@@ -48,12 +48,21 @@ export function createEntityStore(storeName, apiFunction, entityName, dataListNa
       error.value = null
     }
 
+    const updateDataList = (newData) => {
+      if (Array.isArray(newData)) {
+        dataList.value = newData
+      } else {
+        console.error(`更新${entityName}数据失败：数据格式错误`)
+      }
+    }
+
     const result = {
       [dataListName]: dataList,
       loading,
       error,
       [fetchFunctionName]: fetchDataList,
-      [clearFunctionName]: clearData
+      [clearFunctionName]: clearData,
+      [updateFunctionName]: updateDataList
     }
 
     return result

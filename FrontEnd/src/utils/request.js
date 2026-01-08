@@ -66,7 +66,10 @@ axiosInstance.interceptors.response.use(
     if (response?.status === 401) {
       localStorage.removeItem('token')
       localStorage.removeItem('userInfo')
-      window.location.href = '/login'
+      // 当当前页面不是登录页面时，才跳转到登录页面
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login'
+      }
       return Promise.reject(error)
     }
     

@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
-import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -16,19 +15,20 @@ import java.util.Map;
 @Component
 public class JwtUtil {
 
-    @Value("${jwt.secret:logistics-dashboard-secret-key-for-jwt-token-generation-2024}")
-    private String secret;
-
     @Value("${jwt.expiration:86400000}")
     private Long expiration;
 
+    // 直接生成符合要求的安全密钥
+    private SecretKey secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS512);
+
     private SecretKey getSigningKey() {
-        return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+        return secretKey;
     }
 
-    public String generateToken(String username) {
+    public String generateToken(String username, String role) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("username", username);
+        claims.put("role", role);
         return createToken(claims, username);
     }
 

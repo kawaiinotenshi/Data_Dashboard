@@ -11,13 +11,15 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/warehouse")
+@RequestMapping("/api/warehouse")
 @CrossOrigin
 public class WarehouseController {
     private final WarehouseService warehouseService;
+    private final WebSocketController webSocketController;
 
-    public WarehouseController(WarehouseService warehouseService) {
+    public WarehouseController(WarehouseService warehouseService, WebSocketController webSocketController) {
         this.warehouseService = warehouseService;
+        this.webSocketController = webSocketController;
     }
 
     @GetMapping("/list")
@@ -35,12 +37,16 @@ public class WarehouseController {
     @PostMapping
     public Result<Void> createWarehouse(@RequestBody WarehouseRequestVO warehouseRequestVO) {
         warehouseService.createWarehouse(warehouseRequestVO);
+        // 广播仓库更新
+        webSocketController.broadcastWarehouseUpdate();
         return Result.success();
     }
 
     @PutMapping("/{id}")
     public Result<Void> updateWarehouse(@PathVariable Long id, @RequestBody WarehouseRequestVO warehouseRequestVO) {
         warehouseService.updateWarehouse(id, warehouseRequestVO);
+        // 广播仓库更新
+        webSocketController.broadcastWarehouseUpdate();
         return Result.success();
     }
 
@@ -48,6 +54,8 @@ public class WarehouseController {
     public Result<Void> deleteWarehouse(@PathVariable Long id) {
         boolean success = warehouseService.deleteWarehouse(id);
         if (success) {
+            // 广播仓库更新
+            webSocketController.broadcastWarehouseUpdate();
             return Result.success();
         } else {
             return Result.error("删除仓库失败");
@@ -58,6 +66,8 @@ public class WarehouseController {
     public Result<Void> batchDeleteWarehouses(@RequestBody List<Long> ids) {
         boolean success = warehouseService.batchDeleteWarehouses(ids);
         if (success) {
+            // 广播仓库更新
+            webSocketController.broadcastWarehouseUpdate();
             return Result.success();
         } else {
             return Result.error("批量删除仓库失败");

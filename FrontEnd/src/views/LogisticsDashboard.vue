@@ -18,6 +18,11 @@
       </div>
     </div>
 
+    <!-- 滚动预警栏 -->
+    <div class="alert-section">
+      <AlertBar />
+    </div>
+
     <div class="content">
       <LeftPanel />
       <CenterPanel />
@@ -32,6 +37,7 @@ import LeftPanel from '../components/LeftPanel.vue'
 import CenterPanel from '../components/CenterPanel.vue'
 import RightPanel from '../components/RightPanel.vue'
 import NavMenu from '../components/NavMenu.vue'
+import AlertBar from '../components/AlertBar.vue'
 
 const mainRef = ref(null)
 const currentTime = ref('')
@@ -99,5 +105,13 @@ onUnmounted(() => {
   background: url('/bj.png') no-repeat center center;
   background-size: cover;
   transition: transform 0.1s ease-out;
+}
+
+.alert-section {
+  width: 100%;
+  height: 80px;
+  padding: 0 30px;
+  box-sizing: border-box;
+  margin-bottom: 10px;
 }
 </style>

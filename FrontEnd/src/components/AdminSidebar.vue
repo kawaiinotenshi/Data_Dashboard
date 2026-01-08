@@ -29,6 +29,10 @@ const menuItems = [
   { name: '用户管理', path: '/admin/users', icon: '👤' },
   { name: '员工管理', path: '/admin/employees', icon: '👥' },
   { name: '部门管理', path: '/admin/departments', icon: '🏢' },
+  // 新增数据管理菜单项
+  { name: '订单管理', path: '/admin/orders', icon: '📦' },
+  { name: '仓库管理', path: '/admin/warehouses', icon: '🏪' },
+  { name: '物流任务管理', path: '/admin/logistics-tasks', icon: '🚚' },
   { name: '数据看板', path: '/dashboard', icon: '📊' },
   { name: '供应链看板', path: '/supply-chain', icon: '🔗' }
 ]

@@ -6,6 +6,10 @@ spring:
     name: logistics-dashboard
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:dev}
+  mvc:
+    throw-exception-if-no-handler-found: true
+  resources:
+    add-mappings: false
   
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -38,7 +42,7 @@ spring:
         min-idle: 0
 
   cache:
-    type: none
+    type: redis
 
 jwt:
   secret: ${JWT_SECRET:logistics-dashboard-secret-key-for-jwt-token-generation-2024}
@@ -88,13 +92,13 @@ mybatis-plus:
 logging:
   level:
     root: info
-    com.logistics: debug
-    com.logistics.mapper: debug
-    com.baomidou.mybatisplus: debug
+    com.logistics: info
+    com.logistics.mapper: warn
+    com.baomidou.mybatisplus: info
     org.springframework: info
     org.springframework.web: info
-    org.hibernate.SQL: debug
-    org.hibernate.type.descriptor.sql.BasicBinder: trace
+    org.hibernate.SQL: info
+    org.hibernate.type.descriptor.sql.BasicBinder: info
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n"
     file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n"

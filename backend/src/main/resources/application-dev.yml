@@ -19,6 +19,9 @@ spring:
     timeout: 5000
     lettuce:
       connection-timeout: 5000
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
 
 logging:
   level:

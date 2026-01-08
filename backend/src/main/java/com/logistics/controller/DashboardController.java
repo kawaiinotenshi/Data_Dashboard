@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/dashboard")
+@RequestMapping("/api/dashboard")
 @CrossOrigin
 public class DashboardController {
     private final DashboardService dashboardService;

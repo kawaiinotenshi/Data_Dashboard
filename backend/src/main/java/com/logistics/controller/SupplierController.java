@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/supplier")
+@RequestMapping("/api/supplier")
 @CrossOrigin
 public class SupplierController {
     private final SupplierService supplierService;

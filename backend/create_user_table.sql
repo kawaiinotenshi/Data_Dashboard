@@ -17,4 +17,6 @@ CREATE TABLE `user` (
 
 -- 插入默认管理员用户
 INSERT INTO `user` (`username`, `password`, `email`, `phone`, `role`, `status`) 
-VALUES ('admin', '$2a$10$7C3yL2tN3Bd1E1rE2tE3rE4tE5rE6tE7rE8tE9rE0tE1rE2tE3', 'admin@example.com', '13800138000', 'admin', 'active');
+VALUES ('admin', '$2a$10$oFVbf5nFWFyFT7js7R3iAe5MnR37HLgiFLIFDaC6nRin28vsSvgy2', 'admin@example.com', '13800138000', 'admin', 'active');
+
+-- 设置默认管理员密码为root

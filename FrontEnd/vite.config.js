@@ -4,9 +4,13 @@ import { resolve } from 'path'
 
 export default defineConfig({
   plugins: [vue()],
+  define: {
+    global: 'window'
+  },
   resolve: {
     alias: {
-      '@': resolve(__dirname, 'src')
+      '@': resolve(__dirname, 'src'),
+      'global': resolve(__dirname, 'node_modules/global')
     }
   },
   server: {

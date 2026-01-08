@@ -324,8 +324,8 @@ CREATE TABLE `user`  (
 -- ----------------------------
 -- Records of user
 -- ----------------------------
-INSERT INTO `user` VALUES (1, 'admin2', '', 'admin@example.com', '13800138000', 'admin', 'active', '2026-01-08 11:28:46', '2026-01-08 11:28:46', 0);
-INSERT INTO `user` VALUES (3, '111111', '111111', '1507165422@qq.com', '1', 'user', 'active', NULL, NULL, 1);
+INSERT INTO `user` VALUES (1, 'admin', '$2a$10$oFVbf5nFWFyFT7js7R3iAe5MnR37HLgiFLIFDaC6nRin28vsSvgy2', 'admin@example.com', '13800138000', 'admin', 'active', '2026-01-08 11:28:46', '2026-01-08 11:28:46', 0);
+-- 默认管理员密码为root
 
 -- ----------------------------
 -- Table structure for warehouse
