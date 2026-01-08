@@ -385,31 +385,72 @@ public class BaseEntity {
 1. 进入项目根目录
 2. 执行以下命令：
    ```bash
-   cd deploy
-   docker-compose up -d
+   docker-compose -f deploy/docker-compose.yml up -d
    ```
-3. 等待所有容器启动完成
+3. 等待所有容器启动完成（首次启动可能需要更长时间，因为需要下载镜像和初始化数据库）
 4. 访问地址：
    - 前端面板：http://localhost:80
    - 后端API：http://localhost:8080
+   - Swagger文档：http://localhost:8080/swagger-ui.html
    - Grafana监控：http://localhost:3000
+   - Prometheus监控：http://localhost:9090
 
 #### 11.2.2 单独部署数据库
 如果只需要部署数据库服务：
 ```bash
-cd deploy
-docker-compose -f docker-compose-db.yml up -d
+docker-compose -f deploy/docker-compose-db.yml up -d
 ```
 
 ### 11.3 Docker容器说明
-| 容器名称 | 服务 | 端口 |
-|---------|------|------|
-| logistics-mysql | MySQL数据库 | 3307:3306 |
-| logistics-redis | Redis缓存 | 6379:6379 |
-| logistics-backend | 后端服务 | 8080:8080 |
-| logistics-frontend | 前端服务 | 80:80 |
-| logistics-prometheus | Prometheus监控 | 9090:9090 |
-| logistics-grafana | Grafana可视化 | 3000:3000 |
+
+| 容器名称 | 服务 | 端口 | 说明 |
+|---------|------|------|------|
+| logistics-mysql | MySQL数据库 | 3307:3306 | 使用`logistics_db.sql`初始化数据库 |
+| logistics-redis | Redis缓存 | 6379:6379 | 缓存服务，密码：`logistics_redis_password_2024` |
+| logistics-backend | 后端服务 | 8080:8080 | Spring Boot后端应用 |
+| logistics-frontend | 前端服务 | 80:80 | Vue.js前端应用 |
+| logistics-prometheus | Prometheus监控 | 9090:9090 | 监控数据收集 |
+| logistics-grafana | Grafana可视化 | 3000:3000 | 监控数据可视化，默认账号：admin/admin |
+
+### 11.4 数据库初始化
+- Docker部署会自动使用项目根目录下的`logistics_db.sql`文件初始化数据库
+- 该文件包含完整的数据库结构和初始数据
+- 确保在部署前`logistics_db.sql`文件已存在于项目根目录
+
+### 11.5 关键配置说明
+
+#### 11.5.1 环境变量
+- MySQL根密码：`root`
+- MySQL用户：`logistics`，密码：`root`
+- Redis密码：`logistics_redis_password_2024`
+- Grafana管理员账号：`admin`，密码：`admin`
+
+#### 11.5.2 持久化数据
+所有服务的数据都通过Docker卷进行持久化，确保容器重启后数据不会丢失：
+- MySQL数据：`mysql-data`卷
+- Redis数据：`redis-data`卷
+- Prometheus数据：`prometheus-data`卷
+- Grafana数据：`grafana-data`卷
+- 后端日志：`backend-logs`卷
+
+#### 11.5.3 网络配置
+- 所有容器都连接到`logistics-network`网络（172.20.0.0/16子网）
+- 容器之间可以通过服务名称相互通信
+
+### 11.6 健康检查
+所有服务都配置了健康检查，确保服务正常运行：
+- MySQL：通过`mysqladmin ping`检查
+- Redis：通过`redis-cli ping`检查
+- 后端：通过访问`/api/warehouse/list`端点检查
+- 前端：通过访问根路径检查
+- Prometheus：通过访问健康端点检查
+- Grafana：通过访问健康API检查
+
+### 11.7 资源限制
+所有容器都配置了CPU和内存限制，确保系统资源合理分配
+
+### 11.8 日志管理
+所有容器的日志都配置了最大大小和保留数量，避免日志占用过多磁盘空间
 
 ## 12. 开发指南
 
