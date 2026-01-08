@@ -22,19 +22,7 @@ const routes = [
     name: 'SupplyChain',
     component: () => import('../views/SupplyChainDashboard.vue')
   },
-  {
-    path: '/admin',
-    name: 'Admin',
-    component: () => import('../views/AdminDashboard.vue'),
-    redirect: '/admin/users',
-    children: [
-      {
-        path: 'users',
-        name: 'UserManagement',
-        component: () => import('../components/UserManagement.vue')
-      }
-    ]
-  }
+  { path: '/admin', name: 'Admin', component: () => import('../views/AdminDashboard.vue'), redirect: '/admin/users', children: [ { path: 'users', name: 'UserManagement', component: () => import('../components/UserManagement.vue') }, { path: 'employees', name: 'EmployeeManagement', component: () => import('../components/EmployeeManagement.vue') }, { path: 'departments', name: 'DepartmentManagement', component: () => import('../components/EmployeeManagement.vue') } ] }
 ]
 
 const router = createRouter({

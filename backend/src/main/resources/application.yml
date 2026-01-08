@@ -1,7 +1,5 @@
 server:
-  port: ${SERVER_PORT:8080}
-  servlet:
-    context-path: /api
+  port: ${SERVER_PORT:8081}
 
 spring:
   application:
@@ -40,12 +38,7 @@ spring:
         min-idle: 0
 
   cache:
-    type: redis
-    redis:
-      time-to-live: 3600000
-      cache-null-values: false
-      key-prefix: logistics:
-      use-key-prefix: true
+    type: none
 
 jwt:
   secret: ${JWT_SECRET:logistics-dashboard-secret-key-for-jwt-token-generation-2024}
@@ -90,7 +83,7 @@ mybatis-plus:
       logic-delete-field: isDeleted
       logic-delete-value: 1
       logic-not-delete-value: 0
-  mapper-locations: classpath:mapper/*.xml
+  mapper-locations: classpath:mapper/CustomerMapper.xml,classpath:mapper/InventoryMapper.xml,classpath:mapper/OrderMapper.xml,classpath:mapper/SupplierMapper.xml,classpath:mapper/TransportMapper.xml,classpath:mapper/WarehouseMapper.xml,classpath:mapper/DepartmentMapper.xml,classpath:mapper/EmployeeMapper.xml
 
 logging:
   level:

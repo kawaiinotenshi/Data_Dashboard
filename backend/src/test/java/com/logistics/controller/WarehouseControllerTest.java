@@ -1,15 +1,17 @@
 package com.logistics.controller;
 
-import com.logistics.dto.WarehouseDTO;
+import com.logistics.common.Result;
 import com.logistics.service.WarehouseService;
+import com.logistics.vo.WarehouseRequestVO;
+import com.logistics.vo.WarehouseVO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.ResponseEntity;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 
@@ -25,76 +27,84 @@ class WarehouseControllerTest {
     @InjectMocks
     private WarehouseController warehouseController;
 
-    private WarehouseDTO warehouseDTO;
+    private WarehouseVO warehouseVO;
+    private WarehouseRequestVO warehouseRequestVO;
 
     @BeforeEach
     void setUp() {
-        warehouseDTO = new WarehouseDTO();
-        warehouseDTO.setId(1L);
-        warehouseDTO.setName("大连仓");
-        warehouseDTO.setLocation("大连市");
-        warehouseDTO.setCapacity(10000);
-        warehouseDTO.setOccupied(5000);
+        // 创建 WarehouseVO
+        warehouseVO = new WarehouseVO();
+        warehouseVO.setId(1L);
+        warehouseVO.setName("大连仓");
+        warehouseVO.setLocation("大连市");
+        warehouseVO.setArea(new BigDecimal(10000));
+        warehouseVO.setCapacity(new BigDecimal(5000));
+        warehouseVO.setUtilizationRate(new BigDecimal(0.5));
+        
+        // 创建 WarehouseRequestVO
+        warehouseRequestVO = new WarehouseRequestVO();
+        warehouseRequestVO.setName("大连仓");
+        warehouseRequestVO.setLocation("大连市");
+        warehouseRequestVO.setArea(new BigDecimal(10000));
+        warehouseRequestVO.setCapacity(new BigDecimal(5000));
     }
 
     @Test
     void testGetAllWarehouses() {
-        List<WarehouseDTO> warehouses = Arrays.asList(warehouseDTO);
-        when(warehouseService.getAllWarehouses()).thenReturn(warehouses);
+        List<WarehouseVO> warehouses = Arrays.asList(warehouseVO);
+        when(warehouseService.getAllWarehouseVOs()).thenReturn(warehouses);
 
-        ResponseEntity<List<WarehouseDTO>> response = warehouseController.getAllWarehouses();
+        Result<List<WarehouseVO>> response = warehouseController.getAllWarehouses();
 
         assertNotNull(response);
-        assertEquals(200, response.getStatusCodeValue());
-        assertEquals(1, response.getBody().size());
-        assertEquals("大连仓", response.getBody().get(0).getName());
-        verify(warehouseService, times(1)).getAllWarehouses();
+        assertEquals(200, response.getCode());
+        assertEquals(1, response.getData().size());
+        assertEquals("大连仓", response.getData().get(0).getName());
+        verify(warehouseService, times(1)).getAllWarehouseVOs();
     }
 
     @Test
     void testGetWarehouseById() {
-        when(warehouseService.getWarehouseById(1L)).thenReturn(warehouseDTO);
+        when(warehouseService.getWarehouseVOById(1L)).thenReturn(warehouseVO);
 
-        ResponseEntity<WarehouseDTO> response = warehouseController.getWarehouseById(1L);
+        Result<WarehouseVO> response = warehouseController.getWarehouseById(1L);
 
         assertNotNull(response);
-        assertEquals(200, response.getStatusCodeValue());
-        assertEquals("大连仓", response.getBody().getName());
-        verify(warehouseService, times(1)).getWarehouseById(1L);
+        assertEquals(200, response.getCode());
+        assertEquals("大连仓", response.getData().getName());
+        verify(warehouseService, times(1)).getWarehouseVOById(1L);
     }
 
     @Test
     void testCreateWarehouse() {
-        when(warehouseService.createWarehouse(warehouseDTO)).thenReturn(warehouseDTO);
+        when(warehouseService.createWarehouse(warehouseRequestVO)).thenReturn(true);
 
-        ResponseEntity<WarehouseDTO> response = warehouseController.createWarehouse(warehouseDTO);
+        Result<Void> response = warehouseController.createWarehouse(warehouseRequestVO);
 
         assertNotNull(response);
-        assertEquals(200, response.getStatusCodeValue());
-        assertEquals("大连仓", response.getBody().getName());
-        verify(warehouseService, times(1)).createWarehouse(warehouseDTO);
+        assertEquals(200, response.getCode());
+        verify(warehouseService, times(1)).createWarehouse(warehouseRequestVO);
     }
 
     @Test
     void testUpdateWarehouse() {
-        when(warehouseService.updateWarehouse(1L, warehouseDTO)).thenReturn(warehouseDTO);
+        when(warehouseService.updateWarehouse(1L, warehouseRequestVO)).thenReturn(true);
 
-        ResponseEntity<WarehouseDTO> response = warehouseController.updateWarehouse(1L, warehouseDTO);
+        Result<Void> response = warehouseController.updateWarehouse(1L, warehouseRequestVO);
 
         assertNotNull(response);
-        assertEquals(200, response.getStatusCodeValue());
-        assertEquals("大连仓", response.getBody().getName());
-        verify(warehouseService, times(1)).updateWarehouse(1L, warehouseDTO);
+        assertEquals(200, response.getCode());
+        verify(warehouseService, times(1)).updateWarehouse(1L, warehouseRequestVO);
     }
 
     @Test
     void testDeleteWarehouse() {
-        doNothing().when(warehouseService).deleteWarehouse(1L);
+        when(warehouseService.deleteWarehouse(1L)).thenReturn(true);
 
-        ResponseEntity<Void> response = warehouseController.deleteWarehouse(1L);
+        Result<Void> response = warehouseController.deleteWarehouse(1L);
 
         assertNotNull(response);
-        assertEquals(204, response.getStatusCodeValue());
+        assertEquals(200, response.getCode());
         verify(warehouseService, times(1)).deleteWarehouse(1L);
     }
 }

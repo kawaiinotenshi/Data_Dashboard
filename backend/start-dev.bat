@@ -1,3 +1,3 @@
 @echo off
 echo Starting Logistics Dashboard in Development Mode...
-java -jar -Dspring.profiles.active=dev target/logistics-dashboard.jar
+java -jar -Dspring.profiles.active=dev target/logistics-dashboard-1.0.0.jar

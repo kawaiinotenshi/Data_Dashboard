@@ -1,3 +1,4 @@
+import axios from 'axios'
 import logger from './logger'
 
 export const ErrorCode = {
@@ -28,8 +29,10 @@ export function getErrorMessage(error) {
     const data = error.response.data
     return data?.message || ErrorMessage[status] || `请求错误: ${status}`
   } else if (error.request) {
-    return ErrorMessage[ErrorCode.NETWORK_ERROR]
+    // 请求已发送但未收到响应，可能是服务器内部错误
+    return ErrorMessage[ErrorCode.INTERNAL_SERVER_ERROR]
   } else {
+    // 请求配置错误，才是真正的请求参数错误
     return ErrorMessage[ErrorCode.BAD_REQUEST]
   }
 }
@@ -74,6 +77,13 @@ export function showWarningNotification(message, duration = 3000) {
 }
 
 export function handleApiError(error) {
+  // 检查是否为请求取消错误
+  if (axios.isCancel(error)) {
+    logger.info('请求已取消', { error: error.message })
+    // 不显示错误通知，因为这是内部请求去重机制导致的
+    return Promise.reject(error)
+  }
+  
   logger.error('API错误', { error: error.message, stack: error.stack, response: error.response?.data })
   const message = getErrorMessage(error)
   showErrorNotification(message)

@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- This is a FreeMarker template file, not a valid MyBatis Mapper XML file -->
+<!-- Template for generating MyBatis Mapper XML files -->
 <mapper namespace="${package.Mapper}.${table.mapperName}">
 
     <#if enableCache>

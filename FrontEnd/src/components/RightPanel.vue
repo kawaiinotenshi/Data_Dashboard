@@ -139,9 +139,9 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 import * as echarts from 'echarts'
-import { api } from '@/api/index'
+import { useWarehouseStore } from '@/stores/warehouse'
 
 const activeTab = ref(0)
 const ceshi3Ref = ref(null)
@@ -167,22 +167,23 @@ const scrollData = ref([
   { name: '10.蔬菜', rate: '1.8%', amount: '41顿' }
 ])
 
+// 使用Pinia store获取仓库数据
+const warehouseStore = useWarehouseStore()
+const warehouseData = computed(() => warehouseStore.entityList)
+const warehouseLoading = computed(() => warehouseStore.loading)
+
 const initChart3 = async () => {
   chart3 = echarts.init(ceshi3Ref.value)
   
   let chartData = { name: '大连仓', value: 75 }
   
-  try {
-    const response = await api.warehouse.list()
-    if (response.code === 200 && response.data && response.data.length > 0) {
-      const warehouse = response.data.find(w => w.name === '大连仓') || response.data[0]
-      chartData = {
-        name: warehouse.name || '大连仓',
-        value: warehouse.utilizationRate || 75
-      }
+  // 使用缓存的仓库数据
+  if (warehouseData.value.length > 0) {
+    const warehouse = warehouseData.value.find(w => w.name === '大连仓') || warehouseData.value[0]
+    chartData = {
+      name: warehouse.name || '大连仓',
+      value: warehouse.utilizationRate || 75
     }
-  } catch (error) {
-    console.error('获取仓库数据失败:', error)
   }
   
   const option = {
@@ -302,17 +303,13 @@ const initChart4 = async () => {
   
   let chartData = { name: '青岛仓', value: 82 }
   
-  try {
-    const response = await api.warehouse.list()
-    if (response.code === 200 && response.data && response.data.length > 0) {
-      const warehouse = response.data.find(w => w.name === '青岛仓') || response.data[1] || response.data[0]
-      chartData = {
-        name: warehouse.name || '青岛仓',
-        value: warehouse.utilizationRate || 82
-      }
+  // 使用缓存的仓库数据
+  if (warehouseData.value.length > 0) {
+    const warehouse = warehouseData.value.find(w => w.name === '青岛仓') || warehouseData.value[1] || warehouseData.value[0]
+    chartData = {
+      name: warehouse.name || '青岛仓',
+      value: warehouse.utilizationRate || 82
     }
-  } catch (error) {
-    console.error('获取仓库数据失败:', error)
   }
   
   const option = {
@@ -432,17 +429,13 @@ const initChart5 = async () => {
   
   let chartData = { name: '宁波仓', value: 68 }
   
-  try {
-    const response = await api.warehouse.list()
-    if (response.code === 200 && response.data && response.data.length > 0) {
-      const warehouse = response.data.find(w => w.name === '宁波仓') || response.data[2] || response.data[0]
-      chartData = {
-        name: warehouse.name || '宁波仓',
-        value: warehouse.utilizationRate || 68
-      }
+  // 使用缓存的仓库数据
+  if (warehouseData.value.length > 0) {
+    const warehouse = warehouseData.value.find(w => w.name === '宁波仓') || warehouseData.value[2] || warehouseData.value[0]
+    chartData = {
+      name: warehouse.name || '宁波仓',
+      value: warehouse.utilizationRate || 68
     }
-  } catch (error) {
-    console.error('获取仓库数据失败:', error)
   }
   
   const option = {
@@ -563,7 +556,10 @@ const handleResize = () => {
   chart5 && chart5.resize()
 }
 
-onMounted(() => {
+onMounted(async () => {
+  // 先获取仓库数据
+  await warehouseStore.fetchWarehouseList()
+  // 然后初始化图表
   initChart3()
   initChart4()
   initChart5()

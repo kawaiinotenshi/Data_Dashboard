@@ -85,6 +85,32 @@ export const api = {
     getByVehicleType: (vehicleType) => request.get(`/transport/vehicle-type/${vehicleType}`),
     getTrend: () => request.get('/transport/trend'),
     getByVehicleTypeGroup: () => request.get('/transport/vehicle-type-group')
+  },
+  
+  employee: {
+    list: () => request.get('/employee/list'),
+    getById: (id) => request.get(`/employee/${id}`),
+    create: (data) => request.post('/employee', data),
+    update: (id, data) => request.put(`/employee/${id}`, data),
+    delete: (id) => request.delete(`/employee/${id}`),
+    batchDelete: (ids) => request.delete('/employee/batch', { data: ids }),
+    search: (params) => request.get('/employee/search', { params }),
+    getHighestPaidEmployee: () => request.get('/employee/highest-paid'),
+    getDepartmentStatistics: () => request.get('/employee/department-statistics'),
+    getWithDepartment: () => request.get('/employee/list-with-department')
+  },
+  
+  department: {
+    list: () => request.get('/department/list'),
+    getById: (id) => request.get(`/department/${id}`),
+    create: (data) => request.post('/department', data),
+    update: (id, data) => request.put(`/department/${id}`, data),
+    delete: (id) => request.delete(`/department/${id}`),
+    batchDelete: (ids) => request.delete('/department/batch', { data: ids })
+  },
+  
+  ai: {
+    chat: (data) => request.post('/ai/chat', data, { timeout: 30000 })
   }
 }
 

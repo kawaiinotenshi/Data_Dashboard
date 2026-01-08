@@ -1,7 +1,6 @@
 package com.logistics.config;
 
 import com.logistics.filter.JwtAuthenticationFilter;
-import com.logistics.filter.RateLimitInterceptor;
 import com.logistics.service.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -19,8 +18,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.Arrays;
 import java.util.List;
@@ -28,13 +25,10 @@ import java.util.List;
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
-public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebMvcConfigurer {
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private JwtAuthenticationFilter jwtAuthenticationFilter;
-
-    @Autowired
-    private RateLimitInterceptor rateLimitInterceptor;
 
     @Autowired
     private CustomUserDetailsService customUserDetailsService;
@@ -52,21 +46,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebM
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()
             .authorizeRequests()
-                .antMatchers("/api/auth/**").permitAll()
-                .antMatchers("/api/public/**").permitAll()
-                .antMatchers("/api/dashboard/**").permitAll()
-                .antMatchers("/api/inventory/**").permitAll()
-                .antMatchers("/api/supply-chain/**").permitAll()
-                .antMatchers("/api/statistics/**").permitAll()
-                .antMatchers("/api/delivery/**").permitAll()
-                .antMatchers("/api/inbound/**").permitAll()
-                .antMatchers("/api/outbound/**").permitAll()
-                .antMatchers("/swagger-ui/**").permitAll()
-                .antMatchers("/v3/api-docs/**").permitAll()
-                .antMatchers("/swagger-resources/**").permitAll()
-                .antMatchers("/webjars/**").permitAll()
-                .antMatchers("/error").permitAll()
-                .anyRequest().authenticated()
+                .antMatchers("/**").permitAll()
             .and()
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
     }
@@ -77,8 +57,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebM
         
         List<String> allowedOrigins = Arrays.asList(
             "http://localhost:3000",
+            "http://localhost:3001",
             "http://localhost:8080",
             "http://127.0.0.1:3000",
+            "http://127.0.0.1:3001",
             "http://127.0.0.1:8080",
             "http://frontend:80",
             "http://localhost"
@@ -105,12 +87,5 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebM
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
-    }
-
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(rateLimitInterceptor)
-                .addPathPatterns("/api/**")
-                .excludePathPatterns("/api/auth/**", "/api/public/**");
     }
 }

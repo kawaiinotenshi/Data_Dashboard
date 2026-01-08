@@ -2,14 +2,14 @@
 import requests
 import json
 
-base_url = "http://localhost:8080/api"
+base_url = "http://localhost:8081"
 
 print("=" * 50)
 print("开始测试所有API接口")
 print("=" * 50)
 
 apis = [
-    {"name": "订单列表", "method": "GET", "url": "/order/list", "expected_fields": ["id", "orderNo", "status", "amount"]},
+    {"name": "订单列表", "method": "GET", "url": "/order/list", "expected_fields": ["id", "orderNo", "status", "orderAmount"]},
     {"name": "订单统计", "method": "GET", "url": "/order/statistics", "expected_fields": ["totalOrders", "pendingOrders", "completedOrders", "totalAmount"]},
     {"name": "仓库列表", "method": "GET", "url": "/warehouse/list", "expected_fields": ["id", "name", "location", "capacity"]},
     {"name": "仓库统计", "method": "GET", "url": "/warehouse/statistics", "expected_fields": ["totalWarehouses", "totalCapacity", "usedCapacity", "availableCapacity"]},
@@ -17,7 +17,10 @@ apis = [
     {"name": "供应商列表", "method": "GET", "url": "/supplier/list", "expected_fields": ["id", "name", "contact", "phone"]},
     {"name": "运输列表", "method": "GET", "url": "/transport/list", "expected_fields": ["id", "vehicleNo", "driver", "status"]},
     {"name": "运输统计", "method": "GET", "url": "/transport/statistics", "expected_fields": ["totalTransports", "inProgress", "completed"]},
-    {"name": "仪表盘数据", "method": "GET", "url": "/dashboard/data", "expected_fields": ["orderCount", "warehouseCount", "transportCount"]}
+    {"name": "仪表盘数据", "method": "GET", "url": "/dashboard/data", "expected_fields": ["orderCount", "warehouseCount", "transportCount"]},
+    {"name": "员工列表", "method": "GET", "url": "/employee/list", "expected_fields": ["id", "name", "departmentId", "salary"]},
+    {"name": "部门列表", "method": "GET", "url": "/department/list", "expected_fields": ["id", "name", "description"]},
+    {"name": "员工部门统计", "method": "GET", "url": "/employee/department-statistics", "expected_fields": []}
 ]
 
 success_count = 0

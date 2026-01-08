@@ -1,8 +1,10 @@
 <template>
   <router-view />
+  <AiChatWidget />
 </template>
 
 <script setup>
+import AiChatWidget from './components/AiChatWidget.vue'
 </script>
 
 <style>

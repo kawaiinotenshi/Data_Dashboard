@@ -1,9 +1,10 @@
 package com.logistics.service;
 
-import com.logistics.dto.WarehouseDTO;
 import com.logistics.entity.Warehouse;
 import com.logistics.mapper.WarehouseMapper;
 import com.logistics.service.impl.WarehouseServiceImpl;
+import com.logistics.vo.WarehouseRequestVO;
+import com.logistics.vo.WarehouseVO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,6 +12,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 
@@ -27,15 +29,26 @@ class WarehouseServiceTest {
     private WarehouseServiceImpl warehouseService;
 
     private Warehouse warehouse;
+    private WarehouseVO warehouseVO;
+    private WarehouseRequestVO warehouseRequestVO;
 
     @BeforeEach
     void setUp() {
+        // 创建 Warehouse 实体
         warehouse = new Warehouse();
         warehouse.setId(1L);
         warehouse.setName("大连仓");
         warehouse.setLocation("大连市");
-        warehouse.setCapacity(10000);
-        warehouse.setOccupied(5000);
+        warehouse.setArea(new BigDecimal(10000));
+        warehouse.setCapacity(new BigDecimal(5000));
+        warehouse.setThroughput(new BigDecimal(0));
+        
+        // 创建 WarehouseRequestVO
+        warehouseRequestVO = new WarehouseRequestVO();
+        warehouseRequestVO.setName("大连仓");
+        warehouseRequestVO.setLocation("大连市");
+        warehouseRequestVO.setArea(new BigDecimal(10000));
+        warehouseRequestVO.setCapacity(new BigDecimal(5000));
     }
 
     @Test
@@ -43,7 +56,7 @@ class WarehouseServiceTest {
         List<Warehouse> warehouses = Arrays.asList(warehouse);
         when(warehouseMapper.selectList(null)).thenReturn(warehouses);
 
-        List<WarehouseDTO> result = warehouseService.getAllWarehouses();
+        List<Warehouse> result = warehouseService.getAllWarehouses();
 
         assertNotNull(result);
         assertEquals(1, result.size());
@@ -55,7 +68,7 @@ class WarehouseServiceTest {
     void testGetWarehouseById() {
         when(warehouseMapper.selectById(1L)).thenReturn(warehouse);
 
-        WarehouseDTO result = warehouseService.getWarehouseById(1L);
+        Warehouse result = warehouseService.getWarehouseById(1L);
 
         assertNotNull(result);
         assertEquals("大连仓", result.getName());
@@ -64,37 +77,22 @@ class WarehouseServiceTest {
 
     @Test
     void testCreateWarehouse() {
-        WarehouseDTO dto = new WarehouseDTO();
-        dto.setName("大连仓");
-        dto.setLocation("大连市");
-        dto.setCapacity(10000);
-        dto.setOccupied(5000);
-
         when(warehouseMapper.insert(any(Warehouse.class))).thenReturn(1);
 
-        WarehouseDTO result = warehouseService.createWarehouse(dto);
+        boolean result = warehouseService.createWarehouse(warehouseRequestVO);
 
-        assertNotNull(result);
-        assertEquals("大连仓", result.getName());
+        assertTrue(result);
         verify(warehouseMapper, times(1)).insert(any(Warehouse.class));
     }
 
     @Test
     void testUpdateWarehouse() {
-        WarehouseDTO dto = new WarehouseDTO();
-        dto.setId(1L);
-        dto.setName("大连仓");
-        dto.setLocation("大连市");
-        dto.setCapacity(10000);
-        dto.setOccupied(5000);
-
         when(warehouseMapper.selectById(1L)).thenReturn(warehouse);
         when(warehouseMapper.updateById(any(Warehouse.class))).thenReturn(1);
 
-        WarehouseDTO result = warehouseService.updateWarehouse(1L, dto);
+        boolean result = warehouseService.updateWarehouse(1L, warehouseRequestVO);
 
-        assertNotNull(result);
-        assertEquals("大连仓", result.getName());
+        assertTrue(result);
         verify(warehouseMapper, times(1)).selectById(1L);
         verify(warehouseMapper, times(1)).updateById(any(Warehouse.class));
     }
@@ -103,8 +101,9 @@ class WarehouseServiceTest {
     void testDeleteWarehouse() {
         when(warehouseMapper.deleteById(1L)).thenReturn(1);
 
-        warehouseService.deleteWarehouse(1L);
+        boolean result = warehouseService.deleteWarehouse(1L);
 
+        assertTrue(result);
         verify(warehouseMapper, times(1)).deleteById(1L);
     }
 }

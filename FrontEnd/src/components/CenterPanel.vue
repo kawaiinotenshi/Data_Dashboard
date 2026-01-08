@@ -43,8 +43,9 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 import * as echarts from 'echarts'
+import { useWarehouseStore } from '@/stores/warehouse'
 import { api } from '@/api/index'
 
 const ceshi8Ref = ref(null)
@@ -56,6 +57,11 @@ let chart7 = null
 let resizeObserver8 = null
 let resizeObserver6 = null
 let resizeObserver7 = null
+
+// 使用Pinia store获取仓库数据
+const warehouseStore = useWarehouseStore()
+const warehouseData = computed(() => warehouseStore.entityList)
+const warehouseLoading = computed(() => warehouseStore.loading)
 
 const initChart8 = async () => {
   chart8 = echarts.init(ceshi8Ref.value)
@@ -105,8 +111,8 @@ const initChart8 = async () => {
   ]
   
   try {
-    const response = await api.warehouse.list()
-    if (response.code === 200 && response.data) {
+    // 使用缓存的仓库数据，确保warehouseData.value是数组
+    if (Array.isArray(warehouseData.value) && warehouseData.value.length > 0) {
       const cityMap = {
         '北京': '北京', '天津': '天津', '上海': '上海', '重庆': '重庆',
         '河北': '河北', '河南': '河南', '云南': '云南', '辽宁': '辽宁',
@@ -120,7 +126,7 @@ const initChart8 = async () => {
       }
       
       mapData = mapData.map(item => {
-        const warehouse = response.data.find(w => w.location && cityMap[w.location] === item.name)
+        const warehouse = warehouseData.value.find(w => w.location && cityMap[w.location] === item.name)
         return {
           name: item.name,
           value: warehouse ? warehouse.capacity || item.value : item.value
@@ -369,7 +375,10 @@ const handleResize = () => {
   chart7 && chart7.resize()
 }
 
-onMounted(() => {
+onMounted(async () => {
+  // 先从store获取仓库数据
+  await warehouseStore.fetchWarehouseList()
+  // 然后初始化图表
   initChart8()
   initChart6()
   initChart7()

@@ -1,5 +1,124 @@
 # 更新日志
 
+## [2026-01-07]
+
+### 员工和部门模块集成
+- 部门控制器实现（DepartmentController.java）
+  - 实现完整RESTful API：list、getById、create、update、delete、batchDelete
+  - 统一响应格式，使用Result包装类
+  - 支持分页和参数验证
+  - 实现批量删除功能
+
+- 员工和部门API集成（api/index.js）
+  - 添加员工API：list、getById、create、update、delete、batchDelete、statistics
+  - 添加部门API：list、getById、create、update、delete、batchDelete
+  - 配置API基础路径和请求方法
+  - 统一API调用方式
+
+- 前端路由集成（router/index.js）
+  - 添加员工管理路由：/employee-management
+  - 添加部门管理路由：/department-management
+  - 配置路由元信息
+  - 实现路由懒加载
+
+- 员工管理组件实现（EmployeeManagement.vue）
+  - 创建标签页界面，分离员工和部门管理
+  - 实现数据列表展示，支持分页
+  - 添加搜索、添加、编辑、删除功能
+  - 支持批量删除操作
+  - 集成表单验证和错误提示
+
+### 单元测试完善
+- EmployeeServiceTest.java增强
+  - 添加batchDeleteEmployees测试用例
+  - 添加searchEmployees测试用例
+  - 添加getHighestPaidEmployee测试用例
+  - 添加getDepartmentStatistics测试用例
+  - 添加convertToVO测试用例
+  - 添加createEmployeeByRequestVO测试用例
+  - 添加updateEmployeeByRequestVO测试用例
+  - 使用Mockito模拟依赖
+  - 验证业务逻辑正确性
+
+- DepartmentServiceTest.java修复
+  - 移除@SpringBootTest注解
+  - 使用手动对象创建代替@InjectMocks
+  - 正确配置测试依赖
+  - 修复测试期望和验证
+
+### 错误修复和优化
+- 端口冲突问题解决
+  - 更新后端端口为8081
+  - 配置前端代理指向8081端口
+  - 终止占用端口的进程
+
+- 请求拦截器修复（request.js）
+  - 修复响应拦截器中的TypeError错误
+  - 添加error.config存在性检查
+  - 确保请求清理逻辑正常工作
+
+- 安全配置调整（SecurityConfig.java）
+  - 配置API端点权限
+  - 解决403 Forbidden错误
+  - 确保所有API端点可正常访问
+
+- 数据库表创建（create_tables.sql）
+  - 创建logistics_db数据库
+  - 创建department和employee表结构
+  - 插入测试数据
+  - 确保表结构与实体类一致
+
+### 项目验证
+- API测试验证
+  - ✅ /api/employee/list - 员工列表数据
+  - ✅ /api/employee/{id} - 员工详情数据
+  - ✅ /api/employee/create - 创建员工
+  - ✅ /api/employee/update - 更新员工
+  - ✅ /api/employee/delete/{id} - 删除员工
+  - ✅ /api/employee/batchDelete - 批量删除员工
+  - ✅ /api/employee/statistics - 员工统计数据
+  - ✅ /api/department/list - 部门列表数据
+  - ✅ /api/department/{id} - 部门详情数据
+  - ✅ /api/department/create - 创建部门
+  - ✅ /api/department/update - 更新部门
+  - ✅ /api/department/delete/{id} - 删除部门
+  - ✅ /api/department/batchDelete - 批量删除部门
+
+- 前端功能验证
+  - ✅ 员工管理页面正常加载
+  - ✅ 部门管理页面正常加载
+  - ✅ 数据列表正确显示
+  - ✅ 搜索功能正常工作
+  - ✅ 分页功能正常工作
+  - ✅ 增删改查功能正常工作
+  - ✅ 批量删除功能正常工作
+  - ✅ 无控制台错误
+
+### 实训报告编写
+- 环境搭建与配置报告（实训报告_环境搭建与配置.md）
+  - 记录项目环境搭建过程
+  - 详细说明开发环境配置
+  - 描述依赖安装和版本管理
+  - 总结环境搭建中的问题和解决方案
+
+- 项目部署与运维报告（实训报告_项目部署与运维.md）
+  - 记录项目部署流程
+  - 详细说明Docker容器化配置
+  - 描述运维监控和故障排查
+  - 总结部署运维中的最佳实践
+
+- 正式书面报告（实训报告_正式书面报告.md）
+  - 完整的项目实训报告结构
+  - 包含摘要、目录、正文、参考文献等
+  - 详细描述项目需求、设计、实现和测试
+  - 记录项目成果和个人总结
+
+- 报告格式优化
+  - 遵循正式书面报告规范
+  - 使用专业术语和清晰的章节结构
+  - 包含图表和代码示例
+  - 确保内容完整、准确、专业
+
 ## [2026-01-04]
 
 ### 自动化测试和CI/CD流程实现

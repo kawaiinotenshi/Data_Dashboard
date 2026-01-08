@@ -15,7 +15,7 @@ import java.lang.reflect.Method;
 import java.util.concurrent.TimeUnit;
 
 @Aspect
-@Component
+// @Component 临时禁用缓存切面
 public class CacheAspect {
 
     private static final Logger logger = LoggerFactory.getLogger(CacheAspect.class);
