@@ -20,6 +20,8 @@ export default [
         ResizeObserver: 'readonly',
         setInterval: 'readonly',
         clearInterval: 'readonly',
+        setTimeout: 'readonly',
+        clearTimeout: 'readonly',
         process: 'readonly',
         define: 'readonly',
         exports: 'readonly',

@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { handleApiError, ErrorCode } from './errorHandler'
 
+// 使用Map存储正在进行的请求Promise，而不是取消令牌
 const pendingRequests = new Map()
 
 function generateRequestKey(config) {
@@ -8,34 +9,8 @@ function generateRequestKey(config) {
   return [method, url, JSON.stringify(params), JSON.stringify(data)].join('&')
 }
 
-// 简化请求去重逻辑：将相同请求合并为一个，避免取消操作
-function addPendingRequest(config) {
-  const requestKey = generateRequestKey(config)
-  
-  // 如果已经有相同请求正在进行，直接取消新请求
-  // 这样可以确保只有第一个请求会执行，其他重复请求会被取消
-  // 组件可以通过Pinia store共享已获取的数据
-  if (pendingRequests.has(requestKey)) {
-    const cancel = pendingRequests.get(requestKey)
-    cancel(requestKey)
-  }
-  
-  // 为新请求创建取消令牌并存储
-  const cancelToken = new axios.CancelToken((cancel) => {
-    pendingRequests.set(requestKey, cancel)
-  })
-  
-  config.cancelToken = cancelToken
-}
-
-function removePendingRequest(config) {
-  const requestKey = generateRequestKey(config)
-  if (pendingRequests.has(requestKey)) {
-    pendingRequests.delete(requestKey)
-  }
-}
-
-const request = axios.create({
+// 创建axios实例
+const axiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api',
   timeout: parseInt(import.meta.env.VITE_API_TIMEOUT) || 10000,
   headers: {
@@ -45,11 +20,9 @@ const request = axios.create({
   retryDelay: 1000
 })
 
-request.interceptors.request.use(
+// 创建请求拦截器
+axiosInstance.interceptors.request.use(
   config => {
-    removePendingRequest(config)
-    addPendingRequest(config)
-    
     const token = localStorage.getItem('token')
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
@@ -65,10 +38,9 @@ request.interceptors.request.use(
   }
 )
 
-request.interceptors.response.use(
+// 创建响应拦截器
+axiosInstance.interceptors.response.use(
   response => {
-    removePendingRequest(response.config)
-    
     const endTime = new Date()
     const duration = endTime - response.config.metadata.startTime
     
@@ -85,10 +57,6 @@ request.interceptors.response.use(
     }
   },
   async error => {
-    if (error.config) {
-      removePendingRequest(error.config)
-    }
-    
     const { config, response } = error
     
     if (!config) {
@@ -109,11 +77,44 @@ request.interceptors.response.use(
       
       await new Promise(resolve => setTimeout(resolve, delay))
       
-      return request(config)
+      return axiosInstance(config)
     }
     
     return handleApiError(error)
   }
 )
+
+// 包装axiosInstance，实现请求合并
+const request = (config) => {
+  const requestKey = generateRequestKey(config)
+  
+  // 检查是否有相同请求正在进行
+  if (pendingRequests.has(requestKey)) {
+    return pendingRequests.get(requestKey)
+  }
+  
+  // 发起新请求并将Promise存储到pendingRequests中
+  const requestPromise = axiosInstance(config)
+    .finally(() => {
+      // 请求完成后从pendingRequests中移除
+      if (pendingRequests.get(requestKey) === requestPromise) {
+        pendingRequests.delete(requestKey)
+      }
+    })
+  
+  // 存储请求Promise
+  pendingRequests.set(requestKey, requestPromise)
+  
+  return requestPromise
+}
+
+// 添加HTTP方法快捷方式，以兼容现有代码
+request.get = (url, config = {}) => request({ method: 'get', url, ...config })
+request.post = (url, data = {}, config = {}) => request({ method: 'post', url, data, ...config })
+request.put = (url, data = {}, config = {}) => request({ method: 'put', url, data, ...config })
+request.delete = (url, config = {}) => request({ method: 'delete', url, ...config })
+request.patch = (url, data = {}, config = {}) => request({ method: 'patch', url, data, ...config })
+request.head = (url, config = {}) => request({ method: 'head', url, ...config })
+request.options = (url, config = {}) => request({ method: 'options', url, ...config })
 
 export default request

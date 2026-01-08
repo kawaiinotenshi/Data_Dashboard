@@ -169,8 +169,7 @@ const scrollData = ref([
 
 // 使用Pinia store获取仓库数据
 const warehouseStore = useWarehouseStore()
-const warehouseData = computed(() => warehouseStore.entityList)
-const warehouseLoading = computed(() => warehouseStore.loading)
+const warehouseData = computed(() => warehouseStore.warehouseList)
 
 const initChart3 = async () => {
   chart3 = echarts.init(ceshi3Ref.value)

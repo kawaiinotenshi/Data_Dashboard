@@ -1,423 +1,489 @@
-# 物流供应链可视化面板
+# 大数据面板项目使用手册
 
-## 项目简介
+## 1. 项目概述
 
-这是一个基于Vue.js + Spring Boot + MySQL的物流供应链可视化管理系统，提供仓储管理、客户管理、供应商管理、订单管理、库存管理、运输管理等核心功能，支持数据可视化大屏展示。
+本项目是一个基于Spring Boot和Vue.js的大数据可视化面板系统，旨在为物流行业提供全面的数据管理和分析功能。系统整合了订单管理、用户管理、产品管理、数据统计等核心功能，通过直观的可视化界面展示业务数据，帮助企业做出更明智的决策。
 
-## 项目结构
+### 1.1 项目特点
+- 前后端分离架构，便于维护和扩展
+- 完整的数据管理功能，支持增删改查操作
+- 丰富的数据可视化图表，直观展示业务数据
+- 完善的权限管理机制，确保数据安全
+- 支持Docker容器化部署，简化环境配置
+- 提供RESTful API接口，方便第三方系统集成
 
+## 2. 技术栈
+
+### 2.1 后端技术栈
+| 技术 | 版本 | 用途 |
+|------|------|------|
+| Spring Boot | 2.7.0 | 后端框架 |
+| MyBatis-Plus | 3.5.0 | ORM框架 |
+| MySQL | 8.0 | 关系型数据库 |
+| Redis | 7.0 | 缓存中间件 |
+| Maven | 3.6.3 | 项目构建工具 |
+| JWT | - | 身份认证 |
+| Lombok | - | 简化Java代码 |
+
+### 2.2 前端技术栈
+| 技术 | 版本 | 用途 |
+|------|------|------|
+| Vue.js | 3.0 | 前端框架 |
+| Vite | 2.0 | 前端构建工具 |
+| Element Plus | - | UI组件库 |
+| Axios | - | HTTP客户端 |
+| ECharts | - | 数据可视化图表库 |
+| Vue Router | - | 路由管理 |
+| Pinia | - | 状态管理 |
+
+### 2.3 开发工具
+- IDE：IntelliJ IDEA / VS Code
+- 版本控制：Git
+- 容器化：Docker / Docker Compose
+
+## 3. 项目结构
+
+### 3.1 项目目录结构
 ```
 大数据面板/
-├── FrontEnd/              # 前端Vue.js项目
-│   ├── src/              # 源代码
-│   ├── public/           # 静态资源
-│   ├── Dockerfile        # Docker构建文件
-│   └── package.json      # 依赖配置
-├── backend/              # 后端Spring Boot项目
-│   ├── src/              # 源代码
-│   ├── Dockerfile        # Docker构建文件
-│   └── pom.xml           # Maven配置
-├── deploy/               # Docker部署配置
-│   ├── docker-compose.yml      # Docker Compose编排文件
-│   ├── start-docker.bat        # Windows启动脚本
-│   ├── start-docker.sh         # Linux/Mac启动脚本
-│   ├── stop-docker.bat         # Windows停止脚本
-│   ├── stop-docker.sh          # Linux/Mac停止脚本
-│   └── DOCKER_DEPLOY.md        # Docker部署详细文档
-├── docs/                 # 项目文档
-│   ├── DEPLOY_LOCAL.md   # 本地部署文档
-│   ├── DEPLOY.md         # 通用部署文档
-│   └── PROJECT_MANUAL.md # 项目手册
-├── logistics_db.sql      # 数据库初始化脚本
-├── README.md             # 项目说明（本文件）
-└── project.log           # 项目日志
+├── backend/                # 后端项目目录
+│   ├── src/               # 源代码目录
+│   │   ├── main/          # 主代码目录
+│   │   │   ├── java/      # Java源代码
+│   │   │   │   └── com/logistics/  # 包名
+│   │   │   │       ├── config/      # 配置类
+│   │   │   │       ├── controller/  # 控制器
+│   │   │   │       ├── entity/      # 实体类
+│   │   │   │       │   └── base/    # 基础实体类
+│   │   │   │       ├── mapper/      # Mapper接口
+│   │   │   │       ├── service/     # 业务逻辑层
+│   │   │   │       ├── utils/       # 工具类
+│   │   │   │       └── Application.java  # 启动类
+│   │   │   └── resources/  # 资源目录
+│   │   │       ├── application.yml  # 配置文件
+│   │   │       └── mapper/          # MyBatis映射文件
+│   │   └── test/           # 测试代码
+│   ├── Dockerfile          # Docker构建文件
+│   └── pom.xml             # Maven配置文件
+├── FrontEnd/               # 前端项目目录
+│   ├── public/             # 静态资源
+│   ├── src/                # 源代码目录
+│   │   ├── assets/         # 资源文件
+│   │   ├── components/     # 组件
+│   │   ├── views/          # 页面视图
+│   │   ├── router/         # 路由配置
+│   │   ├── store/          # 状态管理
+│   │   ├── utils/          # 工具类
+│   │   ├── App.vue         # 根组件
+│   │   └── main.js         # 入口文件
+│   ├── Dockerfile          # Docker构建文件
+│   ├── package.json        # 项目配置
+│   └── vite.config.js      # Vite配置
+├── deploy/                 # 部署配置
+│   ├── docker-compose.yml      # Docker Compose配置
+│   └── docker-compose-db.yml   # 仅数据库的Docker配置
+├── logistics_db.sql        # 数据库初始化脚本
+├── start_project.bat       # 项目启动脚本
+└── README.md               # 项目说明文档
 ```
 
-## 部署方式
+## 4. 环境要求
 
-本项目支持两种部署方式：
+### 4.1 开发环境要求
+| 环境 | 版本 | 说明 |
+|------|------|------|
+| JDK | 8或以上 | 后端开发和运行环境 |
+| Node.js | 16或以上 | 前端开发和运行环境 |
+| Maven | 3.6或以上 | 后端项目构建工具 |
+| MySQL | 8.0或以上 | 关系型数据库 |
+| Redis | 7.0或以上 | 缓存中间件 |
+| Git | 2.0或以上 | 版本控制工具 |
 
-### 方式一：本地开发部署
+### 4.2 运行环境要求
+- 服务器：至少2核4G内存
+- 操作系统：Windows/Linux/macOS
+- 网络：支持HTTP/HTTPS协议
 
-适合开发环境和需要自定义配置的场景。
+## 5. 安装配置
 
-#### 前置要求
+### 5.1 环境安装
 
-- Node.js 18+
-- npm 9+
-- Java 11+
-- Maven 3.8+
-- MySQL 8.0+
+#### 5.1.1 安装JDK
+1. 下载JDK 8或以上版本：[Oracle JDK](https://www.oracle.com/java/technologies/javase-downloads.html)或[OpenJDK](https://adoptopenjdk.net/)
+2. 安装并配置环境变量：
+   - JAVA_HOME：JDK安装路径
+   - PATH：添加%JAVA_HOME%\bin
 
-#### 快速启动
+#### 5.1.2 安装Node.js
+1. 下载Node.js 16或以上版本：[Node.js官网](https://nodejs.org/)
+2. 安装并验证：
+   ```bash
+   node -v
+   npm -v
+   ```
 
-1. **初始化数据库**
+#### 5.1.3 安装Maven
+1. 下载Maven 3.6或以上版本：[Maven官网](https://maven.apache.org/)
+2. 安装并配置环境变量：
+   - MAVEN_HOME：Maven安装路径
+   - PATH：添加%MAVEN_HOME%\bin
 
-```bash
-# 创建数据库
-mysql -u root -p
-CREATE DATABASE logistics_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+#### 5.1.4 安装MySQL
+1. 下载MySQL 8.0或以上版本：[MySQL官网](https://www.mysql.com/)
+2. 安装并配置：
+   - 创建数据库：`logistics_db`
+   - 设置字符集：utf8mb4
+   - 创建用户并授权
 
-# 导入数据
-mysql -u root -p logistics_db < logistics_db.sql
+#### 5.1.5 安装Redis
+1. 下载Redis 7.0或以上版本：[Redis官网](https://redis.io/)
+2. 安装并启动Redis服务
+
+### 5.2 项目配置
+
+#### 5.2.1 后端配置
+1. 进入`backend/src/main/resources`目录
+2. 修改`application.yml`文件：
+   ```yaml
+   spring:
+     datasource:
+       url: jdbc:mysql://localhost:3306/logistics_db?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false
+       username: root
+       password: root
+     redis:
+       host: localhost
+       port: 6379
+       password: logistics_redis_password_2024
+   server:
+     port: 8081
+   ```
+
+#### 5.2.2 前端配置
+1. 进入`FrontEnd`目录
+2. 修改`.env.development`文件（开发环境）：
+   ```env
+   VITE_API_BASE_URL = 'http://localhost:8081/api'
+   VITE_API_TIMEOUT = 10000
+   ```
+
+## 6. 运行项目
+
+### 6.1 使用启动脚本（推荐）
+1. 确保所有环境已安装配置完成
+2. 双击运行`start_project.bat`脚本
+3. 脚本会自动检查环境并启动前后端服务
+4. 等待启动完成后，根据提示访问相应地址
+
+### 6.2 手动运行
+
+#### 6.2.1 启动后端服务
+1. 进入`backend`目录
+2. 执行Maven命令：
+   ```bash
+   mvn spring-boot:run -Dspring-boot.run.profiles=dev
+   ```
+3. 等待服务启动完成
+
+#### 6.2.2 启动前端服务
+1. 进入`FrontEnd`目录
+2. 安装依赖：
+   ```bash
+   npm install
+   ```
+3. 启动开发服务器：
+   ```bash
+   npm run dev
+   ```
+4. 等待服务启动完成
+
+### 6.3 访问地址
+- 前端面板：http://localhost:3000
+- 后端API：http://localhost:8081
+- Swagger文档：http://localhost:8081/swagger-ui.html（如果已配置）
+
+## 7. 项目架构
+
+### 7.1 系统架构图
+```
+┌─────────────────┐
+│   前端应用      │
+│   Vue.js +      │
+│   Element Plus  │
+└─────────────────┘
+         │
+         ▼
+┌─────────────────┐
+│   后端API接口   │
+│   Spring Boot   │
+└─────────────────┘
+         │
+         ▼
+┌─────────────────┐
+│   业务逻辑层    │
+│   Service       │
+└─────────────────┘
+         │
+         ▼
+┌─────────────────┐
+│   数据访问层    │
+│   MyBatis-Plus  │
+└─────────────────┘
+         │
+┌────────┴────────┐
+▼                 ▼
+┌─────────────────┐  ┌─────────────────┐
+│   MySQL数据库   │  │   Redis缓存     │
+└─────────────────┘  └─────────────────┘
 ```
 
-2. **配置后端**
+### 7.2 核心模块
 
-编辑 `backend/src/main/resources/application-dev.yml`：
+#### 7.2.1 用户管理模块
+- 用户注册、登录、登出
+- 用户信息管理
+- 角色权限管理
 
-```yaml
-spring:
-  datasource:
-    url: jdbc:mysql://localhost:3306/logistics_db?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai
-    username: root
-    password: root
-```
-
-3. **启动后端**
-
-```bash
-cd backend
-mvn clean package
-java -jar target/*.jar
-```
-
-或使用启动脚本：
-
-```bash
-# Windows
-start-dev.bat
-
-# Linux/Mac
-mvn spring-boot:run
-```
-
-4. **启动前端**
-
-```bash
-cd FrontEnd
-npm install
-npm run dev
-```
-
-5. **访问应用**
-
-- 前端应用: http://localhost:5173
-- 后端API: http://localhost:8080/api
-
-详细文档请参考：[本地部署文档](docs/DEPLOY_LOCAL.md)
-
-### 方式二：Docker容器化部署
-
-适合生产环境和快速部署场景，无需手动配置环境。
-
-#### 前置要求
-
-- Docker Desktop 20.10+
-- Docker Compose 1.29+
-- 至少 4GB 可用内存
-- 至少 10GB 可用磁盘空间
-
-#### 快速启动
-
-**Windows系统：**
-
-```bash
-cd deploy
-start-docker.bat
-```
-
-**Linux/Mac系统：**
-
-```bash
-cd deploy
-chmod +x start-docker.sh
-./start-docker.sh
-```
-
-#### 访问应用
-
-- 前端应用: http://localhost
-- 后端API: http://localhost:8080/api
-- MySQL数据库: localhost:3306 (用户名: root, 密码: root)
-
-详细文档请参考：[Docker部署文档](deploy/DOCKER_DEPLOY.md)
-
-## 功能模块
-
-### 1. 仓储管理（Warehouse）
-- 仓库信息管理
-- 仓库容量监控
-- 仓库位置管理
-
-### 2. 客户管理（Customer）
-- 客户信息维护
-- 客户联系人管理
-- 客户地址管理
-
-### 3. 供应商管理（Supplier）
-- 供应商信息管理
-- 供应商评级管理
-- 供应商合作记录
-
-### 4. 订单管理（Order）
-- 订单创建和编辑
-- 订单状态跟踪
+#### 7.2.2 订单管理模块
+- 订单创建、查询、更新、删除
+- 订单状态管理
 - 订单统计分析
 
-### 5. 库存管理（Inventory）
-- 库存实时监控
-- 库存预警管理
-- 库存出入库记录
+#### 7.2.3 产品管理模块
+- 产品信息管理
+- 库存管理
+- 产品分类管理
 
-### 6. 运输管理（Transport）
-- 运输任务管理
-- 运输路线规划
-- 运输状态跟踪
+#### 7.2.4 数据统计模块
+- 销售数据统计
+- 用户行为分析
+- 业务指标监控
 
-### 7. 数据可视化大屏
-- 仓储数据大屏
-- 供应链数据大屏
-- 物流数据大屏
+#### 7.2.5 系统管理模块
+- 日志管理
+- 系统配置
+- 数据备份与恢复
 
-## API接口
+## 8. 核心功能
 
-### 基础信息
+### 8.1 数据可视化
+- 仪表盘：展示关键业务指标
+- 趋势图：展示数据变化趋势
+- 柱状图：对比不同类别的数据
+- 饼图：展示数据占比
+- 地图：展示地理位置数据
 
-- **基础URL**: http://localhost:8080/api
-- **认证方式**: 暂无（开发环境）
-- **数据格式**: JSON
+### 8.2 数据管理
+- 批量导入/导出数据
+- 数据筛选与排序
+- 数据分页展示
+- 数据验证与清洗
 
-### 主要接口
+### 8.3 权限控制
+- 基于角色的访问控制（RBAC）
+- 细粒度权限管理
+- 操作日志记录
 
-| 模块 | 接口 | 方法 | 说明 |
-|------|------|------|------|
-| 仓储 | /warehouses | GET | 获取所有仓库 |
-| 仓储 | /warehouses/{id} | GET | 获取单个仓库 |
-| 仓储 | /warehouses | POST | 创建仓库 |
-| 仓储 | /warehouses/{id} | PUT | 更新仓库 |
-| 仓储 | /warehouses/{id} | DELETE | 删除仓库 |
-| 客户 | /customers | GET | 获取所有客户 |
-| 客户 | /customers/{id} | GET | 获取单个客户 |
-| 客户 | /customers | POST | 创建客户 |
-| 客户 | /customers/{id} | PUT | 更新客户 |
-| 客户 | /customers/{id} | DELETE | 删除客户 |
-| 供应商 | /suppliers | GET | 获取所有供应商 |
-| 供应商 | /suppliers/{id} | GET | 获取单个供应商 |
-| 供应商 | /suppliers | POST | 创建供应商 |
-| 供应商 | /suppliers/{id} | PUT | 更新供应商 |
-| 供应商 | /suppliers/{id} | DELETE | 删除供应商 |
-| 订单 | /orders | GET | 获取所有订单 |
-| 订单 | /orders/{id} | GET | 获取单个订单 |
-| 订单 | /orders | POST | 创建订单 |
-| 订单 | /orders/{id} | PUT | 更新订单 |
-| 订单 | /orders/{id} | DELETE | 删除订单 |
-| 库存 | /inventories | GET | 获取所有库存 |
-| 库存 | /inventories/{id} | GET | 获取单个库存 |
-| 库存 | /inventories | POST | 创建库存 |
-| 库存 | /inventories/{id} | PUT | 更新库存 |
-| 库存 | /inventories/{id} | DELETE | 删除库存 |
-| 运输 | /transports | GET | 获取所有运输 |
-| 运输 | /transports/{id} | GET | 获取单个运输 |
-| 运输 | /transports | POST | 创建运输 |
-| 运输 | /transports/{id} | PUT | 更新运输 |
-| 运输 | /transports/{id} | DELETE | 删除运输 |
-| 仪表盘 | /dashboard | GET | 获取仪表盘数据 |
+### 8.4 系统集成
+- RESTful API接口
+- WebSocket实时通信
+- 第三方系统集成支持
 
-详细API文档请参考：[API文档](docs/API.md)
+## 9. API文档
 
-## 技术栈
+### 9.1 Swagger文档
+如果项目已配置Swagger，可以通过以下地址访问API文档：
+- http://localhost:8081/swagger-ui.html
 
-### 前端技术
+### 9.2 API规范
 
-- **框架**: Vue.js 3
-- **构建工具**: Vite
-- **状态管理**: Pinia
-- **路由**: Vue Router
-- **HTTP客户端**: Axios
-- **UI组件**: 自定义组件
-- **图表库**: ECharts
+#### 9.2.1 接口命名规范
+- 使用RESTful风格
+- 动词 + 名词组合
+- 示例：
+  - GET /api/users：获取用户列表
+  - POST /api/users：创建用户
+  - GET /api/users/{id}：获取用户详情
+  - PUT /api/users/{id}：更新用户信息
+  - DELETE /api/users/{id}：删除用户
 
-### 后端技术
-
-- **框架**: Spring Boot 2.7
-- **ORM**: MyBatis Plus
-- **数据库**: MySQL 8.0
-- **构建工具**: Maven
-- **日志**: Logback
-- **监控**: Spring Boot Actuator
-
-### 部署技术
-
-- **容器化**: Docker
-- **编排**: Docker Compose
-- **反向代理**: Nginx
-- **Web服务器**: Nginx
-
-## 环境配置
-
-### 本地开发环境
-
-**前端配置** (.env.development):
-
-```env
-VITE_API_BASE_URL=http://localhost:8080/api
+#### 9.2.2 响应格式
+```json
+{
+  "code": 200,
+  "message": "操作成功",
+  "data": {}
+}
 ```
 
-**后端配置** (application-dev.yml):
+## 10. 数据库设计
 
-```yaml
-server:
-  port: 8080
+### 10.1 数据库概述
+本项目使用MySQL数据库，数据库名为`logistics_db`，采用InnoDB存储引擎，字符集为utf8mb4。
 
-spring:
-  datasource:
-    url: jdbc:mysql://localhost:3306/logistics_db
-    username: root
-    password: root
+### 10.2 实体关系图
+
+### 10.3 核心实体类
+
+#### 10.3.1 BaseEntity（基础实体类）
+所有实体类的父类，包含通用字段：
+- id：主键
+- created_at：创建时间
+- updated_at：更新时间
+- deleted：删除标志
+
+```java
+@Data
+public class BaseEntity {
+    @TableId(type = IdType.AUTO)
+    private Long id;
+    
+    @TableField(value = "created_at", fill = FieldFill.INSERT)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime createdAt;
+    
+    @TableField(value = "updated_at", fill = FieldFill.INSERT_UPDATE)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime updatedAt;
+    
+    @TableField(fill = FieldFill.INSERT)
+    @TableLogic
+    private Integer deleted;
+}
 ```
 
-### Docker生产环境
+#### 10.3.2 User（用户实体类）
+- username：用户名
+- password：密码
+- email：邮箱
+- phone：手机号
+- role_id：角色ID
 
-**前端配置** (.env.production):
+#### 10.3.3 Order（订单实体类）
+- order_no：订单号
+- user_id：用户ID
+- product_id：产品ID
+- quantity：数量
+- total_price：总价
+- status：状态
 
-```env
-VITE_API_BASE_URL=/api
-```
+#### 10.3.4 Product（产品实体类）
+- name：产品名称
+- description：产品描述
+- price：价格
+- stock：库存
+- category_id：分类ID
 
-**后端配置** (application-prod.yml):
+## 11. Docker部署
 
-```yaml
-server:
-  port: 8080
+### 11.1 环境要求
+- 安装Docker：19.03或以上版本
+- 安装Docker Compose：1.27或以上版本
 
-spring:
-  datasource:
-    url: jdbc:mysql://mysql:3306/logistics_db
-    username: root
-    password: root
-```
+### 11.2 部署步骤
 
-## 常见问题
+#### 11.2.1 使用Docker Compose部署
+1. 进入项目根目录
+2. 执行以下命令：
+   ```bash
+   cd deploy
+   docker-compose up -d
+   ```
+3. 等待所有容器启动完成
+4. 访问地址：
+   - 前端面板：http://localhost:80
+   - 后端API：http://localhost:8080
+   - Grafana监控：http://localhost:3000
 
-### Q1: 本地部署时数据库连接失败
-
-**A**: 检查MySQL服务是否启动，用户名密码是否正确，数据库是否已创建。
-
+#### 11.2.2 单独部署数据库
+如果只需要部署数据库服务：
 ```bash
-# 检查MySQL服务
-mysql -u root -p -e "SHOW DATABASES;"
-
-# 检查数据库
-mysql -u root -p logistics_db -e "SHOW TABLES;"
+cd deploy
+docker-compose -f docker-compose-db.yml up -d
 ```
 
-### Q2: Docker部署时服务无法启动
+### 11.3 Docker容器说明
+| 容器名称 | 服务 | 端口 |
+|---------|------|------|
+| logistics-mysql | MySQL数据库 | 3307:3306 |
+| logistics-redis | Redis缓存 | 6379:6379 |
+| logistics-backend | 后端服务 | 8080:8080 |
+| logistics-frontend | 前端服务 | 80:80 |
+| logistics-prometheus | Prometheus监控 | 9090:9090 |
+| logistics-grafana | Grafana可视化 | 3000:3000 |
 
-**A**: 检查Docker Desktop是否运行，端口是否被占用。
+## 12. 开发指南
 
-```bash
-# 检查Docker状态
-docker ps -a
+### 12.1 代码规范
 
-# 查看服务日志
-docker-compose logs -f
-```
+#### 12.1.1 Java代码规范
+- 遵循阿里巴巴Java开发手册
+- 使用Lombok简化代码
+- 类名使用驼峰命名法，首字母大写
+- 方法名使用驼峰命名法，首字母小写
+- 变量名使用驼峰命名法，首字母小写
+- 常量名使用全大写，下划线分隔
 
-### Q3: 前端无法访问后端API
+#### 12.1.2 Vue代码规范
+- 遵循Vue官方风格指南
+- 组件名使用大驼峰命名法
+- 方法名使用驼峰命名法
+- 变量名使用驼峰命名法
+- 使用TypeScript（如果项目支持）
 
-**A**: 检查后端服务是否正常启动，跨域配置是否正确。
+### 12.2 开发流程
+1. 从Git仓库拉取最新代码
+2. 创建新的分支进行开发
+3. 编写代码并提交
+4. 推送分支到远程仓库
+5. 创建Pull Request进行代码审查
+6. 合并代码到主分支
 
-```bash
-# 测试后端API
-curl http://localhost:8080/api/warehouses
-```
+### 12.3 测试
+- 单元测试：使用JUnit和Mockito
+- 集成测试：使用Spring Boot Test
+- 前端测试：使用Jest和Vue Test Utils
 
-### Q4: 如何备份数据
+## 13. 常见问题
 
-**本地部署**:
+### 13.1 后端服务启动失败
+- 检查数据库连接是否正确
+- 检查Redis服务是否启动
+- 检查端口是否被占用
+- 查看日志文件获取详细错误信息
 
-```bash
-mysqldump -u root -p logistics_db > backup.sql
-```
+### 13.2 前端页面无法访问后端API
+- 检查前端配置的API地址是否正确
+- 检查后端服务是否启动
+- 检查是否存在跨域问题
+- 查看浏览器控制台的错误信息
 
-**Docker部署**:
+### 13.3 数据库连接失败
+- 检查MySQL服务是否启动
+- 检查数据库用户名和密码是否正确
+- 检查数据库是否存在
+- 检查防火墙设置
 
-```bash
-docker-compose exec mysql mysqldump -uroot -proot logistics_db > backup.sql
-```
+### 13.4 Docker容器启动失败
+- 检查Docker服务是否启动
+- 检查Docker Compose配置文件是否正确
+- 查看容器日志获取详细错误信息
+- 检查端口是否被占用
 
-## 开发指南
+## 14. 联系方式
 
-### 前端开发
+- 项目负责人：XXX
+- 技术支持：XXX
+- 邮箱：XXX@example.com
+- Git仓库地址：XXX
 
-```bash
-cd FrontEnd
+## 15. 更新日志
 
-# 安装依赖
-npm install
-
-# 启动开发服务器
-npm run dev
-
-# 构建生产版本
-npm run build
-
-# 运行测试
-npm run test
-```
-
-### 后端开发
-
-```bash
-cd backend
-
-# 编译项目
-mvn clean compile
-
-# 运行测试
-mvn test
-
-# 打包项目
-mvn clean package
-
-# 启动应用
-java -jar target/*.jar
-```
-
-## 贡献指南
-
-欢迎提交Issue和Pull Request！
-
-1. Fork本仓库
-2. 创建特性分支 (`git checkout -b feature/AmazingFeature`)
-3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
-4. 推送到分支 (`git push origin feature/AmazingFeature`)
-5. 提交Pull Request
-
-## 版本历史
-
-- **v1.0.0** (2025-01-04)
-  - 初始版本发布
-  - 完成核心功能开发
-  - 支持本地部署和Docker部署
-  - 完成API接口测试
-  - 完成前后端集成测试
-
-## 许可证
-
-本项目采用 MIT 许可证。
-
-## 联系方式
-
-- 项目地址: [GitHub Repository]
-- 问题反馈: [Issues]
-- 文档地址: [Wiki]
-
-## 致谢
-
-感谢所有为本项目做出贡献的开发者！
+### V1.0.0（2024-XX-XX）
+- 初始版本发布
+- 实现用户管理、订单管理、产品管理功能
+- 完成数据可视化面板
+- 支持Docker部署
 
 ---
 
-**最后更新**: 2025-01-04
+**© 2024 大数据面板项目组. All rights reserved.**

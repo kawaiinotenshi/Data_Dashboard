@@ -220,28 +220,57 @@ onBeforeUnmount(() => {
     AI
   </button>
 
-  <section v-if="chatOpen" id="admin-ai-chat" class="chat-panel" role="dialog" aria-label="AI 聊天">
+  <section
+    v-if="chatOpen"
+    id="admin-ai-chat"
+    class="chat-panel"
+    role="dialog"
+    aria-label="AI 聊天"
+  >
     <header class="chat-header">
-      <div class="chat-title">AI 聊天</div>
-      <button class="btn ghost mini" type="button" @click="closeChat">关闭</button>
+      <div class="chat-title">
+        AI 聊天
+      </div>
+      <button
+        class="btn ghost mini"
+        type="button"
+        @click="closeChat"
+      >
+        关闭
+      </button>
     </header>
 
-    <div ref="chatListEl" class="chat-messages">
-      <div v-for="m in chatMessages" :key="m.id" class="chat-message" :class="m.role === 'user' ? 'me' : 'bot'">
-        <div class="chat-bubble">{{ m.content }}</div>
+    <div
+      ref="chatListEl"
+      class="chat-messages"
+    >
+      <div
+        v-for="m in chatMessages"
+        :key="m.id"
+        class="chat-message"
+        :class="m.role === 'user' ? 'me' : 'bot'"
+      >
+        <div class="chat-bubble">
+          {{ m.content }}
+        </div>
       </div>
     </div>
 
     <div class="chat-input">
       <textarea
+        v-model="chatInput"
         class="input chat-textarea"
         rows="2"
-        v-model="chatInput"
         :disabled="chatSending"
         placeholder="输入问题，回车发送（Shift+Enter 换行）"
         @keydown="onChatInputKeydown"
       />
-      <button class="btn primary" type="button" :disabled="chatSending || !chatInput.trim()" @click="sendChat">
+      <button
+        class="btn primary"
+        type="button"
+        :disabled="chatSending || !chatInput.trim()"
+        @click="sendChat"
+      >
         发送
       </button>
     </div>

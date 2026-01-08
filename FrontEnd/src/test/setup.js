@@ -1,13 +1,13 @@
 import { vi } from 'vitest'
 import { config } from '@vue/test-utils'
 
-global.ResizeObserver = vi.fn().mockImplementation(() => ({
+globalThis.ResizeObserver = vi.fn().mockImplementation(() => ({
   observe: vi.fn(),
   unobserve: vi.fn(),
   disconnect: vi.fn()
 }))
 
-global.matchMedia = vi.fn().mockImplementation(query => ({
+globalThis.matchMedia = vi.fn().mockImplementation(query => ({
   matches: false,
   media: query,
   onchange: null,

@@ -109,6 +109,16 @@ export const api = {
     batchDelete: (ids) => request.delete('/department/batch', { data: ids })
   },
   
+  user: {
+    list: () => request.get('/user/list'),
+    getById: (id) => request.get(`/user/${id}`),
+    create: (data) => request.post('/user', data),
+    update: (id, data) => request.put(`/user/${id}`, data),
+    delete: (id) => request.delete(`/user/${id}`),
+    batchDelete: (ids) => request.delete('/user/batch', { data: ids }),
+    search: (params) => request.get('/user/search', { params })
+  },
+  
   ai: {
     chat: (data) => request.post('/ai/chat', data, { timeout: 30000 })
   }

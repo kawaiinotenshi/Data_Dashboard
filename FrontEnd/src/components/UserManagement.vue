@@ -203,37 +203,10 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { useUserStore } from '../stores/user'
+import api from '../api'
 
-const users = ref([
-  {
-    id: 1,
-    username: 'admin',
-    email: 'admin@example.com',
-    phone: '13800138000',
-    role: 'admin',
-    status: 'active',
-    createdAt: '2024-01-01T00:00:00Z'
-  },
-  {
-    id: 2,
-    username: 'user1',
-    email: 'user1@example.com',
-    phone: '13800138001',
-    role: 'user',
-    status: 'active',
-    createdAt: '2024-01-02T00:00:00Z'
-  },
-  {
-    id: 3,
-    username: 'user2',
-    email: 'user2@example.com',
-    phone: '13800138002',
-    role: 'user',
-    status: 'inactive',
-    createdAt: '2024-01-03T00:00:00Z'
-  }
-])
-
+const userStore = useUserStore()
 const searchKeyword = ref('')
 const currentPage = ref(1)
 const pageSize = ref(10)
@@ -250,7 +223,7 @@ const formData = ref({
 })
 
 const filteredUsers = computed(() => {
-  let result = users.value
+  let result = userStore.userList
 
   if (searchKeyword.value) {
     const keyword = searchKeyword.value.toLowerCase()
@@ -267,7 +240,7 @@ const filteredUsers = computed(() => {
   return result.slice(start, end)
 })
 
-const total = computed(() => users.value.length)
+const total = computed(() => userStore.userList.length)
 
 const totalPages = computed(() => Math.ceil(total.value / pageSize.value))
 
@@ -307,11 +280,14 @@ const handleEditUser = (user) => {
   showModal.value = true
 }
 
-const handleDeleteUser = (user) => {
+const handleDeleteUser = async (user) => {
   if (confirm(`确定要删除用户 ${user.username} 吗？`)) {
-    const index = users.value.findIndex(u => u.id === user.id)
-    if (index > -1) {
-      users.value.splice(index, 1)
+    try {
+      await api.user.delete(user.id)
+      await userStore.fetchUserList()
+    } catch (error) {
+      console.error('删除用户失败:', error)
+      alert('删除用户失败')
     }
   }
 }
@@ -320,28 +296,28 @@ const handleCloseModal = () => {
   showModal.value = false
 }
 
-const handleSubmit = () => {
-  if (isEditMode.value) {
-    const index = users.value.findIndex(u => u.id === formData.value.id)
-    if (index > -1) {
-      users.value[index] = {
-        ...formData.value,
-        password: formData.value.password || users.value[index].password
-      }
+const handleSubmit = async () => {
+  try {
+    if (isEditMode.value) {
+      await api.user.update(formData.value.id, formData.value)
+    } else {
+      await api.user.create(formData.value)
     }
-  } else {
-    const newUser = {
-      ...formData.value,
-      id: Math.max(...users.value.map(u => u.id)) + 1,
-      createdAt: new Date().toISOString()
-    }
-    users.value.push(newUser)
+    await userStore.fetchUserList()
+    showModal.value = false
+  } catch (error) {
+    console.error('保存用户失败:', error)
+    alert('保存用户失败')
   }
-  showModal.value = false
 }
 
-onMounted(() => {
+onMounted(async () => {
   console.log('用户管理组件已加载')
+  try {
+    await userStore.fetchUserList()
+  } catch (error) {
+    console.error('获取用户列表失败:', error)
+  }
 })
 </script>
 
@@ -369,21 +345,26 @@ onMounted(() => {
 }
 
 .btn-primary {
-  padding: 10px 20px;
+  min-width: 120px;
+  max-width: 150px;
+  width: auto;
+  flex: none;
+  height: 60px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   background-color: #4a90e2;
   color: #fff;
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 16px;
+  font-weight: 600;
   transition: all 0.3s ease;
 }
 
 .btn-primary:hover {
   background-color: #357abd;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(74, 144, 226, 0.3);
 }
 
 .search-bar {
@@ -659,6 +640,13 @@ onMounted(() => {
 }
 
 .btn-primary {
-  flex: 1;
+  min-width: 120px;
+  max-width: 150px;
+  width: auto;
+  flex: none;
+  height: 60px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 </style>

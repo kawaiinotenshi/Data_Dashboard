@@ -1,8 +1,13 @@
 <template>
   <div class="login-container">
     <div class="login-box">
-      <h2 class="login-title">物流仓储大数据展示系统</h2>
-      <form @submit.prevent="handleLogin" class="login-form">
+      <h2 class="login-title">
+        物流仓储大数据展示系统
+      </h2>
+      <form
+        class="login-form"
+        @submit.prevent="handleLogin"
+      >
         <div class="form-group">
           <label for="username">用户名</label>
           <input
@@ -11,7 +16,7 @@
             type="text"
             placeholder="请输入用户名"
             required
-          />
+          >
         </div>
         <div class="form-group">
           <label for="password">密码</label>
@@ -21,14 +26,21 @@
             type="password"
             placeholder="请输入密码"
             required
-          />
+          >
         </div>
         <div class="form-group">
-          <button type="submit" class="login-button" :disabled="loading">
+          <button
+            type="submit"
+            class="login-button"
+            :disabled="loading"
+          >
             {{ loading ? '登录中...' : '登录' }}
           </button>
         </div>
-        <div v-if="errorMessage" class="error-message">
+        <div
+          v-if="errorMessage"
+          class="error-message"
+        >
           {{ errorMessage }}
         </div>
       </form>

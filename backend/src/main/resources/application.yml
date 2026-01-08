@@ -83,7 +83,7 @@ mybatis-plus:
       logic-delete-field: isDeleted
       logic-delete-value: 1
       logic-not-delete-value: 0
-  mapper-locations: classpath:mapper/CustomerMapper.xml,classpath:mapper/InventoryMapper.xml,classpath:mapper/OrderMapper.xml,classpath:mapper/SupplierMapper.xml,classpath:mapper/TransportMapper.xml,classpath:mapper/WarehouseMapper.xml,classpath:mapper/DepartmentMapper.xml,classpath:mapper/EmployeeMapper.xml
+  mapper-locations: classpath:mapper/CustomerMapper.xml,classpath:mapper/InventoryMapper.xml,classpath:mapper/OrderMapper.xml,classpath:mapper/SupplierMapper.xml,classpath:mapper/TransportMapper.xml,classpath:mapper/WarehouseMapper.xml,classpath:mapper/DepartmentMapper.xml,classpath:mapper/EmployeeMapper.xml,classpath:mapper/UserMapper.xml
 
 logging:
   level:

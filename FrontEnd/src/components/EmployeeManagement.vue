@@ -8,11 +8,19 @@
     <div class="charts-container">
       <div class="chart-card">
         <h3>部门人数统计</h3>
-        <div class="chart-content" id="departmentChart" style="height: 200px;"></div>
+        <div
+          id="departmentChart"
+          class="chart-content"
+          style="height: 200px;"
+        />
       </div>
       <div class="chart-card">
         <h3>员工薪资分布</h3>
-        <div class="chart-content" id="salaryChart" style="height: 200px;"></div>
+        <div
+          id="salaryChart"
+          class="chart-content"
+          style="height: 200px;"
+        />
       </div>
     </div>
 
@@ -40,7 +48,7 @@
         <input
           v-model="searchKeyword"
           type="text"
-          placeholder="搜索{{ activeTab === 'employee' ? '员工姓名' : '部门名称' }}"
+          :placeholder="`搜索${activeTab === 'employee' ? '员工姓名' : '部门名称'}`"
           class="search-input"
           @input="handleSearch"
         >
@@ -56,7 +64,10 @@
     <!-- 表格区域 -->
     <div class="table-container">
       <!-- 员工表格 -->
-      <table v-if="activeTab === 'employee'" class="data-table">
+      <table
+        v-if="activeTab === 'employee'"
+        class="data-table"
+      >
         <thead>
           <tr>
             <th>员工编号</th>
@@ -96,7 +107,10 @@
       </table>
 
       <!-- 部门表格 -->
-      <table v-else class="data-table">
+      <table
+        v-else
+        class="data-table"
+      >
         <thead>
           <tr>
             <th>部门编号</th>
@@ -192,8 +206,14 @@
               <div class="form-group">
                 <label>所属部门</label>
                 <select v-model="formData.departmentId">
-                  <option value="">无部门</option>
-                  <option v-for="dept in departments" :key="dept.id" :value="dept.id">
+                  <option value="">
+                    无部门
+                  </option>
+                  <option
+                    v-for="dept in departments"
+                    :key="dept.id"
+                    :value="dept.id"
+                  >
                     {{ dept.name }}
                   </option>
                 </select>
@@ -236,7 +256,7 @@
                   v-model="formData.description"
                   rows="3"
                   placeholder="请输入部门描述"
-                ></textarea>
+                />
               </div>
             </template>
 
@@ -502,22 +522,55 @@ onMounted(() => {
   color: #4a90e2;
 }
 
-.btn-primary {
-  padding: 10px 20px;
-  background-color: #4a90e2;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 500;
-  transition: all 0.3s ease;
+/* 图表容器样式 */
+.charts-container {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
 }
 
-.btn-primary:hover {
-  background-color: #357abd;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(74, 144, 226, 0.3);
+.chart-card {
+  flex: 1;
+  min-width: 300px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.chart-card h3 {
+  margin-top: 0;
+  margin-bottom: 16px;
+  color: #333;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* 操作栏样式 */
+.operation-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  gap: 16px;
+}
+
+.search-bar {
+  flex: 1;
+  min-width: 200px;
+  margin-bottom: 0;
+}
+
+.btn-primary {
+  min-width: 120px;
+  max-width: 150px;
+  width: auto;
+  flex: none;
+  height: 60px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .search-bar {

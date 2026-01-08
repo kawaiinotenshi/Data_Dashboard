@@ -13,6 +13,9 @@
 <script setup>
 import AdminHeader from '../components/AdminHeader.vue'
 import AdminSidebar from '../components/AdminSidebar.vue'
+
+// 引入统一的管理界面样式
+import '../assets/admin-styles.css'
 </script>
 
 <style scoped>

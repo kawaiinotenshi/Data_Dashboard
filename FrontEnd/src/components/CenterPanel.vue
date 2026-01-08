@@ -60,8 +60,7 @@ let resizeObserver7 = null
 
 // 使用Pinia store获取仓库数据
 const warehouseStore = useWarehouseStore()
-const warehouseData = computed(() => warehouseStore.entityList)
-const warehouseLoading = computed(() => warehouseStore.loading)
+const warehouseData = computed(() => warehouseStore.warehouseList)
 
 const initChart8 = async () => {
   chart8 = echarts.init(ceshi8Ref.value)
@@ -252,7 +251,7 @@ const initChart6 = async () => {
 const initChart7 = async () => {
   chart7 = echarts.init(ceshi7Ref.value)
   
-  let warehouseData = [320, 302, 301, 334]
+  let warehouseSeriesData = [320, 302, 301, 334]
   let transportData = [120, 132, 101, 134]
   let deliveryData = [220, 182, 191, 234]
   
@@ -280,7 +279,7 @@ const initChart7 = async () => {
         return date.getMonth() >= 9 && date.getMonth() <= 11
       })
       
-      warehouseData = [
+      warehouseSeriesData = [
         q1Data.reduce((sum, item) => sum + (item.orderAmount || 0), 0),
         q2Data.reduce((sum, item) => sum + (item.orderAmount || 0), 0),
         q3Data.reduce((sum, item) => sum + (item.orderAmount || 0), 0),
@@ -336,7 +335,7 @@ const initChart7 = async () => {
         name: '仓储',
         type: 'bar',
         stack: 'total',
-        data: warehouseData,
+        data: warehouseSeriesData,
         itemStyle: {
           color: '#8d7fec'
         }

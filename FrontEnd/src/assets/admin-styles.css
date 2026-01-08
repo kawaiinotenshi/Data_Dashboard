@@ -1,0 +1,193 @@
+:root {
+  --btn-primary-bg: #4a90e2;
+  --btn-primary-hover: #357abd;
+  --btn-secondary-bg: #f5f5f5;
+  --btn-secondary-hover: #e0e0e0;
+  --btn-edit-bg: #ff9800;
+  --btn-edit-hover: #f57c00;
+  --btn-delete-bg: #f44336;
+  --btn-delete-hover: #d32f2f;
+  --btn-success-bg: #52c41a;
+  --btn-success-hover: #389e0d;
+  --btn-border-radius: 4px;
+  --btn-small-padding: 8px 16px;
+  --btn-medium-padding: 10px 20px;
+  --btn-large-padding: 12px 24px;
+  --btn-small-font: 14px;
+  --btn-medium-font: 14px;
+  --btn-large-font: 16px;
+}
+
+/* 统一按钮样式 */
+.btn {
+  border: none;
+  border-radius: var(--btn-border-radius);
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-primary {
+  padding: var(--btn-medium-padding);
+  background-color: var(--btn-primary-bg);
+  color: #fff;
+  font-size: var(--btn-medium-font);
+}
+
+.btn-primary:hover {
+  background-color: var(--btn-primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(74, 144, 226, 0.3);
+}
+
+.btn-secondary {
+  padding: var(--btn-medium-padding);
+  background-color: var(--btn-secondary-bg);
+  color: #333;
+  border: 1px solid #e0e0e0;
+  font-size: var(--btn-medium-font);
+}
+
+.btn-secondary:hover {
+  background-color: var(--btn-secondary-hover);
+}
+
+.btn-edit {
+  padding: var(--btn-small-padding);
+  background-color: var(--btn-edit-bg);
+  color: #fff;
+  font-size: var(--btn-small-font);
+  margin-right: 8px;
+}
+
+.btn-edit:hover {
+  background-color: var(--btn-edit-hover);
+}
+
+.btn-delete {
+  padding: var(--btn-small-padding);
+  background-color: var(--btn-delete-bg);
+  color: #fff;
+  font-size: var(--btn-small-font);
+}
+
+.btn-delete:hover {
+  background-color: var(--btn-delete-hover);
+}
+
+.btn-success {
+  padding: var(--btn-medium-padding);
+  background-color: var(--btn-success-bg);
+  color: #fff;
+  font-size: var(--btn-medium-font);
+}
+
+.btn-success:hover {
+  background-color: var(--btn-success-hover);
+}
+
+/* 搜索按钮 */
+.btn-search {
+  padding: var(--btn-medium-padding);
+  background-color: var(--btn-primary-bg);
+  color: #fff;
+  font-size: var(--btn-medium-font);
+}
+
+.btn-search:hover {
+  background-color: var(--btn-primary-hover);
+}
+
+/* 分页按钮 */
+.pagination-btn {
+  padding: var(--btn-small-padding);
+  background-color: #fff;
+  color: var(--btn-primary-bg);
+  border: 1px solid var(--btn-primary-bg);
+  font-size: var(--btn-small-font);
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background-color: var(--btn-primary-bg);
+  color: #fff;
+}
+
+/* 模态框按钮 */
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+/* 标签页按钮 */
+.tab-btn {
+  padding: var(--btn-medium-padding);
+  background: none;
+  border: none;
+  font-size: var(--btn-medium-font);
+  font-weight: 500;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-bottom: 2px solid transparent;
+  margin-right: 20px;
+}
+
+.tab-btn.active {
+  color: var(--btn-primary-bg);
+  border-bottom-color: var(--btn-primary-bg);
+}
+
+.tab-btn:hover {
+  color: var(--btn-primary-bg);
+}
+
+/* 操作栏布局 */
+.operation-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* 搜索栏布局 */
+.search-bar {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex: 1;
+  max-width: 500px;
+}
+
+.search-input {
+  flex: 1;
+  padding: 10px 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+/* 表格操作列布局 */
+.action-cell {
+  display: flex;
+  gap: 8px;
+}
+
+/* 确保所有按钮在不同组件中保持一致的尺寸和样式 */
+.user-management .btn-edit,
+.employee-management .btn-edit {
+  padding: var(--btn-small-padding);
+  font-size: var(--btn-small-font);
+}
+
+.user-management .btn-delete,
+.employee-management .btn-delete {
+  padding: var(--btn-small-padding);
+  font-size: var(--btn-small-font);
+}
