@@ -8,6 +8,7 @@
         <result column="vehicle_count" property="vehicleCount" jdbcType="INTEGER"/>
         <result column="total_distance" property="totalDistance" jdbcType="DECIMAL"/>
         <result column="month" property="month" jdbcType="VARCHAR"/>
+        <result column="status" property="status" jdbcType="VARCHAR"/>
         <result column="created_time" property="createdTime" jdbcType="TIMESTAMP"/>
         <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP"/>
     </resultMap>

@@ -13,7 +13,8 @@ export const api = {
     getByDateRange: (startDate, endDate) => request.get('/order/date-range', { params: { startDate, endDate } }),
     getByCustomer: (customerId) => request.get(`/order/customer/${customerId}`),
     getTrend: () => request.get('/order/trend'),
-    getCustomerOrderCount: () => request.get('/order/customer-order-count')
+    getCustomerOrderCount: () => request.get('/order/customer-order-count'),
+    rollbackInventory: (id) => request.post(`/order/${id}/rollback-inventory`)
   },
   
   warehouse: {

@@ -4,6 +4,7 @@ import com.alibaba.excel.EasyExcel;
 import com.logistics.common.Result;
 import com.logistics.service.OrderService;
 import com.logistics.util.EasyExcelListener;
+import com.logistics.util.WebSocketUtils;
 import com.logistics.vo.OrderRequestVO;
 import com.logistics.vo.OrderVO;
 import org.springframework.web.bind.annotation.*;
@@ -18,11 +19,11 @@ import java.util.Map;
 @CrossOrigin
 public class OrderController {
     private final OrderService orderService;
-    private final WebSocketController webSocketController;
+    private final WebSocketUtils webSocketUtils;
 
-    public OrderController(OrderService orderService, WebSocketController webSocketController) {
+    public OrderController(OrderService orderService, WebSocketUtils webSocketUtils) {
         this.orderService = orderService;
-        this.webSocketController = webSocketController;
+        this.webSocketUtils = webSocketUtils;
     }
 
     @GetMapping("/list")
@@ -47,7 +48,7 @@ public class OrderController {
     public Result<Void> createOrder(@RequestBody OrderRequestVO orderRequestVO) {
         orderService.createOrder(orderRequestVO);
         // 广播订单更新
-        webSocketController.broadcastOrderUpdate();
+        webSocketUtils.broadcastOrderUpdate();
         return Result.success();
     }
 
@@ -55,7 +56,7 @@ public class OrderController {
     public Result<Void> updateOrder(@PathVariable Long id, @RequestBody OrderRequestVO orderRequestVO) {
         orderService.updateOrder(id, orderRequestVO);
         // 广播订单更新
-        webSocketController.broadcastOrderUpdate();
+        webSocketUtils.broadcastOrderUpdate();
         return Result.success();
     }
 
@@ -64,7 +65,7 @@ public class OrderController {
         boolean success = orderService.deleteOrder(id);
         if (success) {
             // 广播订单更新
-            webSocketController.broadcastOrderUpdate();
+            webSocketUtils.broadcastOrderUpdate();
             return Result.success();
         } else {
             return Result.error("删除订单失败");
@@ -76,7 +77,7 @@ public class OrderController {
         boolean success = orderService.batchDeleteOrders(ids);
         if (success) {
             // 广播订单更新
-            webSocketController.broadcastOrderUpdate();
+            webSocketUtils.broadcastOrderUpdate();
             return Result.success();
         } else {
             return Result.error("批量删除订单失败");
@@ -121,7 +122,7 @@ public class OrderController {
                     .doRead();
             
             // 广播订单更新
-            webSocketController.broadcastOrderUpdate();
+            webSocketUtils.broadcastOrderUpdate();
             
             return Result.success();
         } catch (IOException e) {

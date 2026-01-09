@@ -21,8 +21,9 @@ class WebSocketService {
     }
 
     try {
-      // 创建SockJS连接
-      const socket = new SockJS('http://localhost:8081/ws', null, { timeout: this.connectionTimeout })
+      // 创建SockJS连接，使用完整URL（去掉API_BASE_URL中的/api后缀）
+      const baseUrl = import.meta.env.VITE_API_BASE_URL ? import.meta.env.VITE_API_BASE_URL.replace('/api', '') : 'http://localhost:8081'
+      const socket = new SockJS(baseUrl + '/ws', null, { timeout: this.connectionTimeout })
       this.stompClient = Stomp.over(socket)
 
       // 配置连接选项，添加认证令牌

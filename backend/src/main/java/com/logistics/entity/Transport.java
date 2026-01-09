@@ -1,5 +1,6 @@
 package com.logistics.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.logistics.entity.base.BaseEntity;
 import lombok.Data;
@@ -17,4 +18,16 @@ public class Transport extends BaseEntity {
     private BigDecimal totalDistance;
     private String month;
     private String status;
+    
+    @TableField(exist = false)
+    private Long orderId;
+    
+    @TableField(exist = false)
+    private LocalDateTime scheduledTime;
+    
+    @TableField(exist = false)
+    private LocalDateTime actualStartTime;
+    
+    @TableField(exist = false)
+    private LocalDateTime actualEndTime;
 }

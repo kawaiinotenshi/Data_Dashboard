@@ -29,14 +29,14 @@
       <button
         class="tab-btn"
         :class="{ active: activeTab === 'employee' }"
-        @click="activeTab = 'employee'"
+        @click="router.push('/admin/employees')"
       >
         员工管理
       </button>
       <button
         class="tab-btn"
         :class="{ active: activeTab === 'department' }"
-        @click="activeTab = 'department'"
+        @click="router.push('/admin/departments')"
       >
         部门管理
       </button>
@@ -283,9 +283,13 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, watch, nextTick } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import api from '../api'
+import * as echarts from 'echarts'
 
+const route = useRoute()
+const router = useRouter()
 const activeTab = ref('employee')
 const employees = ref([])
 const departments = ref([])
@@ -465,10 +469,212 @@ watch(activeTab, () => {
   searchKeyword.value = ''
 })
 
-// 组件挂载时加载数据
+// 图表实例引用
+const departmentChart = ref(null)
+const salaryChart = ref(null)
+
+// 初始化部门人数统计图表
+const initDepartmentChart = () => {
+  nextTick(() => {
+    const chartDom = document.getElementById('departmentChart')
+    if (!chartDom) return
+    
+    if (departmentChart.value) {
+      departmentChart.value.dispose()
+    }
+    
+    departmentChart.value = echarts.init(chartDom)
+    
+    // 准备部门人数数据
+    const departmentData = departments.value.map(dept => {
+      return {
+        name: dept.name,
+        value: getDepartmentEmployeeCount(dept.id)
+      }
+    }).filter(item => item.value > 0)
+    
+    const option = {
+      title: {
+        text: '部门人数统计',
+        left: 'center',
+        textStyle: {
+          fontSize: 14,
+          fontWeight: 'normal'
+        }
+      },
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: {
+          type: 'shadow'
+        },
+        formatter: '{b}: {c} 人'
+      },
+      xAxis: {
+        type: 'category',
+        data: departmentData.map(item => item.name),
+        axisLabel: {
+          rotate: 45,
+          fontSize: 12
+        }
+      },
+      yAxis: {
+        type: 'value',
+        name: '人数',
+        minInterval: 1
+      },
+      series: [{
+        data: departmentData.map(item => item.value),
+        type: 'bar',
+        itemStyle: {
+          color: '#4a90e2'
+        },
+        emphasis: {
+          itemStyle: {
+            color: '#357ab7'
+          }
+        }
+      }]
+    }
+    
+    departmentChart.value.setOption(option)
+    
+    // 窗口大小变化时自适应
+    window.addEventListener('resize', () => {
+      departmentChart.value && departmentChart.value.resize()
+    })
+  })
+}
+
+// 初始化员工薪资分布图表
+const initSalaryChart = () => {
+  nextTick(() => {
+    const chartDom = document.getElementById('salaryChart')
+    if (!chartDom) return
+    
+    if (salaryChart.value) {
+      salaryChart.value.dispose()
+    }
+    
+    salaryChart.value = echarts.init(chartDom)
+    
+    // 准备薪资数据，按区间统计
+    const salaryRanges = [
+      { name: '3k以下', min: 0, max: 3000 },
+      { name: '3k-5k', min: 3000, max: 5000 },
+      { name: '5k-8k', min: 5000, max: 8000 },
+      { name: '8k-12k', min: 8000, max: 12000 },
+      { name: '12k-15k', min: 12000, max: 15000 },
+      { name: '15k以上', min: 15000, max: Infinity }
+    ]
+    
+    const salaryData = salaryRanges.map(range => {
+      const count = employees.value.filter(emp => 
+        emp.salary >= range.min && emp.salary < range.max
+      ).length
+      return {
+        name: range.name,
+        value: count
+      }
+    })
+    
+    const option = {
+      title: {
+        text: '员工薪资分布',
+        left: 'center',
+        textStyle: {
+          fontSize: 14,
+          fontWeight: 'normal'
+        }
+      },
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: {
+          type: 'line'
+        },
+        formatter: '{b}: {c} 人'
+      },
+      xAxis: {
+        type: 'category',
+        data: salaryData.map(item => item.name),
+        axisLabel: {
+          fontSize: 12
+        }
+      },
+      yAxis: {
+        type: 'value',
+        name: '人数',
+        minInterval: 1
+      },
+      series: [{
+        data: salaryData.map(item => item.value),
+        type: 'line',
+        smooth: true,
+        itemStyle: {
+          color: '#f5a623'
+        },
+        areaStyle: {
+          color: {
+            type: 'linear',
+            x: 0,
+            y: 0,
+            x2: 0,
+            y2: 1,
+            colorStops: [{
+              offset: 0, color: 'rgba(245, 166, 35, 0.3)'
+            }, {
+              offset: 1, color: 'rgba(245, 166, 35, 0.1)'
+            }]
+          }
+        },
+        lineStyle: {
+          width: 3
+        },
+        symbol: 'circle',
+        symbolSize: 6
+      }]
+    }
+    
+    salaryChart.value.setOption(option)
+    
+    // 窗口大小变化时自适应
+    window.addEventListener('resize', () => {
+      salaryChart.value && salaryChart.value.resize()
+    })
+  })
+}
+
+// 更新所有图表
+const updateCharts = () => {
+  initDepartmentChart()
+  initSalaryChart()
+}
+
+// 根据路由初始化标签
+const initTabFromRoute = () => {
+  if (route.path.includes('/departments')) {
+    activeTab.value = 'department'
+  } else {
+    activeTab.value = 'employee'
+  }
+}
+
+// 组件挂载时加载数据和初始化标签
 onMounted(() => {
-  loadData()
+  initTabFromRoute()
+  loadData().then(() => {
+    updateCharts()
+  })
 })
+
+// 监听路由变化，更新标签
+watch(() => route.path, () => {
+  initTabFromRoute()
+})
+
+// 监听数据变化，更新图表
+watch([employees, departments], () => {
+  updateCharts()
+}, { deep: true })
 </script>
 
 <style scoped>

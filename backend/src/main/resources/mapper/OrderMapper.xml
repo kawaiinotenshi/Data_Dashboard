@@ -9,6 +9,9 @@
         <result column="order_amount" property="orderAmount" jdbcType="DECIMAL"/>
         <result column="order_date" property="orderDate" jdbcType="TIMESTAMP"/>
         <result column="status" property="status" jdbcType="VARCHAR"/>
+        <result column="warehouse_id" property="warehouseId" jdbcType="BIGINT"/>
+        <result column="transport_id" property="transportId" jdbcType="BIGINT"/>
+        <result column="required_capacity" property="requiredCapacity" jdbcType="DECIMAL"/>
         <result column="created_time" property="createdTime" jdbcType="TIMESTAMP"/>
         <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP"/>
     </resultMap>

@@ -27,6 +27,9 @@ spring:
       validation-timeout: 5000
       pool-name: LogisticsHikariCP
       initialization-fail-timeout: 1
+    schema: classpath:schema.sql
+    initialization-mode: always
+    continue-on-error: true
 
   redis:
     host: ${REDIS_HOST:localhost}
@@ -87,7 +90,10 @@ mybatis-plus:
       logic-delete-field: isDeleted
       logic-delete-value: 1
       logic-not-delete-value: 0
-  mapper-locations: classpath:mapper/CustomerMapper.xml,classpath:mapper/InventoryMapper.xml,classpath:mapper/OrderMapper.xml,classpath:mapper/SupplierMapper.xml,classpath:mapper/TransportMapper.xml,classpath:mapper/WarehouseMapper.xml,classpath:mapper/DepartmentMapper.xml,classpath:mapper/EmployeeMapper.xml,classpath:mapper/UserMapper.xml
+      table-prefix: 
+    enable-sql-runner: true
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.logistics.entity
 
 logging:
   level:

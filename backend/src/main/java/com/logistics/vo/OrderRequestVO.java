@@ -24,4 +24,11 @@ public class OrderRequestVO {
     @Size(max = 20, message = "订单状态长度不能超过20个字符")
     @Pattern(regexp = "^(pending|processing|shipped|delivered|cancelled)$", message = "订单状态必须是pending、processing、shipped、delivered或cancelled之一")
     private String status;
+    
+    @NotNull(message = "仓库ID不能为空")
+    private Long warehouseId;
+    
+    @NotNull(message = "所需容量不能为空")
+    @DecimalMin(value = "0.0", message = "所需容量必须大于等于0")
+    private BigDecimal requiredCapacity;
 }

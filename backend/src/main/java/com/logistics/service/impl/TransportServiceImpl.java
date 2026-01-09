@@ -1,12 +1,17 @@
 package com.logistics.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.logistics.entity.Order;
 import com.logistics.entity.Transport;
 import com.logistics.mapper.TransportMapper;
+import com.logistics.service.OrderService;
 import com.logistics.service.TransportService;
+import com.logistics.util.WebSocketUtils;
 import com.logistics.vo.TransportRequestVO;
 import com.logistics.vo.TransportVO;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,6 +20,13 @@ import java.util.Map;
 
 @Service
 public class TransportServiceImpl extends BaseEntityServiceImpl<TransportMapper, Transport> implements TransportService {
+    
+    @Autowired
+    @Lazy
+    private OrderService orderService;
+    
+    @Autowired
+    private WebSocketUtils webSocketUtils;
     @Override
     public String getEntityName() {
         return "运输记录";
@@ -56,19 +68,46 @@ public class TransportServiceImpl extends BaseEntityServiceImpl<TransportMapper,
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean createTransport(TransportRequestVO transportRequestVO) {
-        return createEntity(transportRequestVO, Transport.class);
+        boolean result = createEntity(transportRequestVO, Transport.class);
+        if (result) {
+            // 广播所有数据更新
+            webSocketUtils.broadcastAllUpdates();
+        }
+        return result;
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean updateTransport(Long id, TransportRequestVO transportRequestVO) {
-        return updateEntity(id, transportRequestVO);
+        // 获取原运输任务
+        Transport oldTransport = getById(id);
+        if (oldTransport == null) {
+            return false;
+        }
+        
+        // 更新运输任务
+        Transport newTransport = new Transport();
+        BeanUtils.copyProperties(transportRequestVO, newTransport);
+        newTransport.setId(id);
+        boolean result = updateById(newTransport);
+        
+        if (result) {
+            // 广播所有数据更新
+            webSocketUtils.broadcastAllUpdates();
+        }
+        
+        return result;
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean deleteTransport(Long id) {
-        return deleteEntity(id);
+        boolean result = deleteEntity(id);
+        if (result) {
+            // 广播所有数据更新
+            webSocketUtils.broadcastAllUpdates();
+        }
+        return result;
     }
 
     @Override

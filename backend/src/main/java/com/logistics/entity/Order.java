@@ -17,4 +17,7 @@ public class Order extends BaseEntity {
     private BigDecimal orderAmount;
     private LocalDateTime orderDate;
     private String status;
+    private Long warehouseId; // 关联的仓库ID
+    private Long transportId; // 关联的运输任务ID
+    private BigDecimal requiredCapacity; // 订单所需容量
 }

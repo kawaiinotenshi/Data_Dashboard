@@ -1,6 +1,6 @@
 package com.logistics.service.impl;
 
-import com.logistics.controller.WebSocketController;
+import com.logistics.util.WebSocketUtils;
 import com.logistics.entity.Warehouse;
 import com.logistics.service.InventoryMonitorService;
 import com.logistics.service.WarehouseService;
@@ -19,14 +19,14 @@ import java.util.stream.Collectors;
 public class InventoryMonitorServiceImpl implements InventoryMonitorService {
 
     private final WarehouseService warehouseService;
-    private final WebSocketController webSocketController;
+    private final WebSocketUtils webSocketUtils;
     
     // 库存预警配置
     private Map<String, Object> alertConfig = new HashMap<>();
     
-    public InventoryMonitorServiceImpl(WarehouseService warehouseService, WebSocketController webSocketController) {
+    public InventoryMonitorServiceImpl(WarehouseService warehouseService, WebSocketUtils webSocketUtils) {
         this.warehouseService = warehouseService;
-        this.webSocketController = webSocketController;
+        this.webSocketUtils = webSocketUtils;
         
         // 初始化预警配置（默认值）
         alertConfig.put("lowThreshold", new BigDecimal("20"));  // 低库存阈值：20%
@@ -53,9 +53,9 @@ public class InventoryMonitorServiceImpl implements InventoryMonitorService {
                 
                 // 如果是警告或错误级别的预警，广播通知
                 if ("WARN".equals(alert.getAlertLevel()) || "ERROR".equals(alert.getAlertLevel())) {
-                    webSocketController.broadcastSystemNotice(alert.getAlertMessage());
+                    webSocketUtils.broadcastSystemNotice(alert.getAlertMessage());
                     // 专门广播库存预警信息
-                    webSocketController.broadcastInventoryAlert(alert);
+                    webSocketUtils.broadcastInventoryAlert(alert);
                 }
             }
         }

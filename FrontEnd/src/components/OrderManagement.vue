@@ -269,7 +269,21 @@ const handleEditOrder = (row) => {
 
 const handleDeleteOrder = async (row) => {
   try {
+    // 1. 获取订单详情，以便后续进行库存回滚
+    const orderDetails = await api.order.getById(row.id)
+    
+    // 2. 删除订单
     await api.order.delete(row.id)
+    
+    // 3. 调用库存回滚API（如果后端提供了该接口）
+    try {
+      await api.order.rollbackInventory(row.id)
+      console.log('订单库存回滚成功')
+    } catch (rollbackError) {
+      console.warn('订单库存回滚失败:', rollbackError)
+      // 库存回滚失败不影响订单删除的成功提示
+    }
+    
     ElMessage.success('删除订单成功')
     await getOrders()
   } catch (error) {

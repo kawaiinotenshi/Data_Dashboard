@@ -47,7 +47,7 @@ const routes = [
       { 
         path: 'departments', 
         name: 'DepartmentManagement', 
-        component: () => import('../components/EmployeeManagement.vue'),
+        component: () => import('../components/DepartmentManagement.vue'),
         meta: { requiresAuth: true, roles: ['admin'] } // 仅管理员可访问
       },
       // 新增数据管理路由

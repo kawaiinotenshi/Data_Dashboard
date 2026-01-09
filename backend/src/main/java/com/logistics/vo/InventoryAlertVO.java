@@ -47,6 +47,11 @@ public class InventoryAlertVO {
     private String alertMessage;
     
     /**
+     * 预警时间戳
+     */
+    private Long timestamp;
+    
+    /**
      * 低库存阈值
      */
     private BigDecimal lowThreshold;

@@ -2,6 +2,7 @@ package com.logistics.controller;
 
 import com.logistics.common.Result;
 import com.logistics.service.TransportService;
+import com.logistics.util.WebSocketUtils;
 import com.logistics.vo.TransportVO;
 import com.logistics.vo.TransportRequestVO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,12 +16,12 @@ import java.util.Map;
 @CrossOrigin
 public class TransportController {
     private final TransportService transportService;
-    private final WebSocketController webSocketController;
+    private final WebSocketUtils webSocketUtils;
 
     @Autowired
-    public TransportController(TransportService transportService, WebSocketController webSocketController) {
+    public TransportController(TransportService transportService, WebSocketUtils webSocketUtils) {
         this.transportService = transportService;
-        this.webSocketController = webSocketController;
+        this.webSocketUtils = webSocketUtils;
     }
 
     @GetMapping("/list")
@@ -45,7 +46,7 @@ public class TransportController {
     public Result<Void> createTransport(@RequestBody TransportRequestVO transportRequestVO) {
         transportService.createTransport(transportRequestVO);
         // 广播物流任务更新
-        webSocketController.broadcastTransportUpdate();
+        webSocketUtils.broadcastTransportUpdate();
         return Result.success();
     }
 
@@ -53,7 +54,7 @@ public class TransportController {
     public Result<Void> updateTransport(@PathVariable Long id, @RequestBody TransportRequestVO transportRequestVO) {
         transportService.updateTransport(id, transportRequestVO);
         // 广播物流任务更新
-        webSocketController.broadcastTransportUpdate();
+        webSocketUtils.broadcastTransportUpdate();
         return Result.success();
     }
 
@@ -62,7 +63,7 @@ public class TransportController {
         boolean success = transportService.deleteTransport(id);
         if (success) {
             // 广播物流任务更新
-            webSocketController.broadcastTransportUpdate();
+            webSocketUtils.broadcastTransportUpdate();
             return Result.success();
         } else {
             return Result.error("删除运输记录失败");
@@ -74,7 +75,7 @@ public class TransportController {
         boolean success = transportService.batchDeleteTransports(ids);
         if (success) {
             // 广播物流任务更新
-            webSocketController.broadcastTransportUpdate();
+            webSocketUtils.broadcastTransportUpdate();
             return Result.success();
         } else {
             return Result.error("批量删除运输记录失败");

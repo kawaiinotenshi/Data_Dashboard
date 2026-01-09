@@ -1,11 +1,11 @@
 package com.logistics.component;
 
-import com.logistics.controller.WebSocketController;
 import com.logistics.entity.Transport;
 import com.logistics.entity.Warehouse;
 import com.logistics.service.InventoryMonitorService;
 import com.logistics.service.TransportService;
 import com.logistics.service.WarehouseService;
+import com.logistics.util.WebSocketUtils;
 import com.logistics.vo.TransportStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -32,7 +32,7 @@ public class SimulationRunner {
     private InventoryMonitorService inventoryMonitorService;
 
     @Autowired
-    private WebSocketController webSocketController;
+    private WebSocketUtils webSocketUtils;
 
     private final Random random = new Random();
 
@@ -66,11 +66,11 @@ public class SimulationRunner {
             }
 
             // 广播更新
-            webSocketController.broadcastTransportUpdate();
-            webSocketController.broadcastSystemNotice("物流任务状态更新完成");
+            webSocketUtils.broadcastTransportUpdate();
+            webSocketUtils.broadcastSystemNotice("物流任务状态更新完成");
         } catch (Exception e) {
             e.printStackTrace();
-            webSocketController.broadcastSystemNotice("物流任务状态更新失败: " + e.getMessage());
+            webSocketUtils.broadcastSystemNotice("物流任务状态更新失败: " + e.getMessage());
         }
     }
 
@@ -110,11 +110,11 @@ public class SimulationRunner {
             }
 
             // 广播更新
-            webSocketController.broadcastWarehouseUpdate();
-            webSocketController.broadcastSystemNotice("仓库库存更新完成");
+            webSocketUtils.broadcastWarehouseUpdate();
+            webSocketUtils.broadcastSystemNotice("仓库库存更新完成");
         } catch (Exception e) {
             e.printStackTrace();
-            webSocketController.broadcastSystemNotice("仓库库存更新失败: " + e.getMessage());
+            webSocketUtils.broadcastSystemNotice("仓库库存更新失败: " + e.getMessage());
         }
     }
 
@@ -130,11 +130,11 @@ public class SimulationRunner {
             // orderService.createOrder(orderRequestVO);
             
             // 广播更新
-            webSocketController.broadcastOrderUpdate();
-            webSocketController.broadcastSystemNotice("新订单生成完成");
+            webSocketUtils.broadcastOrderUpdate();
+            webSocketUtils.broadcastSystemNotice("新订单生成完成");
         } catch (Exception e) {
             e.printStackTrace();
-            webSocketController.broadcastSystemNotice("新订单生成失败: " + e.getMessage());
+            webSocketUtils.broadcastSystemNotice("新订单生成失败: " + e.getMessage());
         }
     }
 
@@ -143,7 +143,7 @@ public class SimulationRunner {
      */
     @Scheduled(fixedRate = 20000)
     public void broadcastAllData() {
-        webSocketController.broadcastAllUpdates();
+        webSocketUtils.broadcastAllUpdates();
     }
 
     /**
@@ -175,7 +175,7 @@ public class SimulationRunner {
             inventoryMonitorService.checkInventoryLevels();
         } catch (Exception e) {
             e.printStackTrace();
-            webSocketController.broadcastSystemNotice("库存检查失败: " + e.getMessage());
+            webSocketUtils.broadcastSystemNotice("库存检查失败: " + e.getMessage());
         }
     }
 }
