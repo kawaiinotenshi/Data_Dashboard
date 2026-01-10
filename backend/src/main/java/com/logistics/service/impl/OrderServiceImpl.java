@@ -8,11 +8,13 @@ import com.logistics.mapper.OrderMapper;
 import com.logistics.service.OrderService;
 import com.logistics.service.TransportService;
 import com.logistics.service.WarehouseService;
+import com.logistics.service.BusinessQuarterlyService;
 import com.logistics.vo.InventoryAlertVO;
 import com.logistics.vo.OrderRequestVO;
 import com.logistics.vo.OrderVO;
 import com.logistics.vo.TransportRequestVO;
 import com.logistics.util.WebSocketUtils;
+import com.logistics.util.OrderNoGenerator;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,6 +37,12 @@ public class OrderServiceImpl extends BaseEntityServiceImpl<OrderMapper, Order> 
     
     @Autowired
     private WebSocketUtils webSocketUtils;
+    
+    @Autowired
+    private BusinessQuarterlyService businessQuarterlyService;
+    
+    @Autowired
+    private OrderNoGenerator orderNoGenerator;
     
     @Override
     public String getEntityName() {
@@ -88,10 +96,19 @@ public class OrderServiceImpl extends BaseEntityServiceImpl<OrderMapper, Order> 
         Order order = new Order();
         BeanUtils.copyProperties(orderRequestVO, order);
         
+        // 自动生成订单号
+        String orderNo = orderNoGenerator.generateOrderNo();
+        order.setOrderNo(orderNo);
+        
+        // 设置创建时间
+        if (order.getOrderDate() == null) {
+            order.setOrderDate(LocalDateTime.now());
+        }
+        
         // 保存订单
         boolean result = save(order);
         if (result) {
-            // 获取仓库信息
+            // 1. 扣减仓库库存
             Warehouse warehouse = warehouseService.getWarehouseById(order.getWarehouseId());
             if (warehouse != null) {
                 // 计算当前可用容量（通过capacity和throughput计算）
@@ -108,39 +125,59 @@ public class OrderServiceImpl extends BaseEntityServiceImpl<OrderMapper, Order> 
                 BigDecimal newThroughput = warehouse.getThroughput().add(order.getRequiredCapacity());
                 warehouse.setThroughput(newThroughput);
                 // 更新利用率
-                warehouse.setUtilizationRate(newThroughput.divide(warehouse.getCapacity(), 2, BigDecimal.ROUND_HALF_UP).multiply(BigDecimal.valueOf(100)));
+                BigDecimal utilization = newThroughput.divide(warehouse.getCapacity(), 2, BigDecimal.ROUND_HALF_UP).multiply(BigDecimal.valueOf(100));
+                warehouse.setUtilizationRate(utilization);
+                
+                // 设置仓库状态
+                int status = 0; // 0: 正常
+                if (utilization.compareTo(BigDecimal.valueOf(90)) > 0) {
+                    status = 2; // 2: 高库存警告
+                } else if (utilization.compareTo(BigDecimal.valueOf(10)) < 0) {
+                    status = 1; // 1: 低库存警告
+                }
+                warehouse.setStatus(status);
+                
                 warehouseService.updateById(warehouse);
                 
-                // 检查仓库利用率，触发预警
-                BigDecimal totalCapacity = warehouse.getCapacity();
-                BigDecimal utilization = newThroughput.divide(totalCapacity, 2, BigDecimal.ROUND_HALF_UP).multiply(BigDecimal.valueOf(100));
-                
                 // 利用率 >90% 或 <10% 时触发预警
-                if (utilization.compareTo(BigDecimal.valueOf(90)) > 0) {
-                    // 发送库存预警
+                if (status != 0) {
                     InventoryAlertVO alert = new InventoryAlertVO();
                     alert.setWarehouseId(warehouse.getId());
                     alert.setWarehouseName(warehouse.getName());
-                    alert.setAlertType("burst");
-                    alert.setAlertMessage("仓库" + warehouse.getName() + "利用率已超过90%，当前可用容量：" + newAvailableCapacity);
-                    alert.setTimestamp(System.currentTimeMillis());
-                    // 广播库存预警
-                    webSocketUtils.broadcastInventoryAlert(alert);
-                } else if (utilization.compareTo(BigDecimal.valueOf(10)) < 0) {
-                    // 发送库存预警
-                    InventoryAlertVO alert = new InventoryAlertVO();
-                    alert.setWarehouseId(warehouse.getId());
-                    alert.setWarehouseName(warehouse.getName());
-                    alert.setAlertType("vacancy");
-                    alert.setAlertMessage("仓库" + warehouse.getName() + "利用率低于10%，当前可用容量：" + newAvailableCapacity);
+                    alert.setAlertType(status == 2 ? "burst" : "vacancy");
+                    alert.setAlertMessage("仓库" + warehouse.getName() + "利用率已" + (status == 2 ? "超过90%" : "低于10%") + "，当前可用容量：" + newAvailableCapacity);
                     alert.setTimestamp(System.currentTimeMillis());
                     // 广播库存预警
                     webSocketUtils.broadcastInventoryAlert(alert);
                 }
-                
-                // 广播所有数据更新
-                webSocketUtils.broadcastAllUpdates();
             }
+            
+            // 2. 生成物流任务
+            TransportRequestVO transportRequest = new TransportRequestVO();
+            transportRequest.setVehicleType("货车"); // 根据业务逻辑确定
+            transportRequest.setVehicleCount(1);
+            transportRequest.setTotalDistance(new BigDecimal(100)); // 实际应计算
+            transportRequest.setStatus("待发货");
+            transportRequest.setMonth(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM")));
+            transportRequest.setOrderId(order.getId());
+            
+            // 调用物流服务创建任务
+            transportService.createTransport(transportRequest);
+            
+            // 3. 更新业务季度统计表
+            if (order.getOrderDate() != null && order.getOrderAmount() != null) {
+                java.time.LocalDate orderDate = order.getOrderDate().toLocalDate();
+                int year = orderDate.getYear();
+                // 计算季度（1-4）
+                int quarter = (orderDate.getMonthValue() - 1) / 3 + 1;
+                
+                // 默认业务类型为运输业务
+                String businessType = "运输业务";
+                businessQuarterlyService.updateQuarterlyAmount(year, quarter, businessType, order.getOrderAmount());
+            }
+            
+            // 广播所有数据更新
+            webSocketUtils.broadcastAllUpdates();
         }
         return result;
     }
@@ -199,12 +236,21 @@ public class OrderServiceImpl extends BaseEntityServiceImpl<OrderMapper, Order> 
                 BigDecimal newAvailableCapacity = warehouse.getCapacity().subtract(newThroughput);
                 
                 // 更新利用率
-                warehouse.setUtilizationRate(newThroughput.divide(warehouse.getCapacity(), 2, BigDecimal.ROUND_HALF_UP).multiply(BigDecimal.valueOf(100)));
+                BigDecimal utilization = newThroughput.divide(warehouse.getCapacity(), 2, BigDecimal.ROUND_HALF_UP).multiply(BigDecimal.valueOf(100));
+                warehouse.setUtilizationRate(utilization);
+                
+                // 设置仓库状态
+                if (utilization.compareTo(BigDecimal.valueOf(90)) > 0) {
+                    warehouse.setStatus(2); // 2: 高库存警告
+                } else if (utilization.compareTo(BigDecimal.valueOf(10)) < 0) {
+                    warehouse.setStatus(1); // 1: 低库存警告
+                } else {
+                    warehouse.setStatus(0); // 0: 正常
+                }
+                
                 warehouseService.updateById(warehouse);
                 
                 // 检查回滚后的仓库利用率
-                BigDecimal totalCapacity = warehouse.getCapacity();
-                BigDecimal utilization = newThroughput.divide(totalCapacity, 2, BigDecimal.ROUND_HALF_UP).multiply(BigDecimal.valueOf(100));
                 System.out.println("订单取消：仓库" + warehouse.getName() + "容量已回滚，当前可用容量：" + newAvailableCapacity + "，利用率：" + utilization + "%");
                 
                 // 发送库存预警（如果需要）
@@ -247,7 +293,12 @@ public class OrderServiceImpl extends BaseEntityServiceImpl<OrderMapper, Order> 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean batchCreateOrders(List<OrderRequestVO> orderRequestVOs) {
-        return batchCreateEntities(orderRequestVOs, Order.class);
+        boolean result = batchCreateEntities(orderRequestVOs, Order.class);
+        if (result) {
+            // 广播所有数据更新，确保随机生成订单时的连锁反应
+            webSocketUtils.broadcastAllUpdates();
+        }
+        return result;
     }
 
     @Override

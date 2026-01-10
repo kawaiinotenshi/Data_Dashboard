@@ -6,6 +6,7 @@ import com.logistics.entity.Transport;
 import com.logistics.mapper.TransportMapper;
 import com.logistics.service.OrderService;
 import com.logistics.service.TransportService;
+import com.logistics.util.CoordinateUtils;
 import com.logistics.util.WebSocketUtils;
 import com.logistics.vo.TransportRequestVO;
 import com.logistics.vo.TransportVO;
@@ -68,7 +69,23 @@ public class TransportServiceImpl extends BaseEntityServiceImpl<TransportMapper,
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean createTransport(TransportRequestVO transportRequestVO) {
-        boolean result = createEntity(transportRequestVO, Transport.class);
+        // 创建运输任务
+        Transport transport = new Transport();
+        BeanUtils.copyProperties(transportRequestVO, transport);
+        
+        // 设置坐标信息
+        if (transport.getOrigin() != null) {
+            transport.setOriginLng(CoordinateUtils.getLongitudeByCity(transport.getOrigin()));
+            transport.setOriginLat(CoordinateUtils.getLatitudeByCity(transport.getOrigin()));
+        }
+        
+        if (transport.getDestination() != null) {
+            transport.setDestinationLng(CoordinateUtils.getLongitudeByCity(transport.getDestination()));
+            transport.setDestinationLat(CoordinateUtils.getLatitudeByCity(transport.getDestination()));
+        }
+        
+        // 保存运输任务
+        boolean result = save(transport);
         if (result) {
             // 广播所有数据更新
             webSocketUtils.broadcastAllUpdates();
@@ -89,6 +106,24 @@ public class TransportServiceImpl extends BaseEntityServiceImpl<TransportMapper,
         Transport newTransport = new Transport();
         BeanUtils.copyProperties(transportRequestVO, newTransport);
         newTransport.setId(id);
+        
+        // 更新坐标信息（与创建时保持一致的逻辑）
+        if (newTransport.getOrigin() != null) {
+            newTransport.setOriginLng(CoordinateUtils.getLongitudeByCity(newTransport.getOrigin()));
+            newTransport.setOriginLat(CoordinateUtils.getLatitudeByCity(newTransport.getOrigin()));
+        } else {
+            newTransport.setOriginLng(null);
+            newTransport.setOriginLat(null);
+        }
+        
+        if (newTransport.getDestination() != null) {
+            newTransport.setDestinationLng(CoordinateUtils.getLongitudeByCity(newTransport.getDestination()));
+            newTransport.setDestinationLat(CoordinateUtils.getLatitudeByCity(newTransport.getDestination()));
+        } else {
+            newTransport.setDestinationLng(null);
+            newTransport.setDestinationLat(null);
+        }
+        
         boolean result = updateById(newTransport);
         
         if (result) {

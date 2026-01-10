@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.logistics.mapper.BusinessQuarterlyMapper">
+    
+    <select id="selectByYearQuarterAndType" resultType="com.logistics.entity.BusinessQuarterly">
+        SELECT * FROM business_quarterly 
+        WHERE year = #{year} 
+        AND quarter = #{quarter} 
+        AND business_type = #{businessType}
+        AND is_deleted = 0
+    </select>
+    
+    <update id="updateAmountByYearQuarterAndType">
+        UPDATE business_quarterly 
+        SET amount = amount + #{amount}, 
+            updated_at = CURRENT_TIMESTAMP, 
+            version = version + 1
+        WHERE year = #{year} 
+        AND quarter = #{quarter} 
+        AND business_type = #{businessType}
+        AND is_deleted = 0
+    </update>
+    
+</mapper>

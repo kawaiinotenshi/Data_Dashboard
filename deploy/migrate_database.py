@@ -9,6 +9,7 @@ try:
         "ALTER TABLE orders ADD COLUMN is_deleted tinyint DEFAULT 0 AFTER updated_time",
         "ALTER TABLE orders ADD COLUMN version int DEFAULT 0 AFTER is_deleted",
 
+        "ALTER TABLE warehouse ADD COLUMN status int DEFAULT 0 AFTER throughput",
         "ALTER TABLE warehouse ADD COLUMN is_deleted tinyint DEFAULT 0 AFTER updated_time",
         "ALTER TABLE warehouse ADD COLUMN version int DEFAULT 0 AFTER is_deleted",
 
@@ -21,7 +22,9 @@ try:
         "ALTER TABLE supplier ADD COLUMN version int DEFAULT 0 AFTER is_deleted",
 
         "ALTER TABLE transport ADD COLUMN status varchar(20) DEFAULT '运输中' AFTER month",
-        "ALTER TABLE transport ADD COLUMN updated_time datetime NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP AFTER status",
+        "ALTER TABLE transport ADD COLUMN origin VARCHAR(200) NULL AFTER status",
+        "ALTER TABLE transport ADD COLUMN destination VARCHAR(200) NULL AFTER origin",
+        "ALTER TABLE transport ADD COLUMN updated_time datetime NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP AFTER destination",
         "ALTER TABLE transport ADD COLUMN is_deleted tinyint DEFAULT 0 AFTER updated_time",
         "ALTER TABLE transport ADD COLUMN version int DEFAULT 0 AFTER is_deleted",
 

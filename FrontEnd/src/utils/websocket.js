@@ -21,8 +21,8 @@ class WebSocketService {
     }
 
     try {
-      // 创建SockJS连接，使用完整URL（去掉API_BASE_URL中的/api后缀）
-      const baseUrl = import.meta.env.VITE_API_BASE_URL ? import.meta.env.VITE_API_BASE_URL.replace('/api', '') : 'http://localhost:8081'
+      // 创建SockJS连接，使用完整URL
+      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8081'
       const socket = new SockJS(baseUrl + '/ws', null, { timeout: this.connectionTimeout })
       this.stompClient = Stomp.over(socket)
 
@@ -86,20 +86,32 @@ class WebSocketService {
 
     // 订阅物流任务更新
     this.stompClient.subscribe('/topic/transports', (message) => {
-      console.log('收到物流任务更新:', message.body)
-      const transportStore = useTransportStore()
-      try {
-        const data = JSON.parse(message.body)
-        transportStore.updateTransportTasks(data)
-      } catch (error) {
-        console.error('解析物流任务更新数据失败:', error)
-      }
+        console.log('收到物流任务更新:', message.body)
+        const transportStore = useTransportStore()
+        try {
+            const data = JSON.parse(message.body)
+            transportStore.updateTransportTasks(data)
+        } catch (error) {
+            console.error('解析物流任务更新数据失败:', error)
+        }
+    })
+
+    // 订阅运输路线更新
+    this.stompClient.subscribe('/topic/transportRoutes', (message) => {
+        console.log('收到运输路线更新:', message.body)
+        try {
+            const routes = JSON.parse(message.body)
+            // 通知所有组件更新运输路线
+            window.dispatchEvent(new CustomEvent('transportRoutesUpdated', { detail: routes }))
+        } catch (error) {
+            console.error('解析运输路线更新数据失败:', error)
+        }
     })
 
     // 订阅库存预警
     this.stompClient.subscribe('/topic/inventoryAlerts', (message) => {
-      console.log('收到库存预警:', message.body)
-      // 处理库存预警
+        console.log('收到库存预警:', message.body)
+        // 处理库存预警
     })
   }
 

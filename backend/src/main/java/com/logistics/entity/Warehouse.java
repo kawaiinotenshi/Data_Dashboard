@@ -18,4 +18,5 @@ public class Warehouse extends BaseEntity {
     private BigDecimal utilizationRate;
     private BigDecimal capacity;
     private BigDecimal throughput;
+    private Integer status; // 0: 正常, 1: 低库存警告, 2: 高库存警告
 }

@@ -112,11 +112,49 @@
         ref="formRef"
         label-width="120px"
       >
-        <el-form-item label="订单编号" prop="orderNumber">
-          <el-input v-model="formData.orderNumber" placeholder="请输入订单编号" />
+        <el-form-item label="订单编号" prop="orderNumber" v-if="isEditMode">
+          <el-input v-model="formData.orderNumber" placeholder="订单编号" readonly />
         </el-form-item>
-        <el-form-item label="客户名称" prop="customerName">
-          <el-input v-model="formData.customerName" placeholder="请输入客户名称" />
+        <el-form-item label="客户" prop="customerId">
+          <el-select v-model="formData.customerId" placeholder="请选择客户">
+            <el-option
+              v-for="customer in customers"
+              :key="customer.id"
+              :label="customer.name"
+              :value="customer.id"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="仓库" prop="warehouseId">
+          <el-select v-model="formData.warehouseId" placeholder="请选择仓库">
+            <el-option
+              v-for="warehouse in warehouses"
+              :key="warehouse.id"
+              :label="warehouse.name"
+              :value="warehouse.id"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="产品" prop="productId">
+          <el-select v-model="formData.productId" placeholder="请选择产品" @change="handleProductChange">
+            <el-option
+              v-for="product in products"
+              :key="product.id"
+              :label="product.name"
+              :value="product.id"
+              :data-price="product.price"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="数量" prop="quantity">
+          <el-input-number
+            v-model="formData.quantity"
+            :min="1"
+            :step="1"
+            style="width: 100%"
+            placeholder="请输入数量"
+            @change="handleQuantityChange"
+          />
         </el-form-item>
         <el-form-item label="订单日期" prop="orderDate">
           <el-date-picker
@@ -132,7 +170,8 @@
             :min="0"
             :precision="2"
             style="width: 100%"
-            placeholder="请输入订单金额"
+            placeholder="订单金额"
+            readonly
           />
         </el-form-item>
         <el-form-item label="订单状态" prop="status">
@@ -167,7 +206,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { Search, Plus, Edit, Delete, UploadFilled, Document } from '@element-plus/icons-vue'
 import { ElMessage, ElLoading } from 'element-plus'
-import api from '../api'
+import { api } from '../api'
 
 // 响应式数据
 const searchKeyword = ref('')
@@ -181,39 +220,53 @@ const formRef = ref(null)
 const orders = ref([])
 const fileList = ref([])
 
-// 表单规则
-const formRules = {
-  orderNumber: [
-    { required: true, message: '请输入订单编号', trigger: 'blur' },
-    { pattern: /^ORD\d{8}$/, message: '订单编号格式应为ORD+8位数字', trigger: 'blur' },
-    {
-      validator: async (rule, value, callback) => {
-        try {
-          const response = await api.order.checkNumberUnique(value, formData.value.id)
-          if (!response.data) {
-            callback(new Error('该订单编号已存在'))
+// 选择器数据源
+const warehouses = ref([])
+const customers = ref([])
+const products = ref([])
+
+// 表单规则 - 使用计算属性动态生成
+const formRules = computed(() => {
+  return {
+    orderNumber: [
+      { required: isEditMode.value, message: '订单编号不能为空', trigger: 'blur' },
+      { pattern: /^ORD\d{12}$/, message: '订单编号格式应为ORD+12位数字', trigger: 'blur' },
+      {
+        validator: async (rule, value, callback) => {
+          if (isEditMode.value && value) {
+            try {
+              const response = await api.order.checkNumberUnique(value, formData.value.id)
+              if (!response.data) {
+                callback(new Error('该订单编号已存在'))
+              } else {
+                callback()
+              }
+            } catch (error) {
+              callback(new Error('验证订单编号失败'))
+            }
           } else {
             callback()
           }
-        } catch (error) {
-          callback(new Error('验证订单编号失败'))
-        }
-      },
-      trigger: 'blur'
-    }
-  ],
-  customerName: [
-    { required: true, message: '请输入客户名称', trigger: 'blur' },
-    { min: 2, max: 50, message: '客户名称长度应在2-50个字符之间', trigger: 'blur' }
-  ],
-  orderDate: [{ required: true, message: '请选择订单日期', trigger: 'change' }],
-  totalAmount: [
-    { required: true, message: '请输入订单金额', trigger: 'blur' },
-    { type: 'number', min: 0.01, message: '订单金额必须大于0', trigger: 'blur' }
-  ],
-  status: [{ required: true, message: '请选择订单状态', trigger: 'change' }],
-  paymentStatus: [{ required: true, message: '请选择支付状态', trigger: 'change' }]
-}
+        },
+        trigger: 'blur'
+      }
+    ],
+    customerId: [{ required: true, message: '请选择客户', trigger: 'change' }],
+    warehouseId: [{ required: true, message: '请选择仓库', trigger: 'change' }],
+    productId: [{ required: true, message: '请选择产品', trigger: 'change' }],
+    quantity: [
+      { required: true, message: '请输入数量', trigger: 'blur' },
+      { type: 'number', min: 1, message: '数量必须大于0', trigger: 'blur' }
+    ],
+    orderDate: [{ required: true, message: '请选择订单日期', trigger: 'change' }],
+    totalAmount: [
+      { required: true, message: '订单金额不能为空', trigger: 'blur' },
+      { type: 'number', min: 0.01, message: '订单金额必须大于0', trigger: 'blur' }
+    ],
+    status: [{ required: true, message: '请选择订单状态', trigger: 'change' }],
+    paymentStatus: [{ required: true, message: '请选择支付状态', trigger: 'change' }]
+  }
+})
 
 // 计算属性
 const filteredOrders = computed(() => {
@@ -247,8 +300,10 @@ const getOrders = async () => {
 const handleAddOrder = () => {
   isEditMode.value = false
   formData.value = {
-    orderNumber: '',
-    customerName: '',
+    customerId: '',
+    warehouseId: '',
+    productId: '',
+    quantity: 1,
     orderDate: new Date(),
     totalAmount: 0,
     status: '待处理',
@@ -263,6 +318,10 @@ const handleEditOrder = (row) => {
   // 将日期字符串转换为Date对象
   if (row.orderDate) {
     formData.value.orderDate = new Date(row.orderDate)
+  }
+  // 如果订单没有quantity字段，默认设置为1
+  if (!formData.value.quantity) {
+    formData.value.quantity = 1
   }
   dialogVisible.value = true
 }
@@ -315,6 +374,9 @@ const handleSubmit = async () => {
 }
 
 const formatCurrency = (value) => {
+  if (value === undefined || value === null || isNaN(Number(value))) {
+    return '¥0.00'
+  }
   return `¥${Number(value).toFixed(2)}`
 }
 
@@ -346,6 +408,35 @@ const handleSizeChange = (size) => {
 
 const handleCurrentChange = (page) => {
   currentPage.value = page
+}
+
+// 产品选择变化处理
+const handleProductChange = () => {
+  // 当产品变化时，重新计算总价
+  calculateTotalAmount()
+}
+
+// 数量变化处理
+const handleQuantityChange = () => {
+  // 当数量变化时，重新计算总价
+  calculateTotalAmount()
+}
+
+// 计算订单总价
+const calculateTotalAmount = () => {
+  if (!formData.value.productId || !formData.value.quantity) {
+    formData.value.totalAmount = 0
+    return
+  }
+  
+  // 找到选中的产品
+  const selectedProduct = products.value.find(p => p.id === formData.value.productId)
+  if (selectedProduct && selectedProduct.price) {
+    // 计算总价
+    formData.value.totalAmount = selectedProduct.price * formData.value.quantity
+  } else {
+    formData.value.totalAmount = 0
+  }
 }
 
 // 文件上传相关方法
@@ -403,9 +494,57 @@ const handleImportExcel = async () => {
   }
 }
 
+// 加载选择器数据源
+const loadSelectData = async () => {
+  try {
+    // 防御性编程：检查api对象及其属性是否存在
+    if (!api) {
+      console.error('API对象未定义')
+      return
+    }
+    
+    // 加载仓库列表
+    if (api.warehouse && api.warehouse.list) {
+      try {
+        const warehouseResponse = await api.warehouse.list()
+        warehouses.value = warehouseResponse?.data || []
+      } catch (error) {
+        console.error('加载仓库列表失败:', error)
+        warehouses.value = []
+      }
+    }
+    
+    // 加载客户列表
+    if (api.customer && api.customer.list) {
+      try {
+        const customerResponse = await api.customer.list()
+        customers.value = customerResponse?.data || []
+      } catch (error) {
+        console.error('加载客户列表失败:', error)
+        customers.value = []
+      }
+    }
+    
+    // 加载产品列表
+    if (api.product && api.product.list) {
+      try {
+        const productResponse = await api.product.list()
+        products.value = productResponse?.data || []
+      } catch (error) {
+        console.error('加载产品列表失败:', error)
+        products.value = []
+      }
+    }
+  } catch (error) {
+    console.error('加载选择器数据失败:', error)
+    ElMessage.warning('部分选择器数据加载失败')
+  }
+}
+
 // 生命周期
 onMounted(async () => {
   await getOrders()
+  await loadSelectData()
 })
 </script>
 

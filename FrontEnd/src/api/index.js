@@ -73,6 +73,18 @@ export const api = {
     getContactRanking: () => request.get('/supplier/contact-ranking')
   },
   
+  product: {
+    list: () => request.get('/product/list'),
+    getById: (id) => request.get(`/product/${id}`),
+    create: (data) => request.post('/product', data),
+    update: (id, data) => request.put(`/product/${id}`, data),
+    delete: (id) => request.delete(`/product/${id}`),
+    batchDelete: (ids) => request.delete('/product/batch', { data: ids }),
+    getByName: (name) => request.get(`/product/name/${name}`),
+    getByCategory: (category) => request.get(`/product/category/${category}`),
+    getBySupplier: (supplierId) => request.get(`/product/supplier/${supplierId}`)
+  },
+  
   transport: {
     list: () => request.get('/transport/list'),
     getById: (id) => request.get(`/transport/${id}`),

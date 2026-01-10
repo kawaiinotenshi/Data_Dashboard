@@ -19,6 +19,20 @@ public class Transport extends BaseEntity {
     private String month;
     private String status;
     
+    // 新增起始地和目的地字段
+    private String origin;
+    private String destination;
+    
+    // 坐标字段
+    @TableField(exist = false)
+    private Double originLng;
+    @TableField(exist = false)
+    private Double originLat;
+    @TableField(exist = false)
+    private Double destinationLng;
+    @TableField(exist = false)
+    private Double destinationLat;
+    
     @TableField(exist = false)
     private Long orderId;
     

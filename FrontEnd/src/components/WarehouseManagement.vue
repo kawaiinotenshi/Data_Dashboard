@@ -23,16 +23,32 @@
     >
       <el-table-column prop="id" label="仓库ID" width="80" />
       <el-table-column prop="name" label="仓库名称" />
-      <el-table-column prop="location" label="位置" />
-      <el-table-column prop="totalCapacity" label="总容量" />
-      <el-table-column prop="usedCapacity" label="已用容量" />
-      <el-table-column prop="remainingCapacity" label="剩余容量" />
+      <el-table-column prop="location" label="位置">
+        <template #default="scope">
+          {{ scope.row.location || '未分配' }}
+        </template>
+      </el-table-column>
+      <el-table-column prop="area" label="面积">
+        <template #default="scope">
+          {{ scope.row.area || '未分配' }}
+        </template>
+      </el-table-column>
+      <el-table-column prop="capacity" label="容量">
+        <template #default="scope">
+          {{ scope.row.capacity || '未分配' }}
+        </template>
+      </el-table-column>
+      <el-table-column prop="throughput" label="吞吐量">
+        <template #default="scope">
+          {{ scope.row.throughput || '未分配' }}
+        </template>
+      </el-table-column>
       <el-table-column prop="utilizationRate" label="利用率" width="100">
         <template #default="scope">
           <el-progress
             type="line"
-            :percentage="Number(scope.row.utilizationRate)"
-            :color="getProgressColor(Number(scope.row.utilizationRate))"
+            :percentage="scope.row.utilizationRate ? Number(scope.row.utilizationRate) * 100 : 0"
+            :color="getProgressColor(scope.row.utilizationRate ? Number(scope.row.utilizationRate) * 100 : 0)"
             :stroke-width="8"
             :show-text="true"
           />
@@ -41,16 +57,18 @@
       <el-table-column prop="status" label="状态" width="100">
         <template #default="scope">
           <el-tag
-            :type="scope.row.status === '正常' ? 'success' : 'danger'"
+            :type="scope.row.status === 0 ? 'success' : scope.row.status === 1 ? 'warning' : 'danger'"
             size="small"
           >
-            {{ scope.row.status }}
+            {{ getStatusText(scope.row.status) }}
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="managerName" label="负责人" />
-      <el-table-column prop="contactNumber" label="联系电话" />
-      <el-table-column prop="createTime" label="创建时间" width="180" />
+      <el-table-column prop="createdTime" label="创建时间" width="180">
+        <template #default="scope">
+          {{ scope.row.createdTime || '未分配' }}
+        </template>
+      </el-table-column>
       <el-table-column label="操作" width="150" fixed="right">
         <template #default="scope">
           <el-button type="primary" size="small" @click="handleEdit(scope.row)">
@@ -94,35 +112,45 @@
         <el-form-item label="位置" prop="location">
           <el-input v-model="warehouseForm.location" placeholder="请输入仓库位置" />
         </el-form-item>
-        <el-form-item label="总容量" prop="totalCapacity">
+        <el-form-item label="面积" prop="area">
           <el-input-number
-            v-model="warehouseForm.totalCapacity"
+            v-model="warehouseForm.area"
             :min="0"
-            :step="100"
-            placeholder="请输入总容量"
+            :step="0.1"
+            placeholder="请输入面积"
           />
         </el-form-item>
-        <el-form-item label="已用容量" prop="usedCapacity">
+        <el-form-item label="容量" prop="capacity">
           <el-input-number
-            v-model="warehouseForm.usedCapacity"
+            v-model="warehouseForm.capacity"
             :min="0"
-            :max="warehouseForm.totalCapacity"
             :step="100"
-            placeholder="请输入已用容量"
+            placeholder="请输入容量"
+          />
+        </el-form-item>
+        <el-form-item label="吞吐量" prop="throughput">
+          <el-input-number
+            v-model="warehouseForm.throughput"
+            :min="0"
+            :step="10"
+            placeholder="请输入吞吐量"
+          />
+        </el-form-item>
+        <el-form-item label="利用率" prop="utilizationRate">
+          <el-input-number
+            v-model="warehouseForm.utilizationRate"
+            :min="0"
+            :max="1"
+            :step="0.01"
+            placeholder="请输入利用率（0-1之间）"
           />
         </el-form-item>
         <el-form-item label="状态" prop="status">
           <el-select v-model="warehouseForm.status" placeholder="请选择状态">
-            <el-option label="正常" value="正常" />
-            <el-option label="异常" value="异常" />
-            <el-option label="维护中" value="维护中" />
+            <el-option label="正常" value="0" />
+            <el-option label="低库存警告" value="1" />
+            <el-option label="高库存警告" value="2" />
           </el-select>
-        </el-form-item>
-        <el-form-item label="负责人" prop="managerName">
-          <el-input v-model="warehouseForm.managerName" placeholder="请输入负责人姓名" />
-        </el-form-item>
-        <el-form-item label="联系电话" prop="contactNumber">
-          <el-input v-model="warehouseForm.contactNumber" placeholder="请输入联系电话" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -157,65 +185,40 @@ const warehouseForm = ref({
   id: null,
   name: '',
   location: '',
-  totalCapacity: 0,
-  usedCapacity: 0,
-  status: '正常',
-  managerName: '',
-  contactNumber: ''
+  area: 0,
+  capacity: 0,
+  throughput: 0,
+  utilizationRate: 0,
+  status: 0
 })
 
 // 表单验证规则
 const rules = {
   name: [
     { required: true, message: '请输入仓库名称', trigger: 'blur' },
-    { min: 2, max: 50, message: '仓库名称长度应在2-50个字符之间', trigger: 'blur' },
-    {
-      validator: async (rule, value, callback) => {
-        try {
-          const response = await api.warehouse.checkNameUnique(value, warehouseForm.value.id)
-          if (!response.data) {
-            callback(new Error('该仓库名称已存在'))
-          } else {
-            callback()
-          }
-        } catch (error) {
-          callback(new Error('验证仓库名称失败'))
-        }
-      },
-      trigger: 'blur'
-    }
+    { min: 2, max: 50, message: '仓库名称长度应在2-50个字符之间', trigger: 'blur' }
   ],
   location: [
     { required: true, message: '请输入仓库位置', trigger: 'blur' },
     { min: 5, max: 100, message: '仓库位置长度应在5-100个字符之间', trigger: 'blur' }
   ],
-  totalCapacity: [
-    { required: true, message: '请输入总容量', trigger: 'blur' },
-    { type: 'number', min: 100, message: '总容量必须大于等于100', trigger: 'blur' }
+  area: [
+    { required: true, message: '请输入面积', trigger: 'blur' },
+    { type: 'number', min: 0.1, message: '面积必须大于0', trigger: 'blur' }
   ],
-  usedCapacity: [
-    { required: true, message: '请输入已用容量', trigger: 'blur' },
-    { type: 'number', min: 0, message: '已用容量不能为负数', trigger: 'blur' },
-    {
-      validator: (rule, value, callback) => {
-        if (warehouseForm.value.totalCapacity > 0 && value > warehouseForm.value.totalCapacity) {
-          callback(new Error('已用容量不能超过总容量'))
-        } else {
-          callback()
-        }
-      },
-      trigger: 'blur'
-    }
+  capacity: [
+    { required: true, message: '请输入容量', trigger: 'blur' },
+    { type: 'number', min: 100, message: '容量必须大于等于100', trigger: 'blur' }
   ],
-  status: [{ required: true, message: '请选择状态', trigger: 'change' }],
-  managerName: [
-    { required: true, message: '请输入负责人姓名', trigger: 'blur' },
-    { min: 2, max: 20, message: '负责人姓名长度应在2-20个字符之间', trigger: 'blur' }
+  throughput: [
+    { required: true, message: '请输入吞吐量', trigger: 'blur' },
+    { type: 'number', min: 0, message: '吞吐量不能为负数', trigger: 'blur' }
   ],
-  contactNumber: [
-    { required: true, message: '请输入联系电话', trigger: 'blur' },
-    { pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号码', trigger: 'blur' }
-  ]
+  utilizationRate: [
+    { required: true, message: '请输入利用率', trigger: 'blur' },
+    { type: 'number', min: 0, max: 1, message: '利用率必须在0-1之间', trigger: 'blur' }
+  ],
+  status: [{ required: true, message: '请选择状态', trigger: 'change' }]
 }
 
 // 过滤后的仓库数据
@@ -225,8 +228,7 @@ const filteredWarehouses = computed(() => {
   }
   return warehouses.value.filter(warehouse => 
     warehouse.name.includes(searchQuery.value) ||
-    warehouse.location.includes(searchQuery.value) ||
-    warehouse.managerName.includes(searchQuery.value)
+    warehouse.location.includes(searchQuery.value)
   )
 })
 
@@ -241,6 +243,16 @@ const getProgressColor = (percentage) => {
   if (percentage < 50) return '#67C23A'
   if (percentage < 80) return '#E6A23C'
   return '#F56C6C'
+}
+
+// 获取状态文本
+const getStatusText = (status) => {
+  const statusMap = {
+    0: '正常',
+    1: '低库存警告',
+    2: '高库存警告'
+  }
+  return statusMap[status] || '未知状态'
 }
 
 // 加载仓库数据
@@ -268,11 +280,11 @@ const handleAdd = () => {
     id: null,
     name: '',
     location: '',
-    totalCapacity: 0,
-    usedCapacity: 0,
-    status: '正常',
-    managerName: '',
-    contactNumber: ''
+    area: 0,
+    capacity: 0,
+    throughput: 0,
+    utilizationRate: 0,
+    status: 0
   }
   dialogVisible.value = true
 }
@@ -310,11 +322,10 @@ const handleSubmit = async () => {
   try {
     await warehouseFormRef.value.validate()
     
-    // 计算剩余容量
-    const remainingCapacity = warehouseForm.value.totalCapacity - warehouseForm.value.usedCapacity
+    // 将状态转换为数字类型
     const data = {
       ...warehouseForm.value,
-      remainingCapacity
+      status: Number(warehouseForm.value.status)
     }
     
     if (data.id) {

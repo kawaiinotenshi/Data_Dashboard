@@ -441,32 +441,81 @@ const handleSubmit = async () => {
     
     const data = { ...taskForm.value }
     
+    // 数据清洗和格式化
     // 将Date对象转换为字符串
     if (data.transportDate) {
       data.transportDate = data.transportDate.toISOString().split('T')[0]
+    } else {
+      delete data.transportDate
     }
+    
     if (data.estimatedArrivalTime) {
       data.estimatedArrivalTime = data.estimatedArrivalTime.toISOString()
+    } else {
+      delete data.estimatedArrivalTime
     }
+    
     if (data.actualArrivalTime) {
       data.actualArrivalTime = data.actualArrivalTime.toISOString()
+    } else {
+      delete data.actualArrivalTime
     }
+    
+    // 确保成本字段是数字
+    data.estimatedCost = Number(data.estimatedCost) || 0
+    if (data.actualCost !== null && data.actualCost !== undefined) {
+      data.actualCost = Number(data.actualCost)
+    } else {
+      delete data.actualCost
+    }
+    
+    // 确保起始地和目的地是有效的城市名称
+    if (!data.origin || data.origin.trim() === '') {
+      ElMessage.error('请输入有效的起始地')
+      return
+    }
+    
+    if (!data.destination || data.destination.trim() === '') {
+      ElMessage.error('请输入有效的目的地')
+      return
+    }
+    
+    data.origin = data.origin.trim()
+    data.destination = data.destination.trim()
     
     if (data.id) {
       // 编辑
-      await api.transport.update(data.id, data)
-      ElMessage.success('更新成功')
+      const response = await api.transport.update(data.id, data)
+      if (response.code === 200) {
+        ElMessage.success('更新成功')
+      } else {
+        ElMessage.error(`更新失败: ${response.message || '未知错误'}`)
+      }
     } else {
       // 新增
-      await api.transport.create(data)
-      ElMessage.success('创建成功')
+      const response = await api.transport.create(data)
+      if (response.code === 200) {
+        ElMessage.success('创建成功')
+      } else {
+        ElMessage.error(`创建失败: ${response.message || '未知错误'}`)
+      }
     }
     
     dialogVisible.value = false
     loadTasks()
   } catch (error) {
     if (error !== false) {
-      ElMessage.error('操作失败')
+      console.error('表单提交错误:', error)
+      if (error.response) {
+        // API错误
+        const message = error.response.data?.message || error.response.statusText || '操作失败'
+        ElMessage.error(`操作失败: ${message}`)
+      } else if (error.message) {
+        // 其他错误
+        ElMessage.error(`操作失败: ${error.message}`)
+      } else {
+        ElMessage.error('操作失败，请稍后重试')
+      }
     }
   }
 }

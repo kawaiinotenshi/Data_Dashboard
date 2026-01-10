@@ -20,4 +20,11 @@ public class TransportRequestVO {
     
     @NotBlank(message = "月份不能为空")
     private String month;
+    
+    // 新增起始地和目的地字段
+    private String origin;
+    private String destination;
+    
+    // 新增订单ID字段，用于关联订单
+    private Long orderId;
 }

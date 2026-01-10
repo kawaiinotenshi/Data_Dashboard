@@ -107,6 +107,8 @@ const warehouseData = computed(() => warehouseStore.warehouseList)
 
   // 库存异常的仓库列表
   const alertWarehouses = ref([])
+  // 运输路线数据
+  const transportRoutes = ref([])
 
   // 初始化地图
   const initChart8 = async () => {
@@ -190,26 +192,34 @@ const warehouseData = computed(() => warehouseStore.warehouseList)
         warehouseData.value.forEach(warehouse => {
           const city = warehouse.location || '北京'
           const coords = cityCoordinates[city]
-          if (coords) {
-            const scatterItem = {
-              name: warehouse.name,
-              value: [...coords, warehouse.utilizationRate || 0],
-              warehouseId: warehouse.id,
-              utilizationRate: warehouse.utilizationRate || 0,
-              capacity: warehouse.capacity || 0
-            }
-            
-            scatterData.push(scatterItem)
-            
-            // 根据库存状态分类
-            if (warehouse.utilizationRate < 20 || warehouse.utilizationRate > 80) {
-              if (warehouse.utilizationRate < 20) {
-                warningWarehouses.push(scatterItem)
-              } else {
-                errorWarehouses.push(scatterItem)
+          
+          // 严格检查坐标有效性
+          if (coords && Array.isArray(coords) && coords.length === 2) {
+            const [lng, lat] = coords
+            // 确保经纬度是有效的数字
+            if (typeof lng === 'number' && typeof lat === 'number' && !isNaN(lng) && !isNaN(lat)) {
+              const scatterItem = {
+                name: warehouse.name,
+                value: [lng, lat, warehouse.utilizationRate || 0],
+                warehouseId: warehouse.id,
+                utilizationRate: warehouse.utilizationRate || 0,
+                capacity: warehouse.capacity || 0,
+                status: warehouse.status || 0 // 0: 正常, 1: 低库存警告, 2: 高库存警告
               }
-            } else {
-              normalWarehouses.push(scatterItem)
+              
+              scatterData.push(scatterItem)
+              
+              // 根据仓库状态分类
+              if (scatterItem.status === 1) {
+                // 低库存警告
+                warningWarehouses.push(scatterItem)
+              } else if (scatterItem.status === 2) {
+                // 高库存警告
+                errorWarehouses.push(scatterItem)
+              } else {
+                // 正常
+                normalWarehouses.push(scatterItem)
+              }
             }
           }
         })
@@ -218,6 +228,142 @@ const warehouseData = computed(() => warehouseStore.warehouseList)
       console.error('获取仓库数据失败:', error)
     }
     
+      // 准备运输路线数据
+    let routesData = []
+    transportRoutes.value.forEach(route => {
+      // 确保origin和destination是城市名称，而不是直接的经纬度
+      const originCity = route.origin || '北京'
+      const destinationCity = route.destination || '上海'
+      
+      // 获取对应的经纬度坐标
+      const originCoords = cityCoordinates[originCity]
+      const destinationCoords = cityCoordinates[destinationCity]
+      
+      // 严格验证两端城市坐标的有效性
+      const isValidOrigin = originCoords && Array.isArray(originCoords) && originCoords.length === 2 && 
+                           typeof originCoords[0] === 'number' && typeof originCoords[1] === 'number' && 
+                           !isNaN(originCoords[0]) && !isNaN(originCoords[1])
+                            
+      const isValidDestination = destinationCoords && Array.isArray(destinationCoords) && destinationCoords.length === 2 && 
+                               typeof destinationCoords[0] === 'number' && typeof destinationCoords[1] === 'number' && 
+                               !isNaN(destinationCoords[0]) && !isNaN(destinationCoords[1])
+      
+      // 只有当两端城市都有有效坐标时，才添加这条路线
+      if (isValidOrigin && isValidDestination) {
+        routesData.push({
+          coords: [originCoords, destinationCoords],
+          lineStyle: {
+            color: route.status === 'pending' ? '#faad14' : '#1890ff'
+          },
+          effect: {
+            color: route.status === 'pending' ? '#faad14' : '#1890ff'
+          }
+        })
+      }
+    })
+    
+    // 确保地图数据已经加载完成后再添加飞线系列
+    const series = [
+      {
+        name: '仓库分布',
+        type: 'map',
+        mapType: 'china',
+        roam: true,
+        label: {
+          show: true,
+          color: '#fff'
+        },
+        itemStyle: {
+          borderColor: '#389BB7',
+          areaColor: '#389BB7'
+        },
+        emphasis: {
+          itemStyle: {
+            areaColor: '#2a333d'
+          }
+        },
+        data: mapData
+      },
+      {
+        name: '正常仓库',
+        type: 'scatter',
+        coordinateSystem: 'geo',
+        symbolSize: 8,
+        itemStyle: {
+          color: '#52c41a'
+        },
+        data: normalWarehouses
+      },
+      {
+        name: '低库存警告',
+        type: 'scatter',
+        coordinateSystem: 'geo',
+        symbolSize: 12,
+        itemStyle: {
+          color: '#faad14',
+          borderColor: '#fff',
+          borderWidth: 2
+        },
+        // 闪烁效果
+        effect: {
+          show: true,
+          period: 2,
+          trailLength: 0.1,
+          symbol: 'circle',
+          symbolSize: 20,
+          color: '#faad14'
+        },
+        data: warningWarehouses
+      },
+      {
+        name: '高库存警告',
+        type: 'scatter',
+        coordinateSystem: 'geo',
+        symbolSize: 15,
+        itemStyle: {
+          color: '#f5222d',
+          borderColor: '#fff',
+          borderWidth: 2
+        },
+        // 闪烁效果
+        effect: {
+          show: true,
+          period: 1,
+          trailLength: 0.2,
+          symbol: 'circle',
+          symbolSize: 25,
+          color: '#f5222d'
+        },
+        data: errorWarehouses
+      }
+    ]
+    
+    // 只有当有有效路线数据时，才添加飞线系列
+    if (routesData.length > 0) {
+      series.push({
+        name: '运输路线',
+        type: 'lines',
+        coordinateSystem: 'geo',
+        zlevel: 2,
+        effect: {
+          show: true,
+          period: 4,
+          trailLength: 0.3,
+          symbol: 'arrow',
+          symbolSize: 5
+        },
+        lineStyle: {
+          normal: {
+            color: '#1890ff',
+            width: 2,
+            opacity: 0.8,
+            curveness: 0.3
+          }
+        },
+        data: routesData
+      })
+    }
+
     const option = {
       tooltip: {
         trigger: 'item'
@@ -233,80 +379,7 @@ const warehouseData = computed(() => warehouseStore.warehouseList)
         },
         calculable: true
       },
-      series: [
-        {
-          name: '仓库分布',
-          type: 'map',
-          mapType: 'china',
-          roam: true,
-          label: {
-            show: true,
-            color: '#fff'
-          },
-          itemStyle: {
-            borderColor: '#389BB7',
-            areaColor: '#389BB7'
-          },
-          emphasis: {
-            itemStyle: {
-              areaColor: '#2a333d'
-            }
-          },
-          data: mapData
-        },
-        {
-          name: '正常仓库',
-          type: 'scatter',
-          coordinateSystem: 'geo',
-          symbolSize: 8,
-          itemStyle: {
-            color: '#52c41a'
-          },
-          data: normalWarehouses
-        },
-        {
-          name: '低库存警告',
-          type: 'scatter',
-          coordinateSystem: 'geo',
-          symbolSize: 12,
-          itemStyle: {
-            color: '#faad14',
-            borderColor: '#fff',
-            borderWidth: 2
-          },
-          // 闪烁效果
-          effect: {
-            show: true,
-            period: 2,
-            trailLength: 0.1,
-            symbol: 'circle',
-            symbolSize: 20,
-            color: '#faad14'
-          },
-          data: warningWarehouses
-        },
-        {
-          name: '高库存警告',
-          type: 'scatter',
-          coordinateSystem: 'geo',
-          symbolSize: 15,
-          itemStyle: {
-            color: '#f5222d',
-            borderColor: '#fff',
-            borderWidth: 2
-          },
-          // 闪烁效果
-          effect: {
-            show: true,
-            period: 1,
-            trailLength: 0.2,
-            symbol: 'circle',
-            symbolSize: 25,
-            color: '#f5222d'
-          },
-          data: errorWarehouses
-        }
-      ]
+      series: series
     }
     chart8.setOption(option)
 
@@ -508,6 +581,12 @@ const handleResize = () => {
   chart7 && chart7.resize()
 }
 
+// 处理运输路线更新
+const handleTransportRoutesUpdate = (event) => {
+  transportRoutes.value = event.detail
+  initChart8() // 重新初始化地图以显示新的路线
+}
+
 onMounted(async () => {
   // 先从store获取仓库数据
   await warehouseStore.fetchWarehouseList()
@@ -516,10 +595,13 @@ onMounted(async () => {
   initChart6()
   initChart7()
   window.addEventListener('resize', handleResize)
+  // 添加运输路线更新事件监听
+  window.addEventListener('transportRoutesUpdated', handleTransportRoutesUpdate)
 })
 
 onUnmounted(() => {
   window.removeEventListener('resize', handleResize)
+  window.removeEventListener('transportRoutesUpdated', handleTransportRoutesUpdate)
   resizeObserver8 && resizeObserver8.disconnect()
   resizeObserver6 && resizeObserver6.disconnect()
   resizeObserver7 && resizeObserver7.disconnect()

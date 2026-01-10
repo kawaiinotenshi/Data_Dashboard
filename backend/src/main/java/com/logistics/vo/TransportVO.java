@@ -14,6 +14,12 @@ public class TransportVO {
     private String status;
     private String vehicleNo;
     private String driver;
+    private String origin;
+    private String destination;
+    private Double originLng;
+    private Double originLat;
+    private Double destinationLng;
+    private Double destinationLat;
     private LocalDateTime createdTime;
     private LocalDateTime updatedTime;
 }
